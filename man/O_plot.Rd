@@ -4,7 +4,8 @@
 \alias{O_plot}
 \title{Plot an object spectrum}
 \usage{
-O_plot(spct, w.band, range, pc.out, label.qty, annotations, stacked, ...)
+O_plot(spct, w.band, range, pc.out, label.qty, annotations, stacked, text.size,
+  ...)
 }
 \arguments{
 \item{spct}{an object_spct object}
@@ -22,6 +23,8 @@ for labels}
 \item{annotations}{a character vector}
 
 \item{stacked}{logical}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 
 \item{...}{other arguments passed to reflectance()}
 }

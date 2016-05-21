@@ -10,7 +10,8 @@
   plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
   pc.out = FALSE, label.qty = "average",
   annotations = getOption("photobiology.plot.annotations", default =
-  c("boxes", "labels", "summaries", "colour.guide", "peaks")))
+  c("boxes", "labels", "summaries", "colour.guide", "peaks")),
+  text.size = 2.5)
 }
 \arguments{
 \item{x}{a filter_spct object}
@@ -30,6 +31,8 @@ min annd max wavelengths (nm)}
 for labels}
 
 \item{annotations}{a character vector}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 }
 \value{
 a \code{ggplot} object.

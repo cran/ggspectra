@@ -1,9 +1,8 @@
-#' Integrate ranges under curve.
+#' Label ranges under spectral curve.
 #'
-#' \code{stat_wb_mean} computes means under a curve. It first integrates the
-#'   area under a spectral curve and also the mean expressed per nanaometre of
-#'   wavelength for each waveband in the input. Sets suitable default aestheics
-#'   for "rect", "hline", "vline", "text" and "label" geoms.
+#' \code{stat_wb_label} computes computes the center of a waveband. Sets
+#' suitable default aestheics for "rect", "hline", "vline", "text" and "label"
+#' geoms displaying "boundaries" and "names" of wavebands.
 #'
 #' @param mapping The aesthetic mapping, usually constructed with
 #'   \code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_string}}. Only needs
@@ -27,20 +26,15 @@
 #'   before the computation proceeds.
 #' @param w.band a waveband object or a list of waveband objects or numeric
 #'   vector of at least length two.
-#' @param integral.fun function on $x$ and $y$.
-#' @param label.mult numeric Scaling factor applied to y-integral values before
-#'   conversion into character strings.
-#' @param label.fmt character string giving a format definition for converting
-#'   y-integral values into character strings by means of function
+#' @param label.fmt character string giving a format definition for formating
+#'   the name of the waveband.
 #'   \code{\link{sprintf}}.
-#' @param ypos.mult numeric Multiplier constant used to scale returned
-#'   \code{y} values.
 #' @param ypos.fixed numeric If not \code{NULL} used a constant value returned
 #'   in \code{y}.
 #'
 #' @section Computed variables:
 #' \describe{
-#'   \item{label}{intergral value as formatted text}
+#'   \item{label}{name of the waveband as a character string}
 #'   \item{x}{w.band-midpoint}
 #'   \item{xmin}{w.band minimum}
 #'   \item{xmax}{w.band maximum}
@@ -56,33 +50,25 @@
 #' library(ggplot2)
 #' # ggplot() methods for spectral objects set a default mapping for x and y.
 #' ggplot(sun.spct) +
-#'   stat_wb_mean(w.band = VIS_bands()) +
-#'   stat_wb_mean(w.band = VIS_bands(),
-#'                geom = "text", angle = 90, size = 2.5,
-#'                label.fmt = "%1.2f") +
 #'   geom_line() +
-#'   scale_fill_identity()
+#'   stat_wb_label(w.band = VIS(), geom = "rect", ymin = -0.04, ymax = 0,
+#'   color = "black", fill = "white") +
+#'   stat_wb_label(w.band = VIS(), y = -0.02)
 #'
 #' @export
 #' @family stats functions
 #'
-stat_wb_mean <- function(mapping = NULL, data = NULL, geom = "rect",
+stat_wb_label <- function(mapping = NULL, data = NULL, geom = "text",
                        w.band = NULL,
-                       integral.fun = photobiology::integrate_xy,
-                       label.mult = 1,
-                       label.fmt = "%.3g",
-                       ypos.mult = 0.55,
-                       ypos.fixed = NULL,
+                       label.fmt = "%s",
+                       ypos.fixed = 0,
                        position = "identity", na.rm = FALSE, show.legend = NA,
                        inherit.aes = TRUE, ...) {
   ggplot2::layer(
-    stat = StatWbMean, data = data, mapping = mapping, geom = geom,
+    stat = StatWbLabel, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(w.band = w.band,
-                  integral.fun = integral.fun,
-                  label.mult = label.mult,
                   label.fmt = label.fmt,
-                  ypos.mult = ypos.mult,
                   ypos.fixed = ypos.fixed,
                   na.rm = na.rm,
                   ...)
@@ -93,15 +79,12 @@ stat_wb_mean <- function(mapping = NULL, data = NULL, geom = "rect",
 #' @format NULL
 #' @usage NULL
 #' @export
-StatWbMean <-
-  ggplot2::ggproto("StatWbMean", ggplot2::Stat,
+StatWbLabel <-
+  ggplot2::ggproto("StatWbLabel", ggplot2::Stat,
                    compute_group = function(data,
                                             scales,
                                             w.band,
-                                            integral.fun,
-                                            label.mult,
                                             label.fmt,
-                                            ypos.mult,
                                             ypos.fixed) {
                      if (is.null(w.band)) {
                        w.band <- waveband(data$x)
@@ -113,53 +96,34 @@ StatWbMean <-
                      if (!is.list(w.band) || is.waveband(w.band)) {
                        w.band <- list(w.band)
                      }
-                     stopifnot(is.function(integral.fun))
                      w.band <- trim_wl(w.band, data$x)
                      integ.df <- data.frame()
                      for (wb in w.band) {
                        if (is.numeric(wb)) { # user supplied a list of numeric vectors
                          wb <- waveband(wb)
                        }
-
                        range <- range(wb)
-                       mydata <- trim_tails(data$x, data$y, use.hinges = TRUE,
-                                            low.limit = range[1],
-                                            high.limit = range[2])
-                       if (is_effective(wb)) {
-                         warning("BSWFs not supported by summary: using wavelength range for ",
-                                 labels(wb)$label, "'.")
-                         wb <- waveband(wb)
-                       }
-                       yint.tmp <- integral.fun(mydata$x, mydata$y)
-                       ymean.tmp <- yint.tmp / spread(wb)
                        integ.df <- rbind(integ.df,
-                                         data.frame(x = midpoint(mydata$x),
+                                         data.frame(x = midpoint(wb),
                                                     xmin = min(wb),
                                                     xmax = max(wb),
-                                                    ymin = min(data$y),
-                                                    ymax = max(data$y),
-                                                    yint = yint.tmp,
-                                                    ymean = ymean.tmp,
                                                     wb.color = color(wb),
                                                     wb.name = labels(wb)$label)
                                          )
                      }
                      if (is.null(ypos.fixed)) {
-                       integ.df$y <- with(integ.df, ymin + (ymean - ymin) * ypos.mult)
+                       integ.df$y <- 0
                      } else {
                        integ.df$y <- ypos.fixed
                      }
-                     integ.df$y.label <- sprintf(label.fmt, integ.df$ymean * label.mult)
+                     integ.df$wb.label <- sprintf(label.fmt, integ.df$wb.name)
 #                     print(integ.df)
                      integ.df
                    },
-                   default_aes = ggplot2::aes(label = ..y.label..,
+                   default_aes = ggplot2::aes(label = ..wb.label..,
+                                              x = ..x..,
                                               xmin = ..xmin..,
                                               xmax = ..xmax..,
-                                              ymax = ..ymean..,
-                                              ymin = 0,
-                                              yintercept = ..ymean..,
                                               fill = ..wb.color..),
-                   required_aes = c("x", "y")
+                   required_aes = c("x")
   )
-

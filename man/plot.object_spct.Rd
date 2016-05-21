@@ -9,7 +9,8 @@
   UVA(), PAR())), range = NULL, plot.qty = NULL, pc.out = FALSE,
   label.qty = "average",
   annotations = getOption("photobiology.plot.annotations", default =
-  c("boxes", "labels", "colour.guide", "peaks")), stacked = TRUE)
+  c("boxes", "labels", "colour.guide", "peaks")), stacked = TRUE,
+  text.size = 2.5)
 }
 \arguments{
 \item{x}{an object_spct object}
@@ -31,6 +32,8 @@ for labels}
 \item{annotations}{a character vector}
 
 \item{stacked}{logical}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 }
 \value{
 a \code{ggplot} object.

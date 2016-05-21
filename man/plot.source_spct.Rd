@@ -10,7 +10,8 @@
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
   label.qty = "total",
   annotations = getOption("photobiology.plot.annotations", default =
-  c("boxes", "labels", "summaries", "colour.guide", "peaks")))
+  c("boxes", "labels", "summaries", "colour.guide", "peaks")),
+  text.size = 2.5)
 }
 \arguments{
 \item{x}{a source_spct object}
@@ -29,6 +30,8 @@ for plotting: "photon" or its synomin "quantum", or "energy"}
 for labels}
 
 \item{annotations}{a character vector}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 }
 \value{
 a \code{ggplot} object.

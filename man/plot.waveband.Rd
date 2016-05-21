@@ -7,7 +7,8 @@
 \method{plot}{waveband}(x, ..., w.length = NULL, range = c(280, 800),
   fill = 0, unit.in = getOption("photobiology.radiation.unit", default =
   "energy"), annotations = getOption("photobiology.plot.annotations", default
-  = c("colour.guide", "boxes", "labels")), wb.trim = TRUE, norm = NULL)
+  = c("colour.guide", "boxes", "labels")), wb.trim = TRUE, norm = NULL,
+  text.size = 2.5)
 }
 \arguments{
 \item{x}{a waveband object}
@@ -31,6 +32,8 @@ based}
 
 \item{norm}{numeric normalization wavelength (nm) or character string "max"
 for normalization at the wavelength of highest peak.}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 }
 \value{
 a \code{ggplot} object.

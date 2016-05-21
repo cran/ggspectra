@@ -4,7 +4,8 @@
 \alias{q_rsp_plot}
 \title{Plot a response spectrum.}
 \usage{
-q_rsp_plot(spct, w.band, range, pc.out, label.qty, annotations, norm, ...)
+q_rsp_plot(spct, w.band, range, pc.out, label.qty, annotations, norm, text.size,
+  ...)
 }
 \arguments{
 \item{spct}{a response_spct object}
@@ -23,6 +24,8 @@ for labels}
 
 \item{norm}{numeric normalization wavelength (nm) or character string "max"
 for normalization at the wavelength of highest peak.}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 
 \item{...}{other arguments passed to q_response()}
 }

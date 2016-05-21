@@ -8,7 +8,8 @@
   default = list(UVC(), UVB(), UVA(), PAR())), range = NULL,
   unit.out = "counts", pc.out = FALSE, label.qty = "average",
   annotations = getOption("photobiology.plot.annotations", default =
-  c("boxes", "labels", "colour.guide", "peaks")), norm = NULL)
+  c("boxes", "labels", "colour.guide", "peaks")), norm = NULL,
+  text.size = 2.5)
 }
 \arguments{
 \item{x}{a raw_spct object}
@@ -30,6 +31,8 @@ with min annd max wavelengths (nm)}
 
 \item{norm}{numeric normalization wavelength (nm) or character string "max"
 for normalization at the wavelength of highest peak.}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 }
 \value{
 a \code{ggplot} object.

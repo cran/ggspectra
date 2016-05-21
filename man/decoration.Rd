@@ -5,7 +5,8 @@
 \title{Add decorations to spectrum plot (private)}
 \usage{
 decoration(w.band, y.max, y.min, x.max, x.min, annotations, label.qty,
-  label.mult = 1, summary.label, unit.out = NULL, time.unit = NULL)
+  label.mult = 1, summary.label, unit.out = NULL, time.unit = NULL,
+  text.size = 2.5)
 }
 \arguments{
 \item{w.band}{waveband object or list of waveband objects}
@@ -15,6 +16,8 @@ decoration(w.band, y.max, y.min, x.max, x.min, annotations, label.qty,
 \item{label.qty}{character}
 
 \item{summary.label}{character}
+
+\item{text.size}{numeric}
 
 \item{ymax, ymin}{numeric}
 }

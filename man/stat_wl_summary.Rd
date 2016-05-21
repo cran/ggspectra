@@ -62,16 +62,18 @@ include aesthetics whose values you want to set, not map. See
 library(photobiology)
 library(ggplot2)
 # ggplot() methods for spectral objects set a default mapping for x and y.
-ggplot(sun.spct) + geom_line() + stat_wl_summary(geom = "hline")
 ggplot(sun.spct) + geom_line() +
- stat_wl_summary(label.fmt = "\%.3f", color = "red")
+  stat_wl_summary(geom = "hline")
+ggplot(sun.spct) + geom_line() +
+  stat_wl_summary(label.fmt = "\%.3f", color = "red")
 
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_peaks}},
   \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_mean}},
+  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
+  \code{\link{stat_wb_mean}},
   \code{\link{stat_wb_relative}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}}

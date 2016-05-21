@@ -14,6 +14,7 @@
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
 #' @param annotations a character vector
+#' @param text.size numeric size of text in the plot decorations.
 #' @param ... other arguments passed to transmittance()
 #'
 #' @return a \code{ggplot} object.
@@ -26,11 +27,12 @@ T_plot <- function(spct,
                    pc.out,
                    label.qty,
                    annotations,
+                   text.size,
                    ...) {
   if (!is.filter_spct(spct)) {
     stop("T_plot() can only plot filter_spct objects.")
   }
-  A2T(spct, byref=TRUE)
+  A2T(spct, byref = TRUE)
   Tfr.type <- getTfrType(spct)
   if (!is.null(range)) {
     trim_spct(spct, range = range, byref = TRUE)
@@ -90,7 +92,7 @@ T_plot <- function(spct,
   plot <- ggplot(spct, aes_(~w.length, ~Tfr)) +
     scale_fill_identity() + scale_color_identity()
   plot <- plot + geom_line()
-  plot <- plot + labs(x="Wavelength (nm)", y=s.Tfr.label)
+  plot <- plot + labs(x = "Wavelength (nm)", y = s.Tfr.label)
 
   plot <- plot + decoration(w.band = w.band,
                             label.mult = scale.factor,
@@ -100,7 +102,8 @@ T_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
-                            summary.label = Tfr.label)
+                            summary.label = Tfr.label,
+                            text.size = text.size)
 
   if (!is.null(annotations) &&
       length(intersect(c("labels", "summaries", "colour.guide"), annotations)) > 0L) {
@@ -137,6 +140,7 @@ T_plot <- function(spct,
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
 #' @param annotations a character vector
+#' @param text.size numeric size of text in the plot decorations.
 #' @param ... other arguments passed to absorbance()
 #'
 #' @return a \code{ggplot} object.
@@ -148,11 +152,12 @@ A_plot <- function(spct,
                    range,
                    label.qty,
                    annotations,
+                   text.size,
                    ...) {
   if (!is.filter_spct(spct)) {
     stop("T_plot() can only plot filter_spct objects.")
   }
-  T2A(spct, action="replace", byref=TRUE)
+  T2A(spct, action = "replace", byref = TRUE)
   if (!is.null(range)) {
     trim_spct(spct, range = range, byref = TRUE)
   }
@@ -160,11 +165,11 @@ A_plot <- function(spct,
   if (!length(Tfr.type)) {
     Tfr.type <- "unknown"
   }
-  if (Tfr.type=="internal") {
+  if (Tfr.type == "internal") {
     s.A.label <- expression(Internal~~spectral~~absorbance~~A[int](lambda)~~(AU))
     A.label.total  <- "atop(A[int], (AU %*% nm))"
     A.label.avg  <- "atop(bar(A[int](lambda)), (AU))"
-  } else if (Tfr.type=="total") {
+  } else if (Tfr.type == "total") {
     s.A.label <- expression(Total~~spectral~~absorbance~~A[tot](lambda)~~(AU))
     A.label.total  <- "atop(A[tot], (AU %*% nm))"
     A.label.avg  <- "atop(bar(A[tot](lambda)), (AU))"
@@ -194,7 +199,7 @@ A_plot <- function(spct,
   plot <- ggplot(spct, aes_(~w.length, ~A)) +
     scale_fill_identity() + scale_color_identity()
   plot <- plot + geom_line()
-  plot <- plot + labs(x="Wavelength (nm)", y=s.A.label)
+  plot <- plot + labs(x = "Wavelength (nm)", y = s.A.label)
 
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
@@ -203,7 +208,8 @@ A_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
-                            summary.label = A.label)
+                            summary.label = A.label,
+                            text.size = text.size)
 
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries", "colour.guide"), annotations)) > 0L) {
@@ -234,6 +240,7 @@ A_plot <- function(spct,
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
 #' @param annotations a character vector
+#' @param text.size numeric size of text in the plot decorations.
 #' @param ... other arguments passed to reflectance()
 #'
 #' @return a \code{ggplot} object.
@@ -246,6 +253,7 @@ R_plot <- function(spct,
                    pc.out,
                    label.qty,
                    annotations,
+                   text.size,
                    ...) {
   if (!is.reflector_spct(spct)) {
     stop("R_plot() can only plot reflector_spct objects.")
@@ -254,7 +262,7 @@ R_plot <- function(spct,
     trim_spct(spct, range = range, byref = TRUE)
   }
   Rfr.type <- getRfrType(spct)
-  if (length(Rfr.type)==0) {
+  if (length(Rfr.type) == 0) {
     Rfr.type <- "unknown"
   }
   if (!pc.out) {
@@ -308,7 +316,7 @@ R_plot <- function(spct,
   plot <- ggplot(spct, aes_(~w.length, ~Rfr)) +
     scale_fill_identity() + scale_color_identity()
   plot <- plot + geom_line()
-  plot <- plot + labs(x="Wavelength (nm)", y=s.Rfr.label)
+  plot <- plot + labs(x = "Wavelength (nm)", y = s.Rfr.label)
 
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
@@ -317,7 +325,8 @@ R_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
-                            summary.label = Rfr.label)
+                            summary.label = Rfr.label,
+                            text.size = text.size)
 
   if (!is.null(annotations) &&
       length(intersect(c("labels", "summaries", "colour.guide"), annotations)) > 0L) {
@@ -355,6 +364,7 @@ R_plot <- function(spct,
 #'   for labels
 #' @param annotations a character vector
 #' @param stacked logical
+#' @param text.size numeric size of text in the plot decorations.
 #' @param ... other arguments passed to reflectance()
 #'
 #' @return a \code{ggplot} object.
@@ -368,6 +378,7 @@ O_plot <- function(spct,
                    label.qty,
                    annotations,
                    stacked,
+                   text.size,
                    ...) {
   if (!is.object_spct(spct)) {
     stop("O_plot() can only plot object_spct objects.")
@@ -375,12 +386,12 @@ O_plot <- function(spct,
   if (!is.null(range)) {
     trim_spct(spct, range = range, byref = TRUE)
   }
-   Rfr.type <- getRfrType(spct)
-    if (length(Rfr.type)==0) {
+  Rfr.type <- getRfrType(spct)
+  if (length(Rfr.type) == 0) {
     Rfr.type <- "unknown"
   }
   Tfr.type <- getTfrType(spct)
-  if (length(Tfr.type)==0) {
+  if (length(Tfr.type) == 0) {
     Tfr.type <- "unknown"
   }
   if (Rfr.type == "specular") {
@@ -393,8 +404,9 @@ O_plot <- function(spct,
   y.max <- 1
   y.min <- 0
   spct[["Afr"]] <- 1.0 - spct[["Tfr"]] - spct[["Rfr"]]
-  tmp.spct <- dplyr::as_data_frame(spct)[c("w.length", "Tfr", "Afr", "Rfr")]
-  molten.spct <- tidyr::gather_(tmp.spct, "variable", "value", c("Tfr", "Afr", "Rfr"))
+  molten.spct <-
+    tidyr::gather_(dplyr::select_(spct, "w.length", "Tfr", "Afr", "Rfr"),
+                   "variable", "value", c("Tfr", "Afr", "Rfr"))
   setGenericSpct(molten.spct, multiple.wl = 3L)
   plot <- ggplot(molten.spct, aes_(~w.length, ~value)) +
     scale_fill_identity()
@@ -413,7 +425,7 @@ O_plot <- function(spct,
                                                Rfr = expression(R(lambda))),
                                     guide = guide_legend(title = NULL))
   }
-  plot <- plot + labs(x="Wavelength (nm)", y=s.Rfr.label)
+  plot <- plot + labs(x = "Wavelength (nm)", y = s.Rfr.label)
 
   annotations <- intersect(annotations, c("labels", "boxes", "segments", "colour.guide"))
 
@@ -424,9 +436,10 @@ O_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
-                            summary.label = "")
+                            summary.label = "",
+                            text.size = text.size)
   if (!is.null(annotations) &&
-      length(intersect(c("boxes", "segments", "labels", "summaries", "colour.guide"), annotations)) > 0L) {
+      length(intersect(c("boxes", "segments", "labels", "colour.guide"), annotations)) > 0L) {
     y.limits <- c(0, y.max * 1.25)
     x.limits <- c(min(spct) - spread(spct) * 0.025, NA)
   } else {
@@ -461,6 +474,7 @@ O_plot <- function(spct,
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
 #' @param annotations a character vector
+#' @param text.size numeric size of text in the plot decorations.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -487,17 +501,33 @@ plot.filter_spct <-
            pc.out = FALSE,
            label.qty = "average",
            annotations = getOption("photobiology.plot.annotations",
-                                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks")) ) {
+                                 default = c("boxes", "labels", "summaries",
+                                             "colour.guide", "peaks")),
+           text.size = 2.5) {
     if ("color.guide" %in% annotations) {
       annotations <- c(setdiff(annotations, "color.guide"), "colour.guide")
     }
+    if (is.null(w.band)) {
+      if (is.null(range)) {
+        w.band <- photobiology::waveband(x)
+      } else if (is.waveband(range)) {
+        w.band <- range
+      } else {
+        w.band <-  photobiology::waveband(range, wb.name = "Total")
+      }
+    }
+
     if (plot.qty == "transmittance") {
       out.ggplot <- T_plot(spct = x, w.band = w.band, range = range,
                            pc.out = pc.out, label.qty = label.qty,
-                           annotations = annotations, ...)
+                           annotations = annotations,
+                           text.size = text.size,
+                           ...)
     } else if (plot.qty == "absorbance") {
       out.ggplot <- A_plot(spct = x, w.band = w.band, range = range,
-                           label.qty = label.qty, annotations = annotations, ...)
+                           label.qty = label.qty, annotations = annotations,
+                           text.size = text.size,
+                           ...)
     } else {
       stop("Invalid 'plot.qty' argument value: '", plot.qty, "'")
     }
@@ -525,6 +555,7 @@ plot.filter_spct <-
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
 #' @param annotations a character vector
+#' @param text.size numeric size of text in the plot decorations.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -541,19 +572,34 @@ plot.filter_spct <-
 #'
 plot.reflector_spct <-
   function(x, ...,
-           w.band=getOption("photobiology.plot.bands", default=list(UVC(), UVB(), UVA(), PAR())),
-           range=NULL,
-           plot.qty=getOption("photobiology.reflector.qty", default="reflectance"),
-           pc.out=FALSE,
-           label.qty="average",
-           annotations=getOption("photobiology.plot.annotations",
-                                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks")) ) {
+           w.band=getOption("photobiology.plot.bands",
+                            default = list(UVC(), UVB(), UVA(), PAR())),
+           range = NULL,
+           plot.qty = getOption("photobiology.reflector.qty", default = "reflectance"),
+           pc.out = FALSE,
+           label.qty = "average",
+           annotations = getOption("photobiology.plot.annotations",
+                                 default = c("boxes", "labels", "summaries",
+                                             "colour.guide", "peaks")),
+           text.size = 2.5) {
     if ("color.guide" %in% annotations) {
       annotations <- c(setdiff(annotations, "color.guide"), "colour.guide")
     }
+    if (is.null(w.band)) {
+      if (is.null(range)) {
+        w.band <- photobiology::waveband(x)
+      } else if (is.waveband(range)) {
+        w.band <- range
+      } else {
+        w.band <-  photobiology::waveband(range, wb.name = "Total")
+      }
+    }
+
     out.ggplot <- R_plot(spct = x, w.band = w.band,  range = range,
                          pc.out = pc.out, label.qty = label.qty,
-                         annotations = annotations, ...)
+                         annotations = annotations,
+                         text.size = text.size,
+                         ...)
     if ("title" %in% annotations) {
       out.ggplot <- out.ggplot + labs(title = deparse(substitute(x)))
     }
@@ -580,6 +626,7 @@ plot.reflector_spct <-
 #'   for labels
 #' @param annotations a character vector
 #' @param stacked logical
+#' @param text.size numeric size of text in the plot decorations.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -598,20 +645,34 @@ plot.reflector_spct <-
 #'
 plot.object_spct <-
   function(x, ...,
-           w.band=getOption("photobiology.plot.bands", default=list(UVC(), UVB(), UVA(), PAR())),
-           range=NULL,
-           plot.qty=NULL,
-           pc.out=FALSE,
-           label.qty="average",
+           w.band = getOption("photobiology.plot.bands",
+                              default = list(UVC(), UVB(), UVA(), PAR())),
+           range = NULL,
+           plot.qty = NULL,
+           pc.out = FALSE,
+           label.qty = "average",
            annotations=getOption("photobiology.plot.annotations",
-                                 default = c("boxes", "labels", "colour.guide", "peaks")),
-           stacked = TRUE) {
+                                 default = c("boxes", "labels",
+                                             "colour.guide", "peaks")),
+           stacked = TRUE,
+           text.size = 2.5) {
     if ("color.guide" %in% annotations) {
       annotations <- c(setdiff(annotations, "color.guide"), "colour.guide")
     }
+    if (is.null(w.band)) {
+      if (is.null(range)) {
+        w.band <- photobiology::waveband(x)
+      } else if (is.waveband(range)) {
+        w.band <- range
+      } else {
+        w.band <-  photobiology::waveband(range, wb.name = "Total")
+      }
+    }
+
     out.ggplot <- O_plot(spct = x, w.band = w.band,  range = range,
                          pc.out = pc.out, label.qty = label.qty,
-                         annotations = annotations, stacked = stacked, ...)
+                         annotations = annotations, stacked = stacked,
+                         text.size = text.size, ...)
     if ("title" %in% annotations) {
       out.ggplot <- out.ggplot + labs(title = deparse(substitute(x)))
     }

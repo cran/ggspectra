@@ -4,15 +4,16 @@
 \alias{cps_plot}
 \title{Plot an instrument counts spectrum.}
 \usage{
-cps_plot(spct, w.band, range, pc.out, label.qty, annotations, norm, ...)
+cps_plot(spct, w.band, range, pc.out, label.qty, annotations, norm, text.size,
+  ...)
 }
 \arguments{
 \item{spct}{a cps_spct object}
 
 \item{w.band}{list of waveband objects}
 
-\item{range}{an R object on which range() returns a vector of length 2,
-with min annd max wavelengths (nm)}
+\item{range}{an R object on which range() returns a vector of length 2, with
+min annd max wavelengths (nm)}
 
 \item{pc.out}{logical, if TRUE use percents instead of fraction of one}
 
@@ -23,6 +24,8 @@ for labels}
 
 \item{norm}{numeric normalization wavelength (nm) or character string "max"
 for normalization at the wavelength of highest peak.}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 
 \item{...}{other arguments}
 }
@@ -35,7 +38,9 @@ cps_spct object.
 }
 \note{
 Note that scales are expanded so as to make space for the annotations.
-The object returned is a ggplot objects, and can be further manipulated.
+  The object returned is a ggplot object, and can be further manipulated.
+  When spct has more than one column with spectral data, each of these
+  columns is normalized individually.
 }
 \keyword{internal}
 

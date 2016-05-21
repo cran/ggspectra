@@ -4,7 +4,7 @@
 \alias{T_plot}
 \title{Plot a filter spectrum.}
 \usage{
-T_plot(spct, w.band, range, pc.out, label.qty, annotations, ...)
+T_plot(spct, w.band, range, pc.out, label.qty, annotations, text.size, ...)
 }
 \arguments{
 \item{spct}{a filter_spct object}
@@ -20,6 +20,8 @@ min annd max wavelengths (nm)}
 for labels}
 
 \item{annotations}{a character vector}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 
 \item{...}{other arguments passed to transmittance()}
 }

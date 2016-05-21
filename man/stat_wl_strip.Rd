@@ -70,7 +70,8 @@ ggplot(sun.spct) + geom_line() +
   stat_wl_strip(ymax = -0.02, ymin = -0.04) +
   scale_fill_identity()
 
-ggplot(sun.spct) + wl_guide(alpha = 0.33) + geom_line()
+# on some graphic devices the output may show spurious vertical lines
+ggplot(sun.spct) + wl_guide(alpha = 0.33, color = NA) + geom_line()
 
 }
 \seealso{
@@ -79,7 +80,8 @@ ggplot(sun.spct) + wl_guide(alpha = 0.33) + geom_line()
 Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_peaks}},
   \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_mean}},
+  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
+  \code{\link{stat_wb_mean}},
   \code{\link{stat_wb_relative}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}},

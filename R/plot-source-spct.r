@@ -13,6 +13,7 @@
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
 #' @param annotations a character vector
+#' @param text.size numeric size of text in the plot decorations.
 #' @param ... other arguments passed to annotate_plot()
 #'
 #' @return a \code{ggplot} object.
@@ -24,6 +25,7 @@ e_plot <- function(spct,
                    range,
                    label.qty,
                    annotations,
+                   text.size,
                    ...) {
   if (!is.source_spct(spct)) {
     stop("e_plot() can only plot source_spct objects.")
@@ -32,7 +34,6 @@ e_plot <- function(spct,
   if (!is.null(range)) {
     trim_spct(spct, range = range, byref = TRUE)
   }
-
   exposure.label <- NA
   if (is_normalized(spct) || is_scaled(spct)) {
     s.irrad.label <- "Spectral~~energy~~exposure~~E(lambda)~~(relative~~units)"
@@ -118,7 +119,8 @@ e_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
-                            summary.label = irrad.label)
+                            summary.label = irrad.label,
+                            text.size = text.size)
 
   if (is_effective(spct)) {
     plot <- plot +  annotate("text",
@@ -166,6 +168,7 @@ e_plot <- function(spct,
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
 #' @param annotations a character vector
+#' @param text.size numeric size of text in the plot decorations.
 #' @param ... other arguments passed to annotate_plot()
 #'
 #' @return a \code{ggplot} object.
@@ -177,6 +180,7 @@ q_plot <- function(spct,
                    range,
                    label.qty,
                    annotations,
+                   text.size,
                    ...) {
   if (!is.source_spct(spct)) {
     stop("q_plot() can only plot source_spct objects.")
@@ -271,7 +275,8 @@ q_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
-                            summary.label = irrad.label)
+                            summary.label = irrad.label,
+                            text.size = text.size)
 
   if (is_effective(spct)) {
     plot <- plot +  annotate("text",
@@ -292,7 +297,8 @@ q_plot <- function(spct,
   }
 
   if (!is.null(annotations) &&
-      length(intersect(c("boxes", "segments", "labels", "summaries", "colour.guide"), annotations)) > 0L) {
+      length(intersect(c("boxes", "segments", "labels", "summaries",
+                         "colour.guide"), annotations)) > 0L) {
     y.limits <- c(0, y.max * 1.25)
     x.limits <- c(min(spct) - spread(spct) * 0.025, NA)
   } else {
@@ -322,6 +328,7 @@ q_plot <- function(spct,
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
 #' @param annotations a character vector
+#' @param text.size numeric size of text in the plot decorations.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -341,21 +348,38 @@ q_plot <- function(spct,
 #'
 plot.source_spct <-
   function(x, ...,
-           w.band=getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(), PAR())),
+           w.band=getOption("photobiology.plot.bands",
+                            default = list(UVC(), UVB(), UVA(), PAR())),
            range=NULL,
            unit.out=getOption("photobiology.radiation.unit", default = "energy"),
            label.qty = "total",
            annotations=getOption("photobiology.plot.annotations",
-                                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks")) ) {
+                                 default = c("boxes", "labels", "summaries",
+                                             "colour.guide", "peaks")),
+           text.size = 2.5) {
     if ("color.guide" %in% annotations) {
       annotations <- c(setdiff(annotations, "color.guide"), "colour.guide")
     }
+    if (is.null(w.band)) {
+      if (is.null(range)) {
+        w.band <- photobiology::waveband(x)
+      } else if (is.waveband(range)) {
+        w.band <- range
+      } else {
+        w.band <-  photobiology::waveband(range, wb.name = "Total")
+      }
+    }
+
     if (unit.out %in% c("photon", "quantum")) {
       out.ggplot <- q_plot(spct = x, w.band = w.band, range = range,
-                           label.qty = label.qty, annotations = annotations, ...)
+                           label.qty = label.qty, annotations = annotations,
+                           text.size = text.size,
+                           ...)
     } else if (unit.out == "energy") {
       out.ggplot <- e_plot(spct = x, w.band = w.band, range = range,
-                           label.qty = label.qty, annotations = annotations, ...)
+                           label.qty = label.qty, annotations = annotations,
+                           text.size = text.size,
+                           ...)
     } else {
       stop("Invalid 'radiation.unit' argument value: '", unit.out, "'")
     }

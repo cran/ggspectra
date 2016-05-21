@@ -10,7 +10,8 @@
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
   pc.out = FALSE, label.qty = "total",
   annotations = getOption("photobiology.plot.annotations", default =
-  c("boxes", "labels", "summaries", "colour.guide", "peaks")), norm = "max")
+  c("boxes", "labels", "summaries", "colour.guide", "peaks")), norm = "max",
+  text.size = 2.5)
 }
 \arguments{
 \item{x}{a response_spct object}
@@ -34,6 +35,8 @@ for labels}
 
 \item{norm}{numeric normalization wavelength (nm) or character string "max"
 for normalization at the wavelength of highest peak.}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 }
 \value{
 a \code{ggplot} object.

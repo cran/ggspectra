@@ -4,7 +4,7 @@
 \alias{A_plot}
 \title{Plot a filter spectrum.}
 \usage{
-A_plot(spct, w.band, range, label.qty, annotations, ...)
+A_plot(spct, w.band, range, label.qty, annotations, text.size, ...)
 }
 \arguments{
 \item{spct}{a filter_spct object}
@@ -18,6 +18,8 @@ min annd max wavelengths (nm)}
 for labels}
 
 \item{annotations}{a character vector}
+
+\item{text.size}{numeric size of text in the plot decorations.}
 
 \item{...}{other arguments passed to absorbance()}
 }

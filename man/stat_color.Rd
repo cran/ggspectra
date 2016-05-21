@@ -54,7 +54,7 @@ include aesthetics whose values you want to set, not map. See
 library(photobiology)
 library(ggplot2)
 ggplot(sun.spct, aes(w.length, s.e.irrad)) + geom_line() +
-  stat_color()
+  stat_color() + scale_color_identity()
 
 }
 \seealso{
@@ -62,7 +62,8 @@ ggplot(sun.spct, aes(w.length, s.e.irrad)) + geom_line() +
 
 Other stats functions: \code{\link{stat_peaks}},
   \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_mean}},
+  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
+  \code{\link{stat_wb_mean}},
   \code{\link{stat_wb_relative}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},

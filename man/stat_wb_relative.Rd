@@ -80,15 +80,21 @@ library(photobiology)
 library(photobiologyWavebands)
 library(ggplot2)
 # ggplot() methods for spectral objects set a default mapping for x and y.
-ggplot(sun.spct) + geom_line() + stat_wb_relative(w.band = VIS_bands())
+ggplot(sun.spct) +
+  geom_line() +
+  stat_wb_relative(w.band = VIS_bands()) +
+  stat_wb_relative(w.band = VIS_bands(),
+                   geom = "text", angle = 90, size = 2.5,
+                   label.fmt = "\%1.2f") +
+  scale_fill_identity()
 
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_peaks}},
   \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_mean}},
-  \code{\link{stat_wb_sirrad}},
+  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
+  \code{\link{stat_wb_mean}}, \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
