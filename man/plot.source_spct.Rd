@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-source-spct.r
 \name{plot.source_spct}
 \alias{plot.source_spct}
-\title{Plot a source spectrum, especialization of generic plot function.}
+\title{Plot method for light-source spectra.}
 \usage{
 \method{plot}{source_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),

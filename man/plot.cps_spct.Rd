@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-cps-spct.r
 \name{plot.cps_spct}
 \alias{plot.cps_spct}
-\title{Plot an instrument counts spectrum, especialization of generic plot function.}
+\title{Plot method for spectra expressed as detector counts per second.}
 \usage{
 \method{plot}{cps_spct}(x, ..., w.band = getOption("photobiology.plot.bands",
   default = list(UVC(), UVB(), UVA(), PAR())), range = NULL,

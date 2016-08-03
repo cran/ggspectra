@@ -54,7 +54,8 @@ the area under the line is filled.
 \examples{
 library(ggplot2)
 library(photobiology)
-ggplot(sun.spct, aes(w.length, s.e.irrad)) + geom_spct()
+# ggplot() methods for spectral objects set a default mapping for x and y.
+ggplot(sun.spct) + geom_spct()
 
 }
 \seealso{

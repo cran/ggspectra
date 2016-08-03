@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-filter-spct.r
 \name{plot.reflector_spct}
 \alias{plot.reflector_spct}
-\title{Plot a reflector spectrum, especialization of generic plot function}
+\title{Plot method for reflector spectra.}
 \usage{
 \method{plot}{reflector_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),

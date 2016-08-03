@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-response-spct.r
 \name{plot.response_spct}
 \alias{plot.response_spct}
-\title{Plot a response spectrum, especialization of generic plot function.}
+\title{Plot method for response spectra.}
 \usage{
 \method{plot}{response_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),

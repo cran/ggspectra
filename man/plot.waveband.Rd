@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-waveband.r
 \name{plot.waveband}
 \alias{plot.waveband}
-\title{Plot a waveband as a spectrum.}
+\title{Plot method for waveband objects.}
 \usage{
 \method{plot}{waveband}(x, ..., w.length = NULL, range = c(280, 800),
   fill = 0, unit.in = getOption("photobiology.radiation.unit", default =

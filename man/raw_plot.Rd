@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-raw-spct.r
 \name{raw_plot}
 \alias{raw_plot}
-\title{Plot an instrument counts spectrum.}
+\title{Plot method for spectra expressed as raw detector counts.}
 \usage{
 raw_plot(spct, w.band, range, pc.out, label.qty, annotations, norm, text.size,
   ...)

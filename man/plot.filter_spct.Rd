@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-filter-spct.r
 \name{plot.filter_spct}
 \alias{plot.filter_spct}
-\title{Plot a filter spectrum, especialization of generic plot function}
+\title{Plot method for filter spectra.}
 \usage{
 \method{plot}{filter_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),

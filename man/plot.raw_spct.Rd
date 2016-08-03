@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-raw-spct.r
 \name{plot.raw_spct}
 \alias{plot.raw_spct}
-\title{Plot an instrument counts spectrum, especialization of generic plot function.}
+\title{Plot method for spectra expressed as raw detector counts.}
 \usage{
 \method{plot}{raw_spct}(x, ..., w.band = getOption("photobiology.plot.bands",
   default = list(UVC(), UVB(), UVA(), PAR())), range = NULL,

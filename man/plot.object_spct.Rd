@@ -2,11 +2,11 @@
 % Please edit documentation in R/plot-filter-spct.r
 \name{plot.object_spct}
 \alias{plot.object_spct}
-\title{Plot an object spectrum, especialization of generic plot function}
+\title{Plot method for object spectra.}
 \usage{
 \method{plot}{object_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
-  UVA(), PAR())), range = NULL, plot.qty = NULL, pc.out = FALSE,
+  UVA(), PAR())), range = NULL, plot.qty = "all", pc.out = FALSE,
   label.qty = "average",
   annotations = getOption("photobiology.plot.annotations", default =
   c("boxes", "labels", "colour.guide", "peaks")), stacked = TRUE,
@@ -22,7 +22,8 @@
 \item{range}{an R object on which range() returns a vector of length 2, with
 min annd max wavelengths (nm)}
 
-\item{plot.qty}{character string (currently ignored)}
+\item{plot.qty}{character string, one of "all", "transmittance",
+"absorbance", "absorptance", or "reflectance".}
 
 \item{pc.out}{logical, if TRUE use percents instead of fraction of one}
 
