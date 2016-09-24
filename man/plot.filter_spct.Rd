@@ -8,10 +8,10 @@
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
   UVA(), PAR())), range = NULL,
   plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
-  pc.out = FALSE, label.qty = "average",
+  pc.out = FALSE, label.qty = NULL,
   annotations = getOption("photobiology.plot.annotations", default =
   c("boxes", "labels", "summaries", "colour.guide", "peaks")),
-  text.size = 2.5)
+  text.size = 2.5, na.rm = TRUE)
 }
 \arguments{
 \item{x}{a filter_spct object}
@@ -33,6 +33,8 @@ for labels}
 \item{annotations}{a character vector}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{na.rm}{logical.}
 }
 \value{
 a \code{ggplot} object.

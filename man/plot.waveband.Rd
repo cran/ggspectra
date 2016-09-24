@@ -8,7 +8,7 @@
   fill = 0, unit.in = getOption("photobiology.radiation.unit", default =
   "energy"), annotations = getOption("photobiology.plot.annotations", default
   = c("colour.guide", "boxes", "labels")), wb.trim = TRUE, norm = NULL,
-  text.size = 2.5)
+  text.size = 2.5, na.rm = TRUE)
 }
 \arguments{
 \item{x}{a waveband object}
@@ -34,6 +34,8 @@ based}
 for normalization at the wavelength of highest peak.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{na.rm}{logical.}
 }
 \value{
 a \code{ggplot} object.

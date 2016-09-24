@@ -4,7 +4,8 @@
 \alias{R_plot}
 \title{Plot a reflector spectrum}
 \usage{
-R_plot(spct, w.band, range, pc.out, label.qty, annotations, text.size, ...)
+R_plot(spct, w.band, range, pc.out, label.qty, annotations, text.size, na.rm,
+  ...)
 }
 \arguments{
 \item{spct}{a filter_spct object}
@@ -22,6 +23,8 @@ for labels}
 \item{annotations}{a character vector}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{na.rm}{logical.}
 
 \item{...}{other arguments passed to reflectance()}
 }

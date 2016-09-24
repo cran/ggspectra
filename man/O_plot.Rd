@@ -5,7 +5,7 @@
 \title{Plot an object spectrum}
 \usage{
 O_plot(spct, w.band, range, pc.out, label.qty, annotations, stacked, text.size,
-  ...)
+  na.rm, ...)
 }
 \arguments{
 \item{spct}{an object_spct object}
@@ -25,6 +25,8 @@ for labels}
 \item{stacked}{logical}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{na.rm}{logical.}
 
 \item{...}{other arguments passed to reflectance()}
 }

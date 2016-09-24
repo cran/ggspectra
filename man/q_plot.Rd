@@ -4,7 +4,7 @@
 \alias{q_plot}
 \title{Plot a source spectrum.}
 \usage{
-q_plot(spct, w.band, range, label.qty, annotations, text.size, ...)
+q_plot(spct, w.band, range, label.qty, annotations, text.size, na.rm, ...)
 }
 \arguments{
 \item{spct}{a source_spct object}
@@ -20,6 +20,8 @@ for labels}
 \item{annotations}{a character vector}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{na.rm}{logical.}
 
 \item{...}{other arguments passed to annotate_plot()}
 }

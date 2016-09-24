@@ -5,7 +5,7 @@
 \title{Plot method for spectra expressed as raw detector counts.}
 \usage{
 raw_plot(spct, w.band, range, pc.out, label.qty, annotations, norm, text.size,
-  ...)
+  na.rm, ...)
 }
 \arguments{
 \item{spct}{a raw_spct object}
@@ -26,6 +26,8 @@ for labels}
 for normalization at the wavelength of highest peak.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{na.rm}{logical.}
 
 \item{...}{other arguments}
 }

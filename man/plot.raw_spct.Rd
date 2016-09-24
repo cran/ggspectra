@@ -9,7 +9,7 @@
   unit.out = "counts", pc.out = FALSE, label.qty = "average",
   annotations = getOption("photobiology.plot.annotations", default =
   c("boxes", "labels", "colour.guide", "peaks")), norm = NULL,
-  text.size = 2.5)
+  text.size = 2.5, na.rm = TRUE)
 }
 \arguments{
 \item{x}{a raw_spct object}
@@ -33,6 +33,8 @@ with min annd max wavelengths (nm)}
 for normalization at the wavelength of highest peak.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{na.rm}{logical.}
 }
 \value{
 a \code{ggplot} object.
