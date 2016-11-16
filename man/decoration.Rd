@@ -6,7 +6,7 @@
 \usage{
 decoration(w.band, y.max, y.min, x.max, x.min, annotations, label.qty,
   label.mult = 1, summary.label, unit.out = NULL, time.unit = NULL,
-  text.size = 2.5, na.rm = TRUE)
+  text.size = 2.5, label.color = NULL, pos.shift = 0, na.rm = TRUE)
 }
 \arguments{
 \item{w.band}{waveband object or list of waveband objects}
@@ -18,6 +18,10 @@ decoration(w.band, y.max, y.min, x.max, x.min, annotations, label.qty,
 \item{summary.label}{character}
 
 \item{text.size}{numeric}
+
+\item{label.color}{color definition or name}
+
+\item{pos.shift}{numeric}
 
 \item{na.rm}{logical}
 

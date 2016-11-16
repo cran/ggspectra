@@ -37,23 +37,48 @@
 #' @param ypos.fixed numeric If not \code{NULL} used a constant value returned
 #'   in \code{y}.
 #'
+#' @return A data frame with one row for each waveband object in the argument
+#' to \code{w.band}. Wavebeand outside the range of the spectral data are
+#' trimmed or discarded.
+#'
 #' @section Computed variables:
+#' What it is named integral below is the result of appying \code{irrad},
+#' \code{e_irrad} or \code{q_irrad} to the data.
 #' \describe{
-#'   \item{y.label}{integral value as formatted text}
+#'   \item{y.label}{yeff multiplied by \code{label.mult} and formatted
+#'   according to \code{label.fmt}}
 #'   \item{x}{w.band-midpoint}
 #'   \item{xmin}{w.band minimum}
 #'   \item{xmax}{w.band maximum}
 #'   \item{ymin}{data$y minimum}
 #'   \item{ymax}{data$y maximum}
-#'   \item{yeff}{Effective irradiance as numeric value}
-#'   \item{ymean}{Mean unweighted spectral irradiance for range of wavabnd}
-#'   \item{yint}{Waveband unweighted irradiance for range of wavabnd}
-#'   \item{y}{Scaled mean value as numeric, or \code{y.position} if not \code{NULL}}
-#'   \item{wb.name}{character}
-#'   \item{wb.color}{character}
+#'   \item{yeff}{weighted irradiance if \code{w.band} describes a BSWF}
+#'   \item{yint}{not weighted irradiance for the range of \code{w.band}}
+#'   \item{xmean}{yint divided by spread(w.band)}
+#'   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
+#'   \item{wb.color}{color of the w.band}
+#'   \item{wb.name}{label of w.band}
 #' }
 #'
-#' @import photobiology
+#' @section Default aesthetics:
+#' Set by the statistic and available to geoms.
+#' \describe{
+#'   \item{label}{..y.label..}
+#'   \item{x}{..x..}
+#'   \item{xmin}{..xmin..}
+#'   \item{xmax}{..xmax..}
+#'   \item{ymin}{..y.. - (..ymax.. - ..ymin..) * 0.03}
+#'   \item{ymax}{..y.. + (..ymax.. - ..ymin..) * 0.03}
+#'   \item{yintercept}{..ymean..}
+#'   \item{fill}{..wb.color..}
+#' }
+#'
+#' @section Required aesthetics:
+#' Required by the statistic and need to be set with \code{aes()}.
+#' \describe{
+#'   \item{x}{numeric, wavelength in nanometres}
+#'   \item{y}{numeric, a spectral quantity}
+#' }
 #'
 #' @examples
 #' library(photobiology)
@@ -172,7 +197,7 @@ StatWbIrrad <-
                                             label.fmt,
                                             ypos.mult,
                                             ypos.fixed) {
-                     if (is.null(w.band)) {
+                     if (length(w.band) == 0) {
                        w.band <- waveband(data$x)
                      }
                      if (is.any_spct(w.band) ||

@@ -26,7 +26,7 @@ the plot defaults.}
 \item{type}{character one of "CMF" (color matching function) or "CC"
 (color coordinates).}
 
-\item{w.band}{photobiology::waveband object or a list of such objects or NULL.}
+\item{w.band}{waveband object or a list of such objects or NULL.}
 
 \item{length.out}{The number of steps to use to simulate a continuous
 range of colours when w.band == NULL.}
@@ -52,14 +52,42 @@ include aesthetics whose values you want to set, not map. See
 
 \item{ymin, ymax}{numeric used as aesthetics for plotting the guide.}
 }
+\value{
+generic_spect object with new \code{x} values plus other computed
+  variables described below.
+}
 \description{
 \code{stat_wl_strip} computes color definitions according to human vision.
 }
 \section{Computed variables}{
 
 \describe{
-  \item{color}{color corresponding to x-value giving wavelength in
-  nanometres.}
+   \item{x}{(w.low + wl.high) / 2}
+   \item{wl.low}{boundary of waveband}
+   \item{wl.high}{boundary of waveband}
+   \item{wl.color}{color corresponding to wavelength}
+   \item{wb.color}{color corresponding to waveband}
+   \item{wb.name}{label of w.band}
+}
+}
+
+\section{Default aesthetics}{
+
+Set by the statistic and available to geoms.
+\describe{
+  \item{x}{..x..}
+  \item{label}{as.character(..wb.f..)}
+  \item{xmin}{..wl.low..}
+  \item{xmax}{..wl.high..}
+  \item{fill}{..wb.color..}
+}
+}
+
+\section{Required aesthetics}{
+
+Required by the statistic and need to be set with \code{aes()}.
+\describe{
+  \item{x}{numeric, wavelength in nanometres}
 }
 }
 \examples{
@@ -78,7 +106,7 @@ ggplot(sun.spct) + wl_guide(alpha = 0.33, color = NA) + geom_line()
 \code{\link[photobiology]{color}}, which is used internally.
 
 Other stats functions: \code{\link{stat_color}},
-  \code{\link{stat_peaks}},
+  \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
   \code{\link{stat_wb_contribution}},
   \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
   \code{\link{stat_wb_mean}},

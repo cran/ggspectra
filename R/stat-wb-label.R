@@ -32,17 +32,36 @@
 #' @param ypos.fixed numeric If not \code{NULL} used a constant value returned
 #'   in \code{y}.
 #'
+#' @return A data frame with one row for each waveband object in the argument
+#' to \code{w.band}. Wavebeand outside the range of the spectral data are
+#' trimmed or discarded.
+#'
 #' @section Computed variables:
 #' \describe{
-#'   \item{label}{name of the waveband as a character string}
 #'   \item{x}{w.band-midpoint}
 #'   \item{xmin}{w.band minimum}
 #'   \item{xmax}{w.band maximum}
-#'   \item{ymean}{Mean value as numeric}
-#'   \item{yint}{Integral value as numeric}
+#'   \item{y}{ypos.fixed or zero}
+#'   \item{wb.color}{color of the w.band}
+#'   \item{wb.name}{label of w.band}
+#'   \item{wb.label}{formatted wb.name}
 #' }
 #'
-#' @import photobiology
+#' @section Default aesthetics:
+#' Set by the statistic and available to geoms.
+#' \describe{
+#'   \item{label}{..wb.label..}
+#'   \item{x}{..x..}
+#'   \item{xmin}{..xmin..}
+#'   \item{xmax}{..xmax..}
+#'   \item{fill}{..wb.color..}
+#' }
+#'
+#' @section Required aesthetics:
+#' Required by the statistic and need to be set with \code{aes()}.
+#' \describe{
+#'   \item{x}{numeric, wavelength in nanometres}
+#' }
 #'
 #' @examples
 #' library(photobiology)
@@ -86,7 +105,7 @@ StatWbLabel <-
                                             w.band,
                                             label.fmt,
                                             ypos.fixed) {
-                     if (is.null(w.band)) {
+                     if (length(w.band) == 0) {
                        w.band <- waveband(data$x)
                      }
                      if (is.any_spct(w.band) ||

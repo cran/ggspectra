@@ -3,6 +3,7 @@ library(ggplot2)
 library(photobiology)
 library(photobiologyWavebands)
 library(ggspectra)
+library(ggrepel)
 
 ## ----setup, include = FALSE, eval = FALSE--------------------------------
 #  library(svglite)
@@ -13,8 +14,8 @@ library(ggspectra)
 
 ## ---- include=FALSE, echo=FALSE------------------------------------------
 library(knitr)
-opts_chunk$set(fig.path = 'figure/pos-', fig.align = 'center', fig.show = 'hold',
-               fig.width = 7, fig.height = 4)
+opts_chunk$set(fig.path = 'figure/guide-pos-', fig.align = 'center', 
+               fig.show = 'hold', fig.width = 7, fig.height = 4)
 options(warnPartialMatchArgs = FALSE)
 
 ## ------------------------------------------------------------------------
@@ -71,6 +72,23 @@ ggplot(sun.spct) + geom_line() +
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
+  stat_peaks(shape = 21, span = 25, size = 2) + scale_fill_identity() +
+  stat_label_peaks(geom = "label_repel", span = 25, size = 3.5, nudge_y = 0.075,
+             color = "white") +
+  stat_valleys(shape = 21, span = 25, size = 2) + scale_fill_identity() +
+  stat_label_valleys(geom = "label_repel", span = 25, size = 3.5, nudge_y = -0.075,
+             color = "white") +
+ expand_limits(y = c(-0.08, 0.9))
+
+## ------------------------------------------------------------------------
+ggplot(sun.spct) + geom_line() + 
+  stat_peaks(shape = 21, span = 25, size = 2) + scale_fill_identity() +
+  stat_label_peaks(geom = "label", span = 25, vjust = "bottom", size = 3, color = "white",
+                   aes(label = ifelse(..is_peak.., ..x.label.., NA)), na.rm = TRUE) +
+  expand_limits(y = c(NA, 0.9))
+
+## ------------------------------------------------------------------------
+ggplot(sun.spct) + geom_line() + 
   stat_peaks(span = NULL, geom = "vline", linetype = "dotted") +
   stat_peaks(span = NULL, geom = "hline", linetype = "dotted")
 
@@ -81,8 +99,9 @@ ggplot(sun.spct) + geom_line() +
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(span = NULL) +
-  stat_peaks(span = NULL, geom = "text", vjust = -0.5, size = 2.5,
-             aes(label = paste(..y.label.., "at", ..x.label.. , "nm")))
+  stat_peaks(span = NULL, geom = "text", vjust = -0.5,
+             aes(label = paste(..y.label.., "at", ..x.label.. , "nm"))) +
+  expand_limits(y = c(NA, 0.9))
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 

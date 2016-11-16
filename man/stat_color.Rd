@@ -40,14 +40,35 @@ the default plot specification, e.g. \code{\link[ggplot2]{borders}}.}
 include aesthetics whose values you want to set, not map. See
 \code{\link[ggplot2]{layer}} for more details.}
 }
+\value{
+The original data frame with a variable with color definitions added.
+}
 \description{
 \code{stat_color} computes color definitions according to human vision.
 }
-\section{Computed variables}{
+\section{Computed variable}{
 
 \describe{
   \item{color}{color corresponding to x-value giving wavelength in
   nanometres.}
+}
+}
+
+\section{Default aesthetics}{
+
+Set by the statistic and available to geoms.
+\describe{
+  \item{color}{..color..}
+  \item{fill}{..color..}
+}
+}
+
+\section{Required aesthetics}{
+
+Required by the statistic and need to be set with \code{aes()}.
+\describe{
+  \item{x}{numeric, wavelength in nanometres}
+  \item{y}{numeric, a spectral quantity}
 }
 }
 \examples{
@@ -60,7 +81,8 @@ ggplot(sun.spct) + geom_line() +
 \seealso{
 \code{\link[photobiology]{color}}, which is used internally.
 
-Other stats functions: \code{\link{stat_peaks}},
+Other stats functions: \code{\link{stat_label_peaks}},
+  \code{\link{stat_peaks}},
   \code{\link{stat_wb_contribution}},
   \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
   \code{\link{stat_wb_mean}},

@@ -34,7 +34,10 @@ e_plot <- function(spct,
   }
   q2e(spct, byref=TRUE)
   if (!is.null(range)) {
-    trim_spct(spct, range = range, byref = TRUE)
+    spct <- trim_wl(spct, range = range)
+  }
+  if (!is.null(w.band)) {
+    w.band <- trim_wl(w.band, range = range(spct))
   }
   exposure.label <- NA
   if (is_normalized(spct) || is_scaled(spct)) {
@@ -100,8 +103,8 @@ e_plot <- function(spct,
   }
   s.irrad.label <- parse(text = s.irrad.label)
   spct[["s.e.irrad"]] <- spct[["s.e.irrad"]] * scale.factor
-  y.max <- max(spct[["s.e.irrad"]], na.rm = TRUE)
-  y.min <- 0
+  y.max <- max(c(spct[["s.e.irrad"]], 0), na.rm = TRUE)
+  y.min <- min(c(spct[["s.e.irrad"]], 0), na.rm = TRUE)
   plot <- ggplot(spct, aes_(~w.length, ~s.e.irrad)) +
     scale_fill_identity() + scale_color_identity()
   plot <- plot + geom_line(na.rm = na.rm)
@@ -147,15 +150,19 @@ e_plot <- function(spct,
 
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries", "colour.guide"), annotations)) > 0L) {
-    y.limits <- c(0, y.max * 1.25)
-    x.limits <- c(min(spct) - spread(spct) * 0.025, NA)
+    y.limits <- c(y.min, y.max * 1.25)
+    x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
-    y.limits <- c(0, 1)
+    y.limits <- c(y.min, y.max * 1.05)
     x.limits <- range(spct)
   }
-  plot <- plot + scale_y_continuous(limits = y.limits)
+  if (abs(y.min) < 5e-2 && (abs(y.max - 1) < 5.e-2)) {
+    plot <- plot +
+      scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1), limits = y.limits)
+  } else {
+    plot <- plot + scale_y_continuous(limits = y.limits)
+  }
   plot + scale_x_continuous(limits = x.limits)
-
 }
 
 #' Plot a source spectrum.
@@ -194,7 +201,10 @@ q_plot <- function(spct,
   }
   e2q(spct, byref = TRUE)
   if (!is.null(range)) {
-    trim_spct(spct, range = range, byref = TRUE)
+    spct <- trim_wl(spct, range = range)
+  }
+  if (!is.null(w.band)) {
+    w.band <- trim_wl(w.band, range = range(spct))
   }
 
   exposure.label <- NA
@@ -261,8 +271,8 @@ q_plot <- function(spct,
   }
   s.irrad.label <- parse(text = s.irrad.label)
   spct[["s.q.irrad"]] <- spct[["s.q.irrad"]] * scale.factor
-  y.max <- max(spct[["s.q.irrad"]], na.rm = TRUE)
-  y.min <- 0
+  y.max <- max(c(spct[["s.q.irrad"]], 0), na.rm = TRUE)
+  y.min <- min(c(spct[["s.q.irrad"]], 0), na.rm = TRUE)
   plot <- ggplot(spct, aes_(~w.length, ~s.q.irrad)) +
     scale_fill_identity() + scale_color_identity()
   plot <- plot + geom_line(na.rm = na.rm)
@@ -309,15 +319,19 @@ q_plot <- function(spct,
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide"), annotations)) > 0L) {
-    y.limits <- c(0, y.max * 1.25)
-    x.limits <- c(min(spct) - spread(spct) * 0.025, NA)
+    y.limits <- c(y.min, y.max * 1.25)
+    x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
-    y.limits <- c(0, 1)
+    y.limits <- c(y.min, y.max * 1.05)
     x.limits <- range(spct)
   }
-  plot <- plot + scale_y_continuous(limits = y.limits)
+  if (abs(y.min) < 5e-2 && (abs(y.max - 1) < 5.e-2)) {
+    plot <- plot +
+      scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1), limits = y.limits)
+  } else {
+    plot <- plot + scale_y_continuous(limits = y.limits)
+  }
   plot + scale_x_continuous(limits = x.limits)
-
 }
 
 #' Plot method for light-source spectra.
@@ -379,13 +393,13 @@ plot.source_spct <-
         label.qty = "total"
       }
     }
-    if (is.null(w.band)) {
+    if (length(w.band) == 0) {
       if (is.null(range)) {
-        w.band <- photobiology::waveband(x)
+        w.band <- waveband(x)
       } else if (is.waveband(range)) {
         w.band <- range
       } else {
-        w.band <-  photobiology::waveband(range, wb.name = "Total")
+        w.band <-  waveband(range, wb.name = "Total")
       }
     }
 

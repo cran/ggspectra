@@ -5,9 +5,9 @@
 \title{Average area under curve for regions.}
 \usage{
 stat_wl_summary(mapping = NULL, data = NULL, geom = "text",
-  range = NULL, integral.fun = photobiology::integrate_xy,
-  label.fmt = "\%.3g", position = "identity", na.rm = FALSE,
-  show.legend = NA, inherit.aes = TRUE, ...)
+  range = NULL, integral.fun = integrate_xy, label.fmt = "\%.3g",
+  position = "identity", na.rm = FALSE, show.legend = NA,
+  inherit.aes = TRUE, ...)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -45,17 +45,46 @@ the default plot specification, e.g. \code{\link[ggplot2]{borders}}.}
 include aesthetics whose values you want to set, not map. See
 \code{\link[ggplot2]{layer}} for more details.}
 }
+\value{
+A data frame with one row.
+}
 \description{
 \code{stat_wl_summary} computes the area under a curve.
 }
 \section{Computed variables}{
 
+What it is named integral below is the result of appying \code{integral.fun},
+with default \code{integrate_xy}.
 \describe{
-  \item{label}{intergral value as formatted text}
-  \item{x}{range-midpoint}
+  \item{y.label}{y formatted according to \code{label.fmt}}
+  \item{x}{w.band-midpoint}
   \item{xmin}{range minimum}
   \item{xmax}{range maximum}
-  \item{y}{integral value as numeric}
+  \item{y}{data$y integral for the range by the spread of the range}
+}
+}
+
+\section{Default aesthetics}{
+
+Set by the statistic and available to geoms.
+\describe{
+  \item{label}{..label..}
+  \item{x}{..x..}
+  \item{xmin}{..xmin..}
+  \item{xmax}{..xmax..}
+  \item{y}{..y..}
+  \item{ymin}{0}
+  \item{ymax}{..y..}
+  \item{yintercept}{..y..}
+}
+}
+
+\section{Required aesthetics}{
+
+Required by the statistic and need to be set with \code{aes()}.
+\describe{
+  \item{x}{numeric, wavelength in nanometres}
+  \item{y}{numeric, a spectral quantity}
 }
 }
 \examples{
@@ -70,7 +99,7 @@ ggplot(sun.spct) + geom_line() +
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
-  \code{\link{stat_peaks}},
+  \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
   \code{\link{stat_wb_contribution}},
   \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
   \code{\link{stat_wb_mean}},

@@ -5,10 +5,10 @@
 \title{Integrate ranges under spectral curve.}
 \usage{
 stat_wb_contribution(mapping = NULL, data = NULL, geom = "rect",
-  w.band = NULL, integral.fun = photobiology::integrate_xy,
-  label.mult = 1, label.fmt = "\%.3g", ypos.mult = 1.07,
-  ypos.fixed = NULL, position = "identity", na.rm = FALSE,
-  show.legend = NA, inherit.aes = TRUE, ...)
+  w.band = NULL, integral.fun = integrate_xy, label.mult = 1,
+  label.fmt = "\%.3g", ypos.mult = 1.07, ypos.fixed = NULL,
+  position = "identity", na.rm = FALSE, show.legend = NA,
+  inherit.aes = TRUE, ...)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -57,6 +57,11 @@ default plot specification, e.g. \code{\link[ggplot2]{borders}}.}
 can include aesthetics whose values you want to set, not map. See
 \code{\link[ggplot2]{layer}} for more details.}
 }
+\value{
+A data frame with one row for each waveband object in the argument
+to \code{w.band}. Wavebeand outside the range of the spectral data are
+trimmed or discarded.
+}
 \description{
 \code{stat_wb_contribution} computes means under a curve. It first integrates the
   area under a spectral curve and also the mean expressed per nanaometre of
@@ -66,13 +71,46 @@ can include aesthetics whose values you want to set, not map. See
 }
 \section{Computed variables}{
 
+What it is named integral below is the result of appying \code{integral.fun}
+to the data, with default \code{integrate_xy}.
 \describe{
-  \item{label}{intergral value as formatted text}
+  \item{y.label}{yint multiplied by \code{label.mult} and formatted
+  according to \code{label.fmt}}
   \item{x}{w.band-midpoint}
   \item{xmin}{w.band minimum}
   \item{xmax}{w.band maximum}
-  \item{ymean}{Mean value as numeric}
-  \item{yint}{Integral value as numeric}
+  \item{ymin}{data$y minimum}
+  \item{ymax}{data$y maximum}
+  \item{yint}{data$y integral for w.band / data$y integral for whole range
+  of data$x}
+  \item{xmean}{yint divided by spread(w.band)}
+  \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
+  \item{wb.color}{color of the w.band}
+  \item{wb.name}{label of w.band}
+}
+}
+
+\section{Default aesthetics}{
+
+Set by the statistic and available to geoms.
+\describe{
+  \item{label}{..y.label..}
+  \item{x}{..x..}
+  \item{xmin}{..xmin..}
+  \item{xmax}{..xmax..}
+  \item{ymin}{..y.. - (..ymax.. - ..ymin..) * 0.03}
+  \item{ymax}{..y.. + (..ymax.. - ..ymin..) * 0.03}
+  \item{yintercept}{..ymean..}
+  \item{fill}{..wb.color..}
+}
+}
+
+\section{Required aesthetics}{
+
+Required by the statistic and need to be set with \code{aes()}.
+\describe{
+  \item{x}{numeric, wavelength in nanometres}
+  \item{y}{numeric, a spectral quantity}
 }
 }
 \examples{
@@ -91,8 +129,9 @@ ggplot(sun.spct) +
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
-  \code{\link{stat_peaks}}, \code{\link{stat_wb_irrad}},
-  \code{\link{stat_wb_label}}, \code{\link{stat_wb_mean}},
+  \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
+  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
+  \code{\link{stat_wb_mean}},
   \code{\link{stat_wb_relative}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},

@@ -47,6 +47,11 @@ default plot specification, e.g. \code{\link[ggplot2]{borders}}.}
 can include aesthetics whose values you want to set, not map. See
 \code{\link[ggplot2]{layer}} for more details.}
 }
+\value{
+A data frame with one row for each waveband object in the argument
+to \code{w.band}. Wavebeand outside the range of the spectral data are
+trimmed or discarded.
+}
 \description{
 \code{stat_wb_label} computes computes the center of a waveband. Sets
 suitable default aestheics for "rect", "hline", "vline", "text" and "label"
@@ -55,12 +60,33 @@ geoms displaying "boundaries" and "names" of wavebands.
 \section{Computed variables}{
 
 \describe{
-  \item{label}{name of the waveband as a character string}
   \item{x}{w.band-midpoint}
   \item{xmin}{w.band minimum}
   \item{xmax}{w.band maximum}
-  \item{ymean}{Mean value as numeric}
-  \item{yint}{Integral value as numeric}
+  \item{y}{ypos.fixed or zero}
+  \item{wb.color}{color of the w.band}
+  \item{wb.name}{label of w.band}
+  \item{wb.label}{formatted wb.name}
+}
+}
+
+\section{Default aesthetics}{
+
+Set by the statistic and available to geoms.
+\describe{
+  \item{label}{..wb.label..}
+  \item{x}{..x..}
+  \item{xmin}{..xmin..}
+  \item{xmax}{..xmax..}
+  \item{fill}{..wb.color..}
+}
+}
+
+\section{Required aesthetics}{
+
+Required by the statistic and need to be set with \code{aes()}.
+\describe{
+  \item{x}{numeric, wavelength in nanometres}
 }
 }
 \examples{
@@ -77,7 +103,7 @@ ggplot(sun.spct) +
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
-  \code{\link{stat_peaks}},
+  \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
   \code{\link{stat_wb_contribution}},
   \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_mean}},
   \code{\link{stat_wb_relative}},
