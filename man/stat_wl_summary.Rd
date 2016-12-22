@@ -94,15 +94,17 @@ library(ggplot2)
 ggplot(sun.spct) + geom_line() +
   stat_wl_summary(geom = "hline")
 ggplot(sun.spct) + geom_line() +
-  stat_wl_summary(label.fmt = "\%.3f", color = "red")
+  stat_wl_summary(label.fmt = "mean = \%.3f", color = "red", vjust = -0.3) +
+  stat_wl_summary(geom = "hline", color = "red")
 
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
+  \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
-  \code{\link{stat_wb_mean}},
+  \code{\link{stat_wb_hbar}}, \code{\link{stat_wb_irrad}},
+  \code{\link{stat_wb_label}}, \code{\link{stat_wb_mean}},
   \code{\link{stat_wb_relative}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}}

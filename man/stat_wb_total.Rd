@@ -4,7 +4,7 @@
 \alias{stat_wb_total}
 \title{Integrate ranges under spectral curve.}
 \usage{
-stat_wb_total(mapping = NULL, data = NULL, geom = "rect", w.band = NULL,
+stat_wb_total(mapping = NULL, data = NULL, geom = "text", w.band = NULL,
   integral.fun = integrate_xy, label.mult = 1, label.fmt = "\%.3g",
   ypos.mult = 1.07, ypos.fixed = NULL, position = "identity",
   na.rm = FALSE, show.legend = NA, inherit.aes = TRUE, ...)
@@ -62,7 +62,7 @@ to \code{w.band}. Wavebeand outside the range of the spectral data are
 trimmed or discarded.
 }
 \description{
-\code{stat_wb_total} computes means under a curve. It first integrates the
+\code{stat_wb_total} computes integral under a curve. It first integrates the
   area under a spectral curve and also the mean expressed per nanaometre of
   wavelength for each waveband in the input. Sets suitable default aesthetics
   for "rect", "hline", "vline", "text" and "label" geoms displaying "totals"
@@ -85,6 +85,7 @@ with default \code{integrate_xy}.
   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}
+  \item{BW.color}{\code{black_or_white(wb.color)}}
 }
 }
 
@@ -118,17 +119,24 @@ library(ggplot2)
 # ggplot() methods for spectral objects set a default mapping for x and y.
 ggplot(sun.spct) +
   geom_line() +
+  stat_wb_box(w.band = VIS()) +
   stat_wb_total(w.band = VIS()) +
-  stat_wb_total(w.band = VIS(), geom = "text", color = "white") +
-  scale_fill_identity()
+  scale_fill_identity() + scale_color_identity()
+
+ggplot(sun.spct) +
+  geom_line() +
+  stat_wb_box(w.band = UV_bands(), color = "white") +
+  stat_wb_total(w.band = UV_bands()) +
+  scale_fill_identity() + scale_color_identity()
 
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
+  \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
-  \code{\link{stat_wb_mean}},
+  \code{\link{stat_wb_hbar}}, \code{\link{stat_wb_irrad}},
+  \code{\link{stat_wb_label}}, \code{\link{stat_wb_mean}},
   \code{\link{stat_wb_relative}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wl_strip}},

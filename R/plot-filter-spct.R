@@ -13,6 +13,9 @@
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
+#' @param span a peak is defined as an element in a sequence which is greater
+#'   than all other elements within a window of width span centered at that
+#'   element.
 #' @param annotations a character vector
 #' @param text.size numeric size of text in the plot decorations.
 #' @param na.rm logical.
@@ -27,6 +30,7 @@ Afr_plot <- function(spct,
                      range,
                      pc.out,
                      label.qty,
+                     span,
                      annotations,
                      text.size,
                      na.rm,
@@ -37,10 +41,10 @@ Afr_plot <- function(spct,
   A2T(spct, byref = TRUE)
   Tfr.type <- getTfrType(spct)
   if (!is.null(range)) {
-    trim_wl(spct, range = range, byref = TRUE)
+    spct <- trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    trim_wl(w.band, range = range(spct))
+    w.band <- trim_wl(w.band, range = range(spct))
   }
   setGenericSpct(spct) # so that we can assign variable Afr
   if (! "Afr" %in% names(spct)) {
@@ -116,10 +120,15 @@ Afr_plot <- function(spct,
   y.max <- 1
   y.min <- 0
 
-  plot <- ggplot(spct, aes_(~w.length, ~Afr)) +
-    scale_fill_identity() + scale_color_identity()
+  plot <- ggplot(spct, aes_(~w.length, ~Afr))
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.Afr.label)
+
+  if (length(annotations) == 1 && annotations == "") {
+    return(plot)
+  }
+
+  plot <- plot + scale_fill_identity() + scale_color_identity()
 
   plot <- plot + decoration(w.band = w.band,
                             label.mult = scale.factor,
@@ -129,12 +138,13 @@ Afr_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
+                            span = span,
                             summary.label = Afr.label,
                             text.size = text.size,
                             na.rm = TRUE)
 
   if (!is.null(annotations) &&
-      length(intersect(c("labels", "summaries", "colour.guide"), annotations)) > 0L) {
+      length(intersect(c("labels", "summaries", "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
     x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
@@ -149,7 +159,7 @@ Afr_plot <- function(spct,
                                       limits = y.limits)
   }
 
-  plot + scale_x_continuous(limits = x.limits)
+  plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 
 }
 
@@ -168,6 +178,9 @@ Afr_plot <- function(spct,
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
+#' @param span a peak is defined as an element in a sequence which is greater
+#'   than all other elements within a window of width span centered at that
+#'   element.
 #' @param annotations a character vector
 #' @param text.size numeric size of text in the plot decorations.
 #' @param na.rm logical.
@@ -182,6 +195,7 @@ T_plot <- function(spct,
                    range,
                    pc.out,
                    label.qty,
+                   span,
                    annotations,
                    text.size,
                    na.rm,
@@ -192,10 +206,10 @@ T_plot <- function(spct,
   A2T(spct, byref = TRUE)
   Tfr.type <- getTfrType(spct)
   if (!is.null(range)) {
-    trim_wl(spct, range = range, byref = TRUE)
+    spct <- trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    trim_wl(w.band, range = range(spct))
+    w.band <- trim_wl(w.band, range = range(spct))
   }
   if (!length(Tfr.type)) {
     Tfr.type <- "unknown"
@@ -249,10 +263,15 @@ T_plot <- function(spct,
   y.max <- 1
   y.min <- 0
 
-  plot <- ggplot(spct, aes_(~w.length, ~Tfr)) +
-    scale_fill_identity() + scale_color_identity()
+  plot <- ggplot(spct, aes_(~w.length, ~Tfr))
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.Tfr.label)
+
+  if (length(annotations) == 1 && annotations == "") {
+    return(plot)
+  }
+
+  plot <- plot + scale_fill_identity() + scale_color_identity()
 
   plot <- plot + decoration(w.band = w.band,
                             label.mult = scale.factor,
@@ -262,12 +281,13 @@ T_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
+                            span = span,
                             summary.label = Tfr.label,
                             text.size = text.size,
                             na.rm = TRUE)
 
   if (!is.null(annotations) &&
-      length(intersect(c("labels", "summaries", "colour.guide"), annotations)) > 0L) {
+      length(intersect(c("labels", "summaries", "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
     x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
@@ -282,7 +302,7 @@ T_plot <- function(spct,
                                       limits = y.limits)
   }
 
-  plot + scale_x_continuous(limits = x.limits)
+  plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 
 }
 
@@ -300,6 +320,9 @@ T_plot <- function(spct,
 #'   min annd max wavelengths (nm)
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
+#' @param span a peak is defined as an element in a sequence which is greater
+#'   than all other elements within a window of width span centered at that
+#'   element.
 #' @param annotations a character vector
 #' @param text.size numeric size of text in the plot decorations.
 #' @param na.rm logical.
@@ -313,6 +336,7 @@ A_plot <- function(spct,
                    w.band,
                    range,
                    label.qty,
+                   span,
                    annotations,
                    text.size,
                    na.rm,
@@ -322,10 +346,10 @@ A_plot <- function(spct,
   }
   T2A(spct, action = "replace", byref = TRUE)
   if (!is.null(range)) {
-    trim_wl(spct, range = range, byref = TRUE)
+    spct <- trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    trim_wl(w.band, range = range(spct))
+    w.band <- trim_wl(w.band, range = range(spct))
   }
   Tfr.type <- getTfrType(spct)
   if (!length(Tfr.type)) {
@@ -362,10 +386,15 @@ A_plot <- function(spct,
 
   y.max <- max(spct[["A"]], na.rm = TRUE)
   y.min <- 0
-  plot <- ggplot(spct, aes_(~w.length, ~A)) +
-    scale_fill_identity() + scale_color_identity()
+  plot <- ggplot(spct, aes_(~w.length, ~A))
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.A.label)
+
+  if (length(annotations) == 1 && annotations == "") {
+    return(plot)
+  }
+
+  plot <- plot + scale_fill_identity() + scale_color_identity()
 
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
@@ -374,12 +403,13 @@ A_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
+                            span = span,
                             summary.label = A.label,
                             text.size = text.size,
                             na.rm = TRUE)
 
   if (!is.null(annotations) &&
-      length(intersect(c("boxes", "segments", "labels", "summaries", "colour.guide"), annotations)) > 0L) {
+      length(intersect(c("boxes", "segments", "labels", "summaries", "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
     x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
@@ -387,7 +417,7 @@ A_plot <- function(spct,
     x.limits <- range(spct)
   }
   plot <- plot + scale_y_continuous(limits = y.limits)
-  plot + scale_x_continuous(limits = x.limits)
+  plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 
 }
 
@@ -406,6 +436,9 @@ A_plot <- function(spct,
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
+#' @param span a peak is defined as an element in a sequence which is greater
+#'   than all other elements within a window of width span centered at that
+#'   element.
 #' @param annotations a character vector
 #' @param text.size numeric size of text in the plot decorations.
 #' @param na.rm logical.
@@ -420,6 +453,7 @@ R_plot <- function(spct,
                    range,
                    pc.out,
                    label.qty,
+                   span,
                    annotations,
                    text.size,
                    na.rm,
@@ -428,10 +462,10 @@ R_plot <- function(spct,
     stop("R_plot() can only plot reflector_spct objects.")
   }
   if (!is.null(range)) {
-    trim_wl(spct, range = range, byref = TRUE)
+    spct <- trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    trim_wl(w.band, range = range(spct))
+    w.band <- trim_wl(w.band, range = range(spct))
   }
   Rfr.type <- getRfrType(spct)
   if (length(Rfr.type) == 0) {
@@ -485,10 +519,15 @@ R_plot <- function(spct,
   }
   y.max <- 1
   y.min <- 0
-  plot <- ggplot(spct, aes_(~w.length, ~Rfr)) +
-    scale_fill_identity() + scale_color_identity()
+  plot <- ggplot(spct, aes_(~w.length, ~Rfr))
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.Rfr.label)
+
+  if (length(annotations) == 1 && annotations == "") {
+    return(plot)
+  }
+
+  plot <- plot + scale_fill_identity() + scale_color_identity()
 
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
@@ -497,12 +536,13 @@ R_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
+                            span = span,
                             summary.label = Rfr.label,
                             text.size = text.size,
                             na.rm = TRUE)
 
   if (!is.null(annotations) &&
-      length(intersect(c("labels", "summaries", "colour.guide"), annotations)) > 0L) {
+      length(intersect(c("labels", "summaries", "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
     x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
@@ -516,7 +556,7 @@ R_plot <- function(spct,
     plot <- plot + scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1),
                                       limits = y.limits)
   }
-  plot + scale_x_continuous(limits = x.limits)
+  plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 
 }
 
@@ -535,6 +575,9 @@ R_plot <- function(spct,
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
+#' @param span a peak is defined as an element in a sequence which is greater
+#'   than all other elements within a window of width span centered at that
+#'   element.
 #' @param annotations a character vector
 #' @param stacked logical
 #' @param text.size numeric size of text in the plot decorations.
@@ -550,6 +593,7 @@ O_plot <- function(spct,
                    range,
                    pc.out,
                    label.qty,
+                   span,
                    annotations,
                    stacked,
                    text.size,
@@ -559,10 +603,10 @@ O_plot <- function(spct,
     stop("O_plot() can only plot object_spct objects.")
   }
   if (!is.null(range)) {
-    trim_wl(spct, range = range, byref = TRUE)
+    spct <- trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    trim_wl(w.band, range = range(spct))
+    w.band <- trim_wl(w.band, range = range(spct))
   }
   Rfr.type <- getRfrType(spct)
   if (length(Rfr.type) == 0) {
@@ -594,8 +638,7 @@ O_plot <- function(spct,
   molten.spct[["variable"]] <-
     factor(molten.spct[["variable"]], levels = stack.levels)
   setGenericSpct(molten.spct, multiple.wl = 3L * getMultipleWl(spct))
-  plot <- ggplot(molten.spct, aes_(~w.length, ~value), na.rm = na.rm) +
-    scale_fill_identity()
+  plot <- ggplot(molten.spct, aes_(~w.length, ~value), na.rm = na.rm)
   if (stacked) {
     plot <- plot + geom_area(aes_(alpha = ~variable), fill = "black", colour = NA)
     plot <- plot + scale_alpha_manual(values = c(Tfr = 0.4,
@@ -607,15 +650,25 @@ O_plot <- function(spct,
                                                  Rfr = expression(R(lambda))),
                                       guide = guide_legend(title = NULL))
   } else {
-    plot <- plot + geom_line(aes_(colour = ~variable))
-    plot <- plot + scale_colour_hue(labels = c(Tfr = expression(T(lambda)),
+    plot <- plot + geom_line(aes_(linetype = ~variable))
+    plot <- plot + scale_linetype(labels = c(Tfr = expression(T(lambda)),
                                                Afr = expression(A(lambda)),
                                                Rfr = expression(R(lambda))),
                                     guide = guide_legend(title = NULL))
   }
   plot <- plot + labs(x = "Wavelength (nm)", y = s.Rfr.label)
 
-  annotations <- intersect(annotations, c("labels", "boxes", "segments", "colour.guide"))
+  if (length(annotations) == 1 && annotations == "") {
+    return(plot)
+  }
+
+  plot <- plot + scale_fill_identity() + scale_color_identity()
+
+  valid.annotations <- c("labels", "boxes", "segments", "colour.guide", "reserve.space")
+  if (!stacked) {
+    valid.annotations <- c(valid.annotations, "peaks", "valleys", "peak.labels", "valley.labels")
+  }
+  annotations <- intersect(annotations, valid.annotations)
 
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
@@ -624,13 +677,14 @@ O_plot <- function(spct,
                             x.min = min(spct),
                             annotations = annotations,
                             label.qty = label.qty,
+                            span = span,
                             summary.label = "",
                             text.size = text.size,
                             na.rm = TRUE)
   if (!is.null(annotations) &&
-      length(intersect(c("boxes", "segments", "labels", "colour.guide"), annotations)) > 0L) {
+      length(intersect(c("boxes", "segments", "labels", "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
-    x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct) - spread(spct) * 0.025, NA)
   } else {
     y.limits <- c(y.min, y.max)
     x.limits <- range(spct)
@@ -641,7 +695,7 @@ O_plot <- function(spct,
     plot <- plot + scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1), limits = y.limits)
   }
 
- plot + scale_x_continuous(limits = x.limits)
+ plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 
 }
 
@@ -662,6 +716,9 @@ O_plot <- function(spct,
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
+#' @param span a peak is defined as an element in a sequence which is greater
+#'   than all other elements within a window of width span centered at that
+#'   element.
 #' @param annotations a character vector
 #' @param text.size numeric size of text in the plot decorations.
 #' @param na.rm logical.
@@ -690,14 +747,15 @@ plot.filter_spct <-
            plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
            pc.out = FALSE,
            label.qty = NULL,
-           annotations = getOption("photobiology.plot.annotations",
-                                 default = c("boxes", "labels", "summaries",
-                                             "colour.guide", "peaks")),
+           span = NULL,
+           annotations = NULL,
            text.size = 2.5,
            na.rm = TRUE) {
-    if ("color.guide" %in% annotations) {
-      annotations <- c(setdiff(annotations, "color.guide"), "colour.guide")
-    }
+    annotations.default <-
+      getOption("photobiology.plot.annotations",
+                default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
+    annotations <- decode_annotations(annotations,
+                                      annotations.default)
     if (is.null(label.qty)) {
       if (is_normalized(x) || is_scaled(x)) {
         label.qty = "contribution"
@@ -716,21 +774,33 @@ plot.filter_spct <-
     }
 
     if (plot.qty == "transmittance") {
-      out.ggplot <- T_plot(spct = x, w.band = w.band, range = range,
-                           pc.out = pc.out, label.qty = label.qty,
+      out.ggplot <- T_plot(spct = x,
+                           w.band = w.band,
+                           range = range,
+                           pc.out = pc.out,
+                           label.qty = label.qty,
+                           span = span,
                            annotations = annotations,
                            text.size = text.size,
                            na.rm = na.rm,
                            ...)
     } else if (plot.qty == "absorbance") {
-      out.ggplot <- A_plot(spct = x, w.band = w.band, range = range,
-                           label.qty = label.qty, annotations = annotations,
+      out.ggplot <- A_plot(spct = x,
+                           w.band = w.band,
+                           range = range,
+                           label.qty = label.qty,
+                           span = span,
+                           annotations = annotations,
                            text.size = text.size,
                            na.rm = na.rm,
                            ...)
     } else if (plot.qty == "absorptance") {
-      out.ggplot <- Afr_plot(spct = x, w.band = w.band, range = range,
-                             pc.out = pc.out, label.qty = label.qty,
+      out.ggplot <- Afr_plot(spct = x,
+                             w.band = w.band,
+                             range = range,
+                             pc.out = pc.out,
+                             label.qty = label.qty,
+                             span = span,
                              annotations = annotations,
                              text.size = text.size,
                              na.rm = na.rm,
@@ -761,6 +831,9 @@ plot.filter_spct <-
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
+#' @param span a peak is defined as an element in a sequence which is greater
+#'   than all other elements within a window of width span centered at that
+#'   element.
 #' @param annotations a character vector
 #' @param text.size numeric size of text in the plot decorations.
 #' @param na.rm logical.
@@ -786,14 +859,15 @@ plot.reflector_spct <-
            plot.qty = getOption("photobiology.reflector.qty", default = "reflectance"),
            pc.out = FALSE,
            label.qty = NULL,
-           annotations = getOption("photobiology.plot.annotations",
-                                 default = c("boxes", "labels", "summaries",
-                                             "colour.guide", "peaks")),
+           span = NULL,
+           annotations = NULL,
            text.size = 2.5,
            na.rm = TRUE) {
-    if ("color.guide" %in% annotations) {
-      annotations <- c(setdiff(annotations, "color.guide"), "colour.guide")
-    }
+    annotations.default <-
+      getOption("photobiology.plot.annotations",
+                default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
+    annotations <- decode_annotations(annotations,
+                                      annotations.default)
     if (is.null(label.qty)) {
       if (is_normalized(x) || is_scaled(x)) {
         label.qty = "contribution"
@@ -811,8 +885,12 @@ plot.reflector_spct <-
       }
     }
     if (plot.qty == "reflectance") {
-      out.ggplot <- R_plot(spct = x, w.band = w.band,  range = range,
-                           pc.out = pc.out, label.qty = label.qty,
+      out.ggplot <- R_plot(spct = x,
+                           w.band = w.band,
+                           range = range,
+                           pc.out = pc.out,
+                           label.qty = label.qty,
+                           span = span,
                            annotations = annotations,
                            text.size = text.size,
                            na.rm = na.rm,
@@ -845,6 +923,9 @@ plot.reflector_spct <-
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels
+#' @param span a peak is defined as an element in a sequence which is greater
+#'   than all other elements within a window of width span centered at that
+#'   element.
 #' @param annotations a character vector
 #' @param stacked logical
 #' @param text.size numeric size of text in the plot decorations.
@@ -873,15 +954,16 @@ plot.object_spct <-
            plot.qty = "all",
            pc.out = FALSE,
            label.qty = NULL,
-           annotations=getOption("photobiology.plot.annotations",
-                                 default = c("boxes", "labels",
-                                             "colour.guide", "peaks")),
+           span = 61,
+           annotations = NULL,
            stacked = TRUE,
            text.size = 2.5,
            na.rm = TRUE) {
-    if ("color.guide" %in% annotations) {
-      annotations <- c(setdiff(annotations, "color.guide"), "colour.guide")
-    }
+    annotations.default <-
+      getOption("photobiology.plot.annotations",
+                default = c("boxes", "labels", "colour.guide", "peaks"))
+    annotations <- decode_annotations(annotations,
+                                      annotations.default)
     if (is.null(label.qty)) {
       if (is_normalized(x) || is_scaled(x)) {
         label.qty = "contribution"
@@ -899,39 +981,60 @@ plot.object_spct <-
       }
     }
     if (is.null(plot.qty) || plot.qty == "all") {
-    out.ggplot <- O_plot(spct = x, w.band = w.band,  range = range,
-                         pc.out = pc.out, label.qty = label.qty,
-                         annotations = annotations, stacked = stacked,
+    out.ggplot <- O_plot(spct = x,
+                         w.band = w.band,
+                         range = range,
+                         pc.out = pc.out,
+                         label.qty = label.qty,
+                         span = span,
+                         annotations = annotations,
+                         stacked = stacked,
                          text.size = text.size,
                          na.rm = na.rm,
                          ...)
     } else if (plot.qty == "transmittance") {
       x <- as.filter_spct(x)
-      out.ggplot <- T_plot(spct = x, w.band = w.band, range = range,
-                           pc.out = pc.out, label.qty = label.qty,
+      out.ggplot <- T_plot(spct = x,
+                           w.band = w.band,
+                           range = range,
+                           pc.out = pc.out,
+                           label.qty = label.qty,
+                           span = span,
                            annotations = annotations,
                            text.size = text.size,
                            na.rm = na.rm,
                            ...)
     } else if (plot.qty == "absorbance") {
       x <- as.filter_spct(x)
-      out.ggplot <- A_plot(spct = x, w.band = w.band, range = range,
-                           label.qty = label.qty, annotations = annotations,
+      out.ggplot <- A_plot(spct = x,
+                           w.band = w.band,
+                           range = range,
+                           label.qty = label.qty,
+                           span = span,
+                           annotations = annotations,
                            text.size = text.size,
                            na.rm = na.rm,
                            ...)
     } else if (plot.qty == "absorptance") {
       x <- as.filter_spct(x)
-      out.ggplot <- Afr_plot(spct = x, w.band = w.band, range = range,
-                             pc.out = pc.out, label.qty = label.qty,
+      out.ggplot <- Afr_plot(spct = x,
+                             w.band = w.band,
+                             range = range,
+                             pc.out = pc.out,
+                             label.qty = label.qty,
+                             span = span,
                              annotations = annotations,
                              text.size = text.size,
                              na.rm = na.rm,
                              ...)
     } else if (plot.qty == "reflectance") {
       x <- as.reflector_spct(x)
-      out.ggplot <- R_plot(spct = x, w.band = w.band,  range = range,
-                           pc.out = pc.out, label.qty = label.qty,
+      out.ggplot <- R_plot(spct = x,
+                           w.band = w.band,
+                           range = range,
+                           pc.out = pc.out,
+                           label.qty = label.qty,
+                           span = span,
                            annotations = annotations,
                            text.size = text.size,
                            na.rm = na.rm,

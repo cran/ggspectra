@@ -4,10 +4,11 @@
 \alias{stat_wb_mean}
 \title{Integrate ranges under curve.}
 \usage{
-stat_wb_mean(mapping = NULL, data = NULL, geom = "rect", w.band = NULL,
+stat_wb_mean(mapping = NULL, data = NULL, geom = "text", w.band = NULL,
   integral.fun = integrate_xy, label.mult = 1, label.fmt = "\%.3g",
-  ypos.mult = 0.55, ypos.fixed = NULL, position = "identity",
-  na.rm = FALSE, show.legend = NA, inherit.aes = TRUE, ...)
+  ypos.mult = 1.07, xpos.fixed = NULL, ypos.fixed = NULL,
+  position = "identity", na.rm = FALSE, show.legend = NA,
+  inherit.aes = TRUE, ...)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -34,8 +35,8 @@ y-integral values into character strings by means of function
 \item{ypos.mult}{numeric Multiplier constant used to scale returned
 \code{y} values.}
 
-\item{ypos.fixed}{numeric If not \code{NULL} used a constant value returned
-in \code{y}.}
+\item{xpos.fixed, ypos.fixed}{numeric If not \code{NULL} used as constant value returned
+in \code{x} or \code{y}.}
 
 \item{position}{The position adjustment to use for overlapping points on this
 layer}
@@ -64,7 +65,7 @@ trimmed or discarded.
 \description{
 \code{stat_wb_mean} computes means under a curve. It first integrates the
   area under a spectral curve and also the mean expressed per nanaometre of
-  wavelength for each waveband in the input. Sets suitable default aestheics
+  wavelength for each waveband in the input. Sets suitable default aesthetics
   for "rect", "hline", "vline", "text" and "label" geoms.
 }
 \section{Computed variables}{
@@ -84,6 +85,7 @@ with default \code{integrate_xy}.
   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}
+  \item{BW.color}{\code{black_or_white(wb.color)}}
 }
 }
 
@@ -114,21 +116,30 @@ Required by the statistic and need to be set with \code{aes()}.
 library(photobiology)
 library(photobiologyWavebands)
 library(ggplot2)
+library(ggrepel)
 # ggplot() methods for spectral objects set a default mapping for x and y.
 ggplot(sun.spct) +
-  stat_wb_mean(w.band = VIS_bands()) +
-  stat_wb_mean(w.band = VIS_bands(),
-               geom = "text", angle = 90, size = 2.5,
-               label.fmt = "\%1.2f") +
+  stat_wb_column(w.band = VIS_bands()) +
+  stat_wb_mean(w.band = VIS_bands(), angle = 90, color = "black") +
   geom_line() +
-  scale_fill_identity()
+  scale_fill_identity() + scale_color_identity()
+
+ggplot(sun.spct) +
+  geom_line() +
+  stat_wb_hbar(w.band = VIS_bands(), size = 1.5) +
+  stat_wb_mean(w.band = VIS_bands(),
+               geom = "label_repel", nudge_y = +0.03,
+               segment.colour = NA) +
+  scale_fill_identity() + scale_color_identity()
 
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
+  \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
+  \code{\link{stat_wb_hbar}}, \code{\link{stat_wb_irrad}},
+  \code{\link{stat_wb_label}},
   \code{\link{stat_wb_relative}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},

@@ -58,6 +58,7 @@
 #'   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
 #'   \item{wb.color}{color of the w.band}
 #'   \item{wb.name}{label of w.band}
+#'   \item{BW.color}{\code{black_or_white(wb.color)}}
 #' }
 #'
 #' @section Default aesthetics:
@@ -86,12 +87,20 @@
 #' library(ggplot2)
 #' # ggplot() methods for spectral objects set a default mapping for x and y.
 #' ggplot(sun.spct) +
-#'   stat_wb_mean(w.band = VIS_bands()) +
+#'   stat_wb_column(w.band = VIS_bands()) +
 #'   stat_wb_e_irrad(w.band = VIS_bands(),
-#'                   geom = "text", angle = 90, size = 4,
+#'                   angle = 90, size = 4,
 #'                   label.fmt = "%2.0f", ypos.fixed = 0.1) +
 #'   geom_line() +
-#'   scale_fill_identity()
+#'   scale_fill_identity() + scale_color_identity()
+#'
+#' ggplot(sun.spct) +
+#'   stat_wb_box(w.band = VIS_bands()) +
+#'   stat_wb_e_irrad(w.band = VIS_bands(),
+#'                   angle = 90, size = 4,
+#'                   label.fmt = "%2.0f") +
+#'   geom_line() +
+#'   scale_fill_identity() + scale_color_identity()
 #'
 #' @export
 #' @family stats functions
@@ -241,7 +250,8 @@ StatWbIrrad <-
                                                     ymin = min(data$y),
                                                     ymean = ymean.tmp,
                                                     wb.color = color(wb),
-                                                    wb.name = labels(wb)$label)
+                                                    wb.name = labels(wb)$label,
+                                                    BW.color = black_or_white(color(wb)))
                                          )
                      }
 
@@ -259,7 +269,8 @@ StatWbIrrad <-
                                               ymin = ..y.. - (..ymax.. - ..ymin..) * 0.03,
                                               ymax = ..y.. + (..ymax.. - ..ymin..) * 0.03,
                                               yintercept = ..ymean..,
-                                              fill = ..wb.color..),
+                                              fill = ..wb.color..,
+                                              color = ..BW.color..),
                    required_aes = c("x", "y")
   )
 

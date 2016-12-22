@@ -1,8 +1,8 @@
-#' Label ranges under spectral curve.
+#' Draw colour boxes for wavebands
 #'
-#' \code{stat_wb_label} computes computes the center of a waveband. Sets
-#' suitable default aesthetics for "text" and "label"
-#' geoms displaying "boundaries" and "names" of wavebands.
+#' \code{stat_wb_box} plots boxes corresponding to wavebands, by default located
+#' slightly above the peak of the spectrum. Sets suitable default aesthetics for
+#' "rect" geom.
 #'
 #' @param mapping The aesthetic mapping, usually constructed with
 #'   \code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_string}}. Only needs
@@ -26,9 +26,8 @@
 #'   before the computation proceeds.
 #' @param w.band a waveband object or a list of waveband objects or numeric
 #'   vector of at least length two.
-#' @param label.fmt character string giving a format definition for formating
-#'   the name of the waveband.
-#'   \code{\link{sprintf}}.
+#' @param ypos.mult numeric Multiplier constant used to scale returned
+#'   \code{y} values.
 #' @param ypos.fixed numeric If not \code{NULL} used a constant value returned
 #'   in \code{y}.
 #'
@@ -37,23 +36,27 @@
 #' trimmed or discarded.
 #'
 #' @section Computed variables:
+#' What it is named integral below is the result of appying \code{integral.fun}
+#' to the data, with default \code{integrate_xy}.
 #' \describe{
 #'   \item{x}{w.band-midpoint}
 #'   \item{xmin}{w.band minimum}
 #'   \item{xmax}{w.band maximum}
-#'   \item{y}{ypos.fixed or zero}
+#'   \item{ymin}{data$y minimum}
+#'   \item{ymax}{data$y maximum}
+#'   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
 #'   \item{wb.color}{color of the w.band}
 #'   \item{wb.name}{label of w.band}
-#'   \item{wb.label}{formatted wb.name}
+#'   \item{BW.color}{\code{black_or_white(wb.color)}}
 #' }
 #'
 #' @section Default aesthetics:
 #' Set by the statistic and available to geoms.
 #' \describe{
-#'   \item{label}{..wb.label..}
-#'   \item{x}{..x..}
 #'   \item{xmin}{..xmin..}
 #'   \item{xmax}{..xmax..}
+#'   \item{ymin}{..y.. - (..ymax.. - ..ymin..) * 0.03}
+#'   \item{ymax}{..y.. + (..ymax.. - ..ymin..) * 0.03}
 #'   \item{fill}{..wb.color..}
 #' }
 #'
@@ -61,6 +64,7 @@
 #' Required by the statistic and need to be set with \code{aes()}.
 #' \describe{
 #'   \item{x}{numeric, wavelength in nanometres}
+#'   \item{y}{numeric, a spectral quantity}
 #' }
 #'
 #' @examples
@@ -69,32 +73,35 @@
 #' library(ggplot2)
 #' # ggplot() methods for spectral objects set a default mapping for x and y.
 #' ggplot(sun.spct) +
+#'   stat_wb_box(w.band = VIS_bands()) +
 #'   geom_line() +
-#'   stat_wb_box(w.band = VIS(), ymin = -0.04, ymax = 0,
-#'   color = "black", fill = "white") +
-#'   stat_wb_label(w.band = VIS(), ypos.fixed = -0.02, color = "black")
-#'
+#'   scale_fill_identity()
 #' ggplot(sun.spct) +
+#'   stat_wb_box(w.band = VIS_bands(), color = "white") +
 #'   geom_line() +
-#'   stat_wb_hbar(w.band = PAR(), ypos.fixed = 0, size = 1) +
-#'   stat_wb_label(aes(color = ..wb.color..),
-#'                 w.band = PAR(), ypos.fixed = +0.025) +
-#'   scale_color_identity()
+#'   scale_fill_identity()
+#'
+#' @note The value returned as default value for \code{y} is based on the
+#'   y-range of spectral values for the whole data set.
 #'
 #' @export
 #' @family stats functions
 #'
-stat_wb_label <- function(mapping = NULL, data = NULL, geom = "text",
-                          w.band = NULL,
-                          label.fmt = "%s",
-                          ypos.fixed = 0,
-                          position = "identity", na.rm = FALSE, show.legend = NA,
-                          inherit.aes = TRUE, ...) {
+stat_wb_box <- function(mapping = NULL,
+                        data = NULL,
+                        geom = "rect",
+                        w.band = NULL,
+                        ypos.mult = 1.07,
+                        ypos.fixed = NULL,
+                        position = "identity",
+                        na.rm = FALSE,
+                        show.legend = NA,
+                        inherit.aes = TRUE, ...) {
   ggplot2::layer(
-    stat = StatWbLabel, data = data, mapping = mapping, geom = geom,
+    stat = StatWbBox, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(w.band = w.band,
-                  label.fmt = label.fmt,
+                  ypos.mult = ypos.mult,
                   ypos.fixed = ypos.fixed,
                   na.rm = na.rm,
                   ...)
@@ -105,15 +112,16 @@ stat_wb_label <- function(mapping = NULL, data = NULL, geom = "text",
 #' @format NULL
 #' @usage NULL
 #' @export
-StatWbLabel <-
-  ggplot2::ggproto("StatWbLabel", ggplot2::Stat,
+StatWbBox <-
+  ggplot2::ggproto("StatWbBox", ggplot2::Stat,
                    compute_group = function(data,
                                             scales,
                                             w.band,
-                                            label.fmt,
+                                            ypos.mult,
                                             ypos.fixed) {
+                     wl.range <- range(data$x)
                      if (length(w.band) == 0) {
-                       w.band <- waveband(data$x)
+                       w.band <- waveband(wl.range)
                      }
                      if (is.any_spct(w.band) ||
                          (is.numeric(w.band) && length(na.omit(w.band)) >= 2)) {
@@ -122,36 +130,40 @@ StatWbLabel <-
                      if (!is.list(w.band) || is.waveband(w.band)) {
                        w.band <- list(w.band)
                      }
-                     w.band <- trim_wl(w.band, data$x)
+                     w.band <- trim_wl(w.band, wl.range)
+
                      integ.df <- data.frame()
                      for (wb in w.band) {
                        if (is.numeric(wb)) { # user supplied a list of numeric vectors
                          wb <- waveband(wb)
                        }
+
                        range <- range(wb)
+                       mydata <- trim_tails(data$x, data$y, use.hinges = TRUE,
+                                            low.limit = range[1],
+                                            high.limit = range[2])
                        integ.df <- rbind(integ.df,
-                                         data.frame(x = midpoint(wb),
+                                         data.frame(x = midpoint(mydata$x),
                                                     xmin = min(wb),
                                                     xmax = max(wb),
+                                                    ymin = min(data$y),
+                                                    ymax = max(data$y),
                                                     wb.color = color(wb),
                                                     wb.name = labels(wb)$label,
                                                     BW.color = black_or_white(color(wb)))
                                          )
                      }
                      if (is.null(ypos.fixed)) {
-                       integ.df$y <- 0
+                       integ.df$y <- with(integ.df, ymin + (ymax - ymin) * ypos.mult)
                      } else {
                        integ.df$y <- ypos.fixed
                      }
-                     integ.df$wb.label <- sprintf(label.fmt, integ.df$wb.name)
-#                     print(integ.df)
                      integ.df
                    },
-                   default_aes = ggplot2::aes(label = ..wb.label..,
-                                              x = ..x..,
-                                              xmin = ..xmin..,
+                   default_aes = ggplot2::aes(xmin = ..xmin..,
                                               xmax = ..xmax..,
-                                              fill = ..wb.color..,
-                                              color = ..BW.color..),
-                   required_aes = c("x")
+                                              ymin = ..y.. - (..ymax.. - ..ymin..) * 0.03,
+                                              ymax = ..y.. + (..ymax.. - ..ymin..) * 0.03,
+                                              fill = ..wb.color..),
+                   required_aes = c("x", "y")
   )

@@ -133,16 +133,15 @@ library(ggplot2)
 library(ggrepel)
 # ggplot() methods for spectral objects set a default mapping for x and y.
 ggplot(sun.spct) + geom_line() +
-  stat_label_peaks(hjust = "left", span = 21, angle = 90) +
-  scale_color_identity()
+  stat_label_peaks(hjust = "left", span = 31, angle = 90, color = "red")
 ggplot(sun.spct) + geom_line() +
-  stat_label_valleys(hjust = "right", span = 21, angle = 90) +
-  scale_color_identity()
+  stat_label_valleys(hjust = "right", span = 21, angle = 90, color = "blue")
 ggplot(sun.spct) + geom_line() +
-  stat_peaks(span = 21, geom = "point", shape = 21, size = 3) +
-  stat_label_peaks(span = 21, geom = "text_repel", colour = "black",
-                   angle = 90, nudge_y = 0.12, label.fmt = "\%3.0f nm") +
+  stat_peaks(span = 41, shape = 21, size = 3) +
+  stat_label_peaks(span = 41, geom = "label_repel", segment.colour = "red",
+                   nudge_y = 0.12, label.fmt = "\%3.0f nm") +
   scale_fill_identity() +
+  scale_color_identity() +
   expand_limits(y = c(NA, 1))
 }
 \seealso{
@@ -150,10 +149,11 @@ ggplot(sun.spct) + geom_line() +
 \code{\link[photobiology]{find_peaks}}, which is used internally.
 
 Other stats functions: \code{\link{stat_color}},
-  \code{\link{stat_peaks}},
+  \code{\link{stat_peaks}}, \code{\link{stat_wb_box}},
+  \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_label}},
-  \code{\link{stat_wb_mean}},
+  \code{\link{stat_wb_hbar}}, \code{\link{stat_wb_irrad}},
+  \code{\link{stat_wb_label}}, \code{\link{stat_wb_mean}},
   \code{\link{stat_wb_relative}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},

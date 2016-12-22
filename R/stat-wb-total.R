@@ -1,6 +1,6 @@
 #' Integrate ranges under spectral curve.
 #'
-#' \code{stat_wb_total} computes means under a curve. It first integrates the
+#' \code{stat_wb_total} computes integral under a curve. It first integrates the
 #'   area under a spectral curve and also the mean expressed per nanaometre of
 #'   wavelength for each waveband in the input. Sets suitable default aesthetics
 #'   for "rect", "hline", "vline", "text" and "label" geoms displaying "totals"
@@ -59,6 +59,7 @@
 #'   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
 #'   \item{wb.color}{color of the w.band}
 #'   \item{wb.name}{label of w.band}
+#'   \item{BW.color}{\code{black_or_white(wb.color)}}
 #' }
 #'
 #' @section Default aesthetics:
@@ -88,14 +89,20 @@
 #' # ggplot() methods for spectral objects set a default mapping for x and y.
 #' ggplot(sun.spct) +
 #'   geom_line() +
+#'   stat_wb_box(w.band = VIS()) +
 #'   stat_wb_total(w.band = VIS()) +
-#'   stat_wb_total(w.band = VIS(), geom = "text", color = "white") +
-#'   scale_fill_identity()
+#'   scale_fill_identity() + scale_color_identity()
+#'
+#' ggplot(sun.spct) +
+#'   geom_line() +
+#'   stat_wb_box(w.band = UV_bands(), color = "white") +
+#'   stat_wb_total(w.band = UV_bands()) +
+#'   scale_fill_identity() + scale_color_identity()
 #'
 #' @export
 #' @family stats functions
 #'
-stat_wb_total <- function(mapping = NULL, data = NULL, geom = "rect",
+stat_wb_total <- function(mapping = NULL, data = NULL, geom = "text",
                        w.band = NULL,
                        integral.fun = integrate_xy,
                        label.mult = 1,
@@ -170,7 +177,8 @@ StatWbTotal <-
                                                     yint = yint.tmp,
                                                     ymean = ymean.tmp,
                                                     wb.color = color(wb),
-                                                    wb.name = labels(wb)$label)
+                                                    wb.name = labels(wb)$label,
+                                                    BW.color = black_or_white(color(wb)))
                                          )
                      }
                      if (is.null(ypos.fixed)) {
@@ -188,6 +196,7 @@ StatWbTotal <-
                                               ymin = ..y.. - (..ymax.. - ..ymin..) * 0.03,
                                               ymax = ..y.. + (..ymax.. - ..ymin..) * 0.03,
                                               yintercept = ..ymean..,
-                                              fill = ..wb.color..),
+                                              fill = ..wb.color..,
+                                              color = ..BW.color..),
                    required_aes = c("x", "y")
   )

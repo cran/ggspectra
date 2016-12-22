@@ -54,7 +54,7 @@ trimmed or discarded.
 }
 \description{
 \code{stat_wb_label} computes computes the center of a waveband. Sets
-suitable default aestheics for "rect", "hline", "vline", "text" and "label"
+suitable default aesthetics for "text" and "label"
 geoms displaying "boundaries" and "names" of wavebands.
 }
 \section{Computed variables}{
@@ -96,16 +96,25 @@ library(ggplot2)
 # ggplot() methods for spectral objects set a default mapping for x and y.
 ggplot(sun.spct) +
   geom_line() +
-  stat_wb_label(w.band = VIS(), geom = "rect", ymin = -0.04, ymax = 0,
+  stat_wb_box(w.band = VIS(), ymin = -0.04, ymax = 0,
   color = "black", fill = "white") +
-  stat_wb_label(w.band = VIS(), y = -0.02)
+  stat_wb_label(w.band = VIS(), ypos.fixed = -0.02, color = "black")
+
+ggplot(sun.spct) +
+  geom_line() +
+  stat_wb_hbar(w.band = PAR(), ypos.fixed = 0, size = 1) +
+  stat_wb_label(aes(color = ..wb.color..),
+                w.band = PAR(), ypos.fixed = +0.025) +
+  scale_color_identity()
 
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
+  \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_mean}},
+  \code{\link{stat_wb_hbar}}, \code{\link{stat_wb_irrad}},
+  \code{\link{stat_wb_mean}},
   \code{\link{stat_wb_relative}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},

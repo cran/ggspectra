@@ -101,6 +101,7 @@ What it is named integral below is the result of appying \code{irrad},
   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}
+  \item{BW.color}{\code{black_or_white(wb.color)}}
 }
 }
 
@@ -133,19 +134,29 @@ library(photobiologyWavebands)
 library(ggplot2)
 # ggplot() methods for spectral objects set a default mapping for x and y.
 ggplot(sun.spct) +
-  stat_wb_mean(w.band = VIS_bands()) +
+  stat_wb_column(w.band = VIS_bands()) +
   stat_wb_e_irrad(w.band = VIS_bands(),
-                  geom = "text", angle = 90, size = 4,
+                  angle = 90, size = 4,
                   label.fmt = "\%2.0f", ypos.fixed = 0.1) +
   geom_line() +
-  scale_fill_identity()
+  scale_fill_identity() + scale_color_identity()
+
+ggplot(sun.spct) +
+  stat_wb_box(w.band = VIS_bands()) +
+  stat_wb_e_irrad(w.band = VIS_bands(),
+                  angle = 90, size = 4,
+                  label.fmt = "\%2.0f") +
+  geom_line() +
+  scale_fill_identity() + scale_color_identity()
 
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
+  \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_label}}, \code{\link{stat_wb_mean}},
+  \code{\link{stat_wb_hbar}}, \code{\link{stat_wb_label}},
+  \code{\link{stat_wb_mean}},
   \code{\link{stat_wb_relative}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},

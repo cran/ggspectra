@@ -8,10 +8,13 @@ sd_section("Geoms",
 )
 
 sd_section("Statistics",
-  "It's often useful to transform your data before plotting, and that's what statistical transformations do.",
+  "It's often useful to summarize spectral data before plotting, and that's what these transformations do.",
   c("stat_color",
     "stat_peaks",
     "stat_label_peaks",
+    "stat_wb_box",
+    "stat_wb_hbar",
+    "stat_wb_column",
     "stat_wb_contribution",
     "stat_wb_irrad",
     "stat_wb_label",
@@ -23,7 +26,7 @@ sd_section("Statistics",
     "stat_wl_summary")
 )
 
-sd_section("Plot creation", "",
+sd_section("Plot creation", "Plot methods for spectra and a function for color-patch charts",
   c("ggplot",
     "plot.raw_spct",
     "plot.cps_spct",
@@ -33,5 +36,10 @@ sd_section("Plot creation", "",
     "plot.reflector_spct",
     "plot.object_spct",
     "plot.waveband",
-    "multiplot")
+    "color_chart")
+)
+
+sd_section("Helper functions", "",
+           c("multiplot",
+             "black_or_white")
 )
