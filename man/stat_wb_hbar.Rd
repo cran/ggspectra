@@ -90,6 +90,7 @@ If the argument passed to \code{w.band} is a BSWF it is silently
   with \code{aes()}. \describe{ \item{x}{numeric, wavelength in nanometres}
   \item{y}{numeric, a spectral quantity} }
 }
+
 \examples{
 library(photobiology)
 library(photobiologyWavebands)
@@ -132,4 +133,3 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
-

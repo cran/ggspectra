@@ -69,4 +69,3 @@ Other plot functions: \code{\link{plot.cps_spct}},
   \code{\link{plot.waveband}}
 }
 \keyword{hplot}
-

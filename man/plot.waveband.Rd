@@ -80,4 +80,3 @@ Other plot functions: \code{\link{plot.cps_spct}},
   \code{\link{plot.source_spct}}
 }
 \keyword{hplot}
-

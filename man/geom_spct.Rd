@@ -51,6 +51,7 @@ the area under the line is filled.
 \section{Aesthetics}{
  See \code{\link[ggplot2]{geom_ribbon}}
 }
+
 \examples{
 library(ggplot2)
 library(photobiology)
@@ -63,4 +64,3 @@ ggplot(sun.spct) + geom_spct()
 \code{\link[ggplot2]{geom_line}} for lines (lines),
 \code{\link[ggplot2]{geom_point}} for scatter plots.
 }
-

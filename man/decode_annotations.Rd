@@ -14,4 +14,3 @@ Allow users to add and subract from default annotations in addition
 to providing a given set of annotations.
 }
 \keyword{internal}
-

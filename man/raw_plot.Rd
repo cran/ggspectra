@@ -49,4 +49,3 @@ Note that scales are expanded so as to make space for the annotations.
   columns is normalized individually.
 }
 \keyword{internal}
-

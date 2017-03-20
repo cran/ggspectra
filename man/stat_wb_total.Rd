@@ -112,6 +112,7 @@ Required by the statistic and need to be set with \code{aes()}.
   \item{y}{numeric, a spectral quantity}
 }
 }
+
 \examples{
 library(photobiology)
 library(photobiologyWavebands)
@@ -142,4 +143,3 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
-

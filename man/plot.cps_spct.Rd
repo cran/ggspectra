@@ -59,4 +59,3 @@ Other plot functions: \code{\link{plot.filter_spct}},
   \code{\link{plot.waveband}}
 }
 \keyword{hplot}
-

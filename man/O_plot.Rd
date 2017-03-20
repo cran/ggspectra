@@ -46,4 +46,3 @@ Note that scales are expanded so as to make space for the annotations.
   The object returned is a ggplot object, and can be further manipulated.
 }
 \keyword{internal}
-

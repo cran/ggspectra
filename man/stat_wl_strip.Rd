@@ -6,7 +6,7 @@
 \title{Calculate colours from wavelength.}
 \usage{
 stat_wl_strip(mapping = NULL, data = NULL, geom = "rect", type = "CMF",
-  w.band = NULL, length.out = 150, position = "identity", na.rm = FALSE,
+  w.band = NULL, length.out = 150, position = "identity", na.rm = TRUE,
   show.legend = FALSE, inherit.aes = TRUE, ...)
 
 wl_guide(mapping = NULL, data = NULL, type = "CMF", w.band = NULL,
@@ -90,6 +90,7 @@ Required by the statistic and need to be set with \code{aes()}.
   \item{x}{numeric, wavelength in nanometres}
 }
 }
+
 \examples{
 library(photobiology)
 library(ggplot2)
@@ -116,4 +117,3 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wb_total}},
   \code{\link{stat_wl_summary}}
 }
-

@@ -6,7 +6,7 @@
 \usage{
 stat_wb_label(mapping = NULL, data = NULL, geom = "text", w.band = NULL,
   label.fmt = "\%s", ypos.fixed = 0, position = "identity",
-  na.rm = FALSE, show.legend = NA, inherit.aes = TRUE, ...)
+  na.rm = TRUE, show.legend = NA, inherit.aes = TRUE, ...)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -89,6 +89,7 @@ Required by the statistic and need to be set with \code{aes()}.
   \item{x}{numeric, wavelength in nanometres}
 }
 }
+
 \examples{
 library(photobiology)
 library(photobiologyWavebands)
@@ -120,4 +121,3 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
-

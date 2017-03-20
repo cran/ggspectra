@@ -4,9 +4,9 @@
 \name{ggspectra-package}
 \alias{ggspectra}
 \alias{ggspectra-package}
-\title{Extensions to 'ggplot2' for Radiation Spectra}
+\title{ggspectra: Extensions to 'ggplot2' for Radiation Spectra}
 \description{
-Additional annotations, stats and scales for plotting "light"
+Additional annotations, and statsfor plotting "light"
 spectra with 'ggplot2', together with specializations of ggplot()
 and plot() methods for spectral data stored in objects of the classes
 defined in package 'photobiology' and a plot() method for objects of
@@ -84,4 +84,21 @@ plot(polyester.spct, UV_bands(), range = UV())
 \code{ggplot2} source code at \url{https://github.com/hadley/ggplot2}\cr
 Function \code{multiplot} from \url{http://www.cookbook-r.com/}
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{http://www.r4photobiology.info}
+  \item \url{https://bitbucket.org/aphalo/ggspectra}
+  \item Report bugs at \url{https://bitbucket.org/aphalo/ggspectra}
+}
 
+}
+\author{
+\strong{Maintainer}: Pedro J. Aphalo \email{pedro.aphalo@helsinki.fi}
+
+Other contributors:
+\itemize{
+  \item Titta K. Kotilainen \email{titta.kotilainen@helsinki.fi} [contributor]
+}
+
+}

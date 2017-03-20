@@ -13,7 +13,7 @@ vignette: >
 
 ## Introduction
 
-Package `ggspectra` extends `ggplot2` with stats, geoms and annotations suitable for light spectra. It also defines `ggplot()` and  `plot()` methods specialized for the classes defined in package `photobiology` for storing different types of spectral data. The `plot()` methods are described separately in vignette 'Plot Methods'.
+Package `ggspectra` extends `ggplot2` with stats, geoms, scales and annotations suitable for light spectra. It also defines `ggplot()` and  `plot()` methods specialized for the classes defined in package `photobiology` for storing different types of spectral data. The `plot()` methods are described separately in vignette 'Plot Methods'.
 
 The new elements can be freely combined with methods and functions defined in packages `ggplot2`, `scales`, `ggrepel` and `cowplot`.
 
@@ -54,6 +54,33 @@ The _stats_ defined in this package help with with the generation of annotations
 ### What is `geom_spct` useful for?
 
 The `geom_spct` _geometry_ is a special case of `geom_area`, but with the minimum of the _y_ range fixed to 0, but with stacking not enabled.
+
+### What are the new _scales_ for?
+
+The new scales are convenience wrapper functions built on top of the scales exported by package 'ggplot2', but with default arguments that are suitable for spectral data. 
+
+Functions for automatic generation of secondary x-axes in the case when a variable containing wavelength data (nm) is mapped to the _x_ _aesthetic_ simplify the task of adding an axis with frequencies or wavenumbers to the plot of a spectrum.
+
+| _scale_     | unit.exponent | name | labels                       |  breaks  |
+|:---------------|:---------------------|:---------------|:----------------|:---------------|
+| scale_y_cps_continuous | 0 | cps_label() | SI_pl_format() | |
+| scale_y_counts_continuous | 3 | counts_label() | SI_pl_format() | |
+| scale_y_counts_tg_continuous | 3 | counts_label() | SI_tg_format() | |
+| scale_y_A_internal_continuous | 0 | A_internal_label() | SI_pl_format() | |
+| scale_y_A_total_continuous | 0 | A_total_label() | SI_pl_format() | |
+| scale_y_Tfr_internal_continuous | 0 | Tfr_internal_label() | SI_pl_format() | |
+| scale_y_Tfr_total_continuous | 0 | Tfr_total_label() | SI_pl_format() | |
+| scale_y_Rfr_internal_continuous | 0 | Rfr_internal_label() | SI_pl_format() | |
+| scale_y_Rfr_total_continuous | 0 | Rfr_total_label() | SI_pl_format() | |
+| scale_y_s.e.irrad_continuous | 0 | s.e.irrad_label() | SI_pl_format() | |
+| scale_y_s.q.irrad_continuous | -6 | s.q.irrad_label() | SI_pl_format() | |
+| scale_y_s.e.response_continuous | 0 | s.e.response_label() | SI_pl_format() | |
+| scale_y_s.q.response_continuous | 0 | s.q.response_label() | SI_pl_format() | |
+| scale_x_wl_continuous | -9 | w_length_label() | SI_pl_format() | pretty_breaks(n=7) |
+ 
+
+In addition secondary axis definitions, `sec_axis_w_number()` and `sec_axis_w_frequency()`, and SI system formatters `SI_pl_format`, and `SI_tg_format` are exported, together with auxiliary functions for finding the nearest SI multiplier based on an arbitrary exponent.
+
 
 ### What are functions `color_chart()` and `black_or_white()` for?
 
@@ -133,6 +160,138 @@ ggplot(yellow_gel.spct, plot.qty = "absorbance") + geom_line()
 ```
 
 The names of the additional parameters are consistent with those by method `plot()` in this package and in the now deprecated package `photobiologygg`.
+
+## Scales
+
+### Wavelength
+
+Currently only an x-scale function suitable for wavelengths in nanometres is defined in package 'ggspectra'.
+
+```{r}
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous()
+```
+
+Functions for automating the addition of secundary axes are also defined.
+
+```{r}
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous(sec.axis = sec_axis_w_number())
+```
+```{r}
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous(sec.axis = sec_axis_w_frequency())
+```
+It is possible to set a different SI scaling factor for the units.
+```{r}
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous(sec.axis = sec_axis_w_frequency(15))
+```
+It is possible to set a non-SI scaling factor for the units.
+```{r}
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous(sec.axis = sec_axis_w_frequency(14))
+```
+
+It is possible find the largest valid SI-scaling factor that is smaller or equal to and arbitrary power of 10.
+
+```{r}
+nearest_SI_exponent(14)
+```
+### Raw counts
+
+```{r}
+ggplot(white_led.raw_spct) + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_counts_continuous()
+  
+```
+
+```{r}
+ggplot(white_led.raw_spct) + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_counts_tg_continuous()
+  
+```
+
+### Counts per second
+
+```{r}
+ggplot(white_led.cps_spct) + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_counts_continuous()
+  
+```
+
+
+### Spectral irradiance
+
+```{r}
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.e.irrad_continuous()
+```
+```{r}
+ggplot(sun.spct, unit.out = "photon") + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.q.irrad_continuous()
+```
+
+We can change the SI unit multipliers on-the-fly. Beware that these are not data transformations, only the labelling of the axes changes! Consequently summary values will not be affected. We will express the spectral irradiance using milli watts instead of watts and wavelengths in micrometres instead of nanometres.
+
+```{r}
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous(-6) +
+  scale_y_s.e.irrad_continuous(-3)
+```
+
+### Response
+
+```{r}
+ggplot(ccd.spct, unit.out = "photon") + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.q.response_continuous()
+```
+
+### Transmittance
+
+```{r}
+ggplot(yellow_gel.spct) + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_Tfr_total_continuous()
+  
+```
+
+### Absorbance
+
+```{r}
+ggplot(yellow_gel.spct, plot.qty = "absorbance") + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_A_total_continuous()
+```
+
+### Reflectance
+
+```{r}
+ggplot(green_leaf.spct) + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_Rfr_total_continuous()
+```
 
 ## Stats
 
@@ -682,6 +841,64 @@ ggplot(data.frame(w.length = 300:800), aes(w.length)) +
 
 ```
 
+We can also in a similar way make a plot comparing different sets of wavebands, in the next example we compare the VIS and NIR bands of the different imagers used in Landsat missions 1 to 8.
+
+```{r}
+ggplot(data.frame(w.length = 300:1100), aes(w.length)) +
+  stat_wl_strip(w.band = RBV_bands(), ymax = 1, ymin = 3) +
+  stat_wb_label(w.band = RBV_bands(), ypos.fixed = 2, angle = 90, vjust = 0.3, size = 3) +
+  stat_wl_strip(w.band = MSS_bands(), ymax = 4, ymin = 6, na.rm = TRUE) +
+  stat_wb_label(w.band = MSS_bands(), ypos.fixed = 5, angle = 90, vjust = 0.3, size = 3) +
+  stat_wl_strip(w.band = ETM_bands(), ymax = 7, ymin = 9, na.rm = TRUE) +
+  stat_wb_label(w.band = ETM_bands(), ypos.fixed = 8, angle = 90, vjust = 0.3, size = 3) +
+  stat_wl_strip(w.band = OLI_bands(), ymax = 10, ymin = 12, na.rm = TRUE) +
+  stat_wb_label(w.band = OLI_bands(), ypos.fixed = 11, angle = 90, vjust = 0.3, size = 3) +
+  scale_fill_identity() + 
+  scale_color_identity() + 
+  scale_y_continuous(labels = c("RBV", "MSS", "TM/ETM", "OLI"), 
+                     breaks = c(2,5,8,11),
+                     limits = c(0, 13),
+                     name = "Imager",
+                     sec.axis = dup_axis(labels = c("L1-L2", "L1-L5", "L4-L7", "L8"), name = "Landsat mission")) +
+  scale_x_continuous(breaks = seq(from = 300, to = 1200, by = 100),
+                     limits = c(400, 1100),
+                     sec.axis = dup_axis()) +
+  labs(x = "Wavelength (nm)", title = "Landsat imagers: VIS and NIR bands") +
+  theme_classic()
+```
+
+The different definitions of the ulatrviolet regions.
+
+```{r}
+ggplot(data.frame(w.length = 100:400), aes(w.length)) +
+  stat_wl_strip(w.band = UV_bands("ISO"), ymax = 1, ymin = 3, color = "white") +
+  stat_wb_label(w.band = UV_bands("ISO"), ypos.fixed = 2, size = 3) +
+  stat_wl_strip(w.band = UV_bands("CIE"), ymax = 4, ymin = 6, color = "white") +
+  stat_wb_label(w.band = UV_bands("CIE"), ypos.fixed = 5, size = 3) +
+  stat_wl_strip(w.band = UV_bands("none"), ymax = 7, ymin = 9, color = "white") +
+  stat_wb_label(w.band = UV_bands("none"), ypos.fixed = 8, size = 3) +  
+  stat_wl_strip(w.band = UV_bands("medical"), ymax = 10, ymin = 12, color = "white") +
+  stat_wb_label(w.band = UV_bands("medical"), ypos.fixed = 11, size = 3) +
+
+  scale_fill_identity() + 
+  scale_color_identity() + 
+  scale_y_continuous(labels = c("ISO", "CIE", "none", "medical"), 
+                     breaks = c(2,5,8,11),
+                     limits = c(0, 13),
+                     name = "Standard",
+                     sec.axis = dup_axis(labels = 
+                      c("use", "use", "avoid!", "avoid!"), name = "Recommendation")) +
+  scale_x_continuous(breaks = c(seq(from = 100, to = 400, by = 50), 280, 315),
+                     limits = c(100, 400),
+                     sec.axis = 
+                       dup_axis(breaks = 
+                                c(100, 150, 200, 220, 250, 290, 320, 340, 400))) +
+  labs(x = "Wavelength (nm)", title = "UV bands",
+       subtitle = "According to ISO standard, CIE recommendations, and non-standard use") +
+  theme_classic()
+```
+It should be noted that this approach is rather different from the way one would normally plot a horizontal bar plot with the grammar of graphics of 'ggplot2', but for plottings existing waveband definitions it is convenient and ensures that the waveband definitions agree with those used for computing summary quantites elsewhere.
+
 ## Wavelength colours at new _x_-values 
 
 The `stat_wl_summary()` and `stat_wb_mean()` return a _reduced_ data set with fewer rows than the original data. `stat_wl_strip()` depending on the input, can also return a data set with more rows than the input data. This is the default behaviour, with `w.band` with argument `NULL`. This _stat_ operates only on the variable mapped to the _x_ _aesthetic_, a _y_-mapping is not required as input.
@@ -816,8 +1033,8 @@ color_chart(grep("blue", colors(), value = TRUE), ncol = 5, text.size = 4)
 ```
 
 ```{r}
-color_chart(w_length2rgb(570:689, color.name = as.character(570:689)), 
+ color_chart(w_length2rgb(570:689, color.name = as.character(570:689)), 
             use.names = TRUE, text.size = 4) +
-  ggtitle("Reddish colors by wavelength (nm)")
+  ggtitle("Reddish colors", subtitle = "Labels: wavelength (nm)")
 ```
 

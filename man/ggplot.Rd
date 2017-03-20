@@ -2,12 +2,12 @@
 % Please edit documentation in R/ggplot-methods.R
 \name{ggplot}
 \alias{ggplot}
-\alias{ggplot.cps_spct}
-\alias{ggplot.filter_spct}
-\alias{ggplot.raw_spct}
-\alias{ggplot.reflector_spct}
-\alias{ggplot.response_spct}
 \alias{ggplot.source_spct}
+\alias{ggplot.response_spct}
+\alias{ggplot.filter_spct}
+\alias{ggplot.reflector_spct}
+\alias{ggplot.cps_spct}
+\alias{ggplot.raw_spct}
 \title{Create a new ggplot plot from spectral data.}
 \usage{
 \method{ggplot}{source_spct}(data, mapping = NULL, ...,
@@ -106,4 +106,3 @@ ggplot(yellow_gel.spct) + geom_line()
 ggplot(yellow_gel.spct, plot.qty = "absorbance") + geom_line()
 
 }
-

@@ -41,4 +41,3 @@ package. It collects code that is common to plot methods for different types
 of spectra but as it may change in the future it is not exported.
 }
 \keyword{internal}
-
