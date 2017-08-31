@@ -38,8 +38,8 @@ element.}
 a \code{ggplot} object.
 }
 \description{
-This function returns a ggplot object with an annotated plot of a object_spct
-object.
+This function returns a ggplot object with an annotated plot of spectral
+transmittance, absorptance and reflectance.
 }
 \note{
 Note that scales are expanded so as to make space for the annotations.

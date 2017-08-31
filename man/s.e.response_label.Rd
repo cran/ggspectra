@@ -2,9 +2,13 @@
 % Please edit documentation in R/axis-utils-response-spct.R
 \name{s.e.response_label}
 \alias{s.e.response_label}
+\alias{s.q.response_label}
 \title{spectral response axis labels}
 \usage{
 s.e.response_label(unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression"))
+
+s.q.response_label(unit.exponent = -6,
   format = getOption("photobiology.math", default = "R.expression"))
 }
 \arguments{

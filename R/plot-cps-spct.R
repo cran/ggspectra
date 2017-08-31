@@ -14,7 +14,7 @@
 #'   min annd max wavelengths (nm)
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
-#'   for labels
+#'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
@@ -107,6 +107,16 @@ cps_plot <- function(spct,
   y.max <- max(c(spct[["cps"]], 0), na.rm = TRUE)
   y.min <- min(c(spct[["cps"]], 0), na.rm = TRUE)
   plot <- ggplot(spct) + aes_(linetype = ~scan)
+
+  # We want data plotted on top of the boundary lines
+  if ("boundaries" %in% annotations) {
+    if (y.min < (-0.01 * y.max)) {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
+    } else {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
+    }
+  }
+
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.cps.label)
 
@@ -136,6 +146,7 @@ cps_plot <- function(spct,
     y.limits <- c(y.min, y.max)
     x.limits <- range(spct)
   }
+
   plot <- plot + scale_y_continuous(limits = y.limits)
   plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 
@@ -156,7 +167,8 @@ cps_plot <- function(spct,
 #'   min annd max wavelengths (nm)
 #' @param unit.out character IGNORED
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
-#' @param label.qty character IGNORED
+#' @param label.qty character string giving the type of summary quantity to use
+#'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
@@ -181,7 +193,7 @@ plot.cps_spct <-
            range = NULL,
            unit.out = "cps",
            pc.out = FALSE,
-           label.qty = "average",
+           label.qty = "mean",
            span = NULL,
            annotations = NULL,
            norm = NULL,

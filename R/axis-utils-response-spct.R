@@ -48,7 +48,7 @@ s.e.response_label <- function(unit.exponent = 0,
   }
 }
 
-#' @rdname s.e.irrad_label
+#' @rdname s.e.response_label
 #'
 #' @export
 #'
@@ -122,7 +122,7 @@ scale_y_s.e.response_continuous <-
                        ...)
   }
 
-#' @rdname scale_y_s.e.irrad_continuous
+#' @rdname scale_y_s.e.response_continuous
 #'
 #' @export
 #'

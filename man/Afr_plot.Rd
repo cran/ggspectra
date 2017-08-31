@@ -37,10 +37,6 @@ a \code{ggplot} object.
 }
 \description{
 This function returns a ggplot object with an annotated plot of a source_spct
-object showing transmittance.
-}
-\note{
-Note that scales are expanded so as to make space for the annotations.
-  The object returned is a ggplot objects, and can be further manipulated.
+object showing absorptance.
 }
 \keyword{internal}

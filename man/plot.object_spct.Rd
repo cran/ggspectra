@@ -26,7 +26,7 @@ min annd max wavelengths (nm)}
 \item{pc.out}{logical, if TRUE use percents instead of fraction of one}
 
 \item{label.qty}{character string giving the type of summary quantity to use
-for labels}
+for labels, one of "mean", "total", "contribution", and "relative".}
 
 \item{span}{a peak is defined as an element in a sequence which is greater
 than all other elements within a window of width span centered at that
@@ -48,15 +48,16 @@ This function returns a ggplot object with an annotated plot of an
 object_spct object.
 }
 \note{
-Note that scales are expanded so as to make space for the annotations.
-  The object returned is a ggplot objects, and can be further manipulated.
+The ggplot object returned can be further manipulated and added to.
+  Except when no annotations are added, limits are set for the x-axis and
+  y-axis scales. The y scale limits are expanded to include all data, or at
+  least to the range of expected values. Scales are further expanded so
+  as to make space for the annotations.
 }
 \examples{
 
 library(photobiology)
-plot(black_body.spct)
-plot(white_body.spct)
-plot(clear_body.spct)
+plot(Ler_leaf.spct)
 
 }
 \seealso{

@@ -8,6 +8,7 @@
 \alias{ggplot.reflector_spct}
 \alias{ggplot.cps_spct}
 \alias{ggplot.raw_spct}
+\alias{ggplot.object_spct}
 \title{Create a new ggplot plot from spectral data.}
 \usage{
 \method{ggplot}{source_spct}(data, mapping = NULL, ...,
@@ -30,6 +31,10 @@
 
 \method{ggplot}{raw_spct}(data, mapping = NULL, ...,
   environment = parent.frame())
+
+\method{ggplot}{object_spct}(data, mapping = NULL, ...,
+  plot.qty = getOption("photobiology.object.qty", default = "all"),
+  environment = parent.frame())
 }
 \arguments{
 \item{data}{Default spectrum dataset to use for plot. If not a spectrum, the
@@ -50,7 +55,9 @@ plotting.}
 found in the data, ggplot will look for it in this environment. It defaults
 to using the environment in which \code{ggplot()} is called.}
 
-\item{plot.qty}{character string one of "transmittance" or "absorbance".}
+\item{plot.qty}{character string one of "transmittance" or "absorbance" for
+filter_spct, and one of "transmittance", "reflectance" or "all" for
+object_spct.}
 }
 \description{
 \code{ggplot()} initializes a ggplot object. It can be used to
@@ -104,5 +111,8 @@ ggplot(sun.spct, unit.out = "photon") + geom_line()
 
 ggplot(yellow_gel.spct) + geom_line()
 ggplot(yellow_gel.spct, plot.qty = "absorbance") + geom_line()
+
+ggplot(Ler_leaf.spct) + facet_grid(~variable) + geom_line()
+ggplot(Ler_leaf.spct) + aes(linetype = variable) + geom_line()
 
 }

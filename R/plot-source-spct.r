@@ -11,7 +11,7 @@
 #' @param range an R object on which range() returns a vector of length 2, with
 #'   min annd max wavelengths (nm)
 #' @param label.qty character string giving the type of summary quantity to use
-#'   for labels
+#'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
@@ -110,7 +110,18 @@ e_plot <- function(spct,
   spct[["s.e.irrad"]] <- spct[["s.e.irrad"]] * scale.factor
   y.max <- max(c(spct[["s.e.irrad"]], 0), na.rm = TRUE)
   y.min <- min(c(spct[["s.e.irrad"]], 0), na.rm = TRUE)
+
   plot <- ggplot(spct, aes_(~w.length, ~s.e.irrad))
+
+  # We want data plotted on top of the boundary lines
+  if ("boundaries" %in% annotations) {
+    if (y.min < (-0.01 * y.max)) {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
+    } else {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
+    }
+  }
+
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.irrad.label)
 
@@ -173,8 +184,10 @@ e_plot <- function(spct,
     plot <- plot +
       scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1), limits = y.limits)
   } else {
-    plot <- plot + scale_y_continuous(limits = y.limits)
+    plot <- plot +
+      scale_y_continuous(limits = y.limits)
   }
+
   plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 }
 
@@ -191,7 +204,7 @@ e_plot <- function(spct,
 #' @param range an R object on which range() returns a vector of length 2, with
 #'   min annd max wavelengths (nm)
 #' @param label.qty character string giving the type of summary quantity to use
-#'   for labels
+#'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
@@ -300,7 +313,18 @@ q_plot <- function(spct,
   spct[["s.q.irrad"]] <- spct[["s.q.irrad"]] * scale.factor
   y.max <- max(c(spct[["s.q.irrad"]], 0), na.rm = TRUE)
   y.min <- min(c(spct[["s.q.irrad"]], 0), na.rm = TRUE)
+
   plot <- ggplot(spct, aes_(~w.length, ~s.q.irrad))
+
+  # We want data plotted on top of the boundary lines
+  if ("boundaries" %in% annotations) {
+    if (y.min < (-0.01 * y.max)) {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
+    } else {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
+    }
+  }
+
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.irrad.label)
 
@@ -358,12 +382,14 @@ q_plot <- function(spct,
     y.limits <- c(y.min, y.max * 1.05)
     x.limits <- range(spct)
   }
+
   if (abs(y.min) < 5e-2 && (abs(y.max - 1) < 5.e-2)) {
     plot <- plot +
       scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1), limits = y.limits)
   } else {
     plot <- plot + scale_y_continuous(limits = y.limits)
   }
+
   plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 }
 
@@ -383,7 +409,7 @@ q_plot <- function(spct,
 #' @param unit.out character string indicating type of radiation units to use
 #'   for plotting: "photon" or its synomin "quantum", or "energy"
 #' @param label.qty character string giving the type of summary quantity to use
-#'   for labels
+#'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
@@ -402,8 +428,6 @@ q_plot <- function(spct,
 #' library(photobiology)
 #' plot(sun.spct)
 #' plot(sun.spct, unit.out = "photon")
-#' plot(sun.daily.spct)
-#' plot(sun.daily.spct, unit.out = "photon")
 #'
 #' @family plot functions
 #'

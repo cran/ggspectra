@@ -167,7 +167,8 @@ StatWbContrib <-
                        range <- range(wb)
                        mydata <- trim_tails(data$x, data$y, use.hinges = TRUE,
                                             low.limit = range[1],
-                                            high.limit = range[2])
+                                            high.limit = range[2],
+                                            verbose = FALSE)
                        if (is_effective(wb)) {
                          warning("BSWFs not supported by summary: using wavelength range for ",
                                  labels(wb)$label, "'.")
@@ -183,9 +184,9 @@ StatWbContrib <-
                                                     ymax = max(data$y),
                                                     yint = yint.tmp,
                                                     ymean = ymean.tmp,
-                                                    wb.color = color(wb),
+                                                    wb.color = color_of(wb),
                                                     wb.name = labels(wb)$label,
-                                                    BW.color = black_or_white(color(wb)))
+                                                    BW.color = black_or_white(color_of(wb)))
                                          )
                      }
                      if (is.null(ypos.fixed)) {

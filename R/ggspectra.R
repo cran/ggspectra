@@ -25,7 +25,7 @@
 #' Package 'ggspectra' is useful solely for plotting spectral data as most
 #' functions depend on the x aesthetic being mapped to a variable containing
 #' wavelength values expressed in nanometres. It works well together with
-#' some other extensions to package 'ggplot2' such as pacakegs 'ggrepel' and
+#' some other extensions to package 'ggplot2' such as packages 'ggrepel' and
 #' 'cowplot'.
 #'
 #' This package is part of a suite of R packages for photobiological
@@ -52,25 +52,18 @@
 #' library(photobiology)
 #' library(photobiologyWavebands)
 #'
-#' # maximum
-#' ggplot(sun.spct, aes(w.length, s.e.irrad)) + geom_line() +
-#' stat_peaks(span = NULL)
-#'
-#' ggplot(sun.spct, aes(w.length, s.e.irrad)) + geom_line() +
-#' stat_peaks(span = 21, geom = "text")
-#'
-#' ggplot(sun.spct, aes(w.length, s.e.irrad)) + geom_line() +
-#'   stat_valleys(span = 21, geom = "text")
+#' ggplot(sun.spct) + geom_line() + stat_peaks(span = NULL)
 #'
 #' ggplot(sun.spct, aes(w.length, s.e.irrad)) + geom_line() +
 #'   stat_peaks(span = 21, geom = "point", colour = "red") +
 #'   stat_peaks(span = 51, geom = "text", colour = "red", vjust = -0.3,
 #'              label.fmt = "%3.0f nm")
 #'
-#' ggplot(sun.spct, aes(w.length, s.e.irrad)) + geom_line() +
-#'   stat_color() + scale_color_identity()
+#' ggplot(polyester.spct) + geom_line()
 #'
 #' plot(sun.spct)
-#' plot(polyester.spct, UV_bands(), range = UV())
+#'
+#' plot(polyester.spct, UV_bands(), range = UV(),
+#'      annotations = c("=", "segments", "labels"))
 #'
 "_PACKAGE"

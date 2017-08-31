@@ -117,7 +117,6 @@ Required by the statistic and need to be set with \code{aes()}.
 library(photobiology)
 library(photobiologyWavebands)
 library(ggplot2)
-library(ggrepel)
 # ggplot() methods for spectral objects set a default mapping for x and y.
 ggplot(sun.spct) +
   stat_wb_column(w.band = VIS_bands()) +
@@ -125,6 +124,9 @@ ggplot(sun.spct) +
   geom_line() +
   scale_fill_identity() + scale_color_identity()
 
+\dontrun{
+# example takes long to run
+library(ggrepel)
 ggplot(sun.spct) +
   geom_line() +
   stat_wb_hbar(w.band = VIS_bands(), size = 1.5) +
@@ -132,6 +134,7 @@ ggplot(sun.spct) +
                geom = "label_repel", nudge_y = +0.03,
                segment.colour = NA) +
   scale_fill_identity() + scale_color_identity()
+}
 
 }
 \seealso{

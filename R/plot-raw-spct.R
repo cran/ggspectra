@@ -14,7 +14,7 @@
 #'   min annd max wavelengths (nm)
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
-#'   for labels
+#'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
@@ -49,6 +49,15 @@ raw_plot <- function(spct,
   if (!is.null(w.band)) {
     w.band <- trim_wl(w.band, range = range(spct))
   }
+
+  # Attempt to retrieve max.counts from metadata
+  linearized <- getInstrSettings(spct)[["linearized"]]
+  if (!(is.null(linearized) || linearized)) {
+    upper.boundary <- getInstrDesc(spct)[["max.counts"]]
+  } else {
+    upper.boundary <- NA_real_
+  }
+
   counts.cols <- names(spct)[grep("^counts", names(spct))]
 #  other.cols <- setdiff(names(x), counts.cols)
   if (is.null(norm)) {
@@ -104,9 +113,32 @@ raw_plot <- function(spct,
                          variable.name = "scan",
                          value.name = "counts")
   setRawSpct(spct, multiple.wl = length(counts.cols))
-  y.max <- max(spct[["counts"]], na.rm = TRUE)
-  y.min <- 0
+  y.max <- max(spct[["counts"]],
+               ifelse(is.na(upper.boundary), 0, upper.boundary - 1),
+               na.rm = TRUE)
+  y.min <- min(spct[["counts"]], 0, na.rm = TRUE)
   plot <- ggplot(spct) + aes_(linetype = ~scan)
+
+  # We want data plotted on top of the boundary lines
+  if ("boundaries" %in% annotations) {
+    if (!is.null(upper.boundary) && is.finite(upper.boundary)) {
+      if (y.max >= upper.boundary) {
+        plot <- plot + geom_hline(yintercept = upper.boundary,
+                                  linetype = "dashed", colour = "red")
+      } else {
+        plot <- plot + geom_hline(yintercept = upper.boundary,
+                                  linetype = "dashed", colour = "black")
+      }
+    }
+    if (y.min < -0.01 * y.max) {
+      plot <- plot + geom_hline(yintercept = 0,
+                                linetype = "dashed", colour = "red")
+    } else if ("boundaries" %in% annotations) {
+      plot <- plot + geom_hline(yintercept = 0,
+                                linetype = "dashed", colour = "black")
+    }
+  }
+
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.counts.label)
 
@@ -138,6 +170,7 @@ raw_plot <- function(spct,
     y.limits <- c(y.min, y.max)
     x.limits <- range(spct)
   }
+
   plot <- plot + scale_y_continuous(limits = y.limits)
   plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 
@@ -159,7 +192,8 @@ raw_plot <- function(spct,
 #' with min annd max wavelengths (nm)
 #' @param unit.out character IGNORED
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
-#' @param label.qty character IGNORED
+#' @param label.qty character string giving the type of summary quantity to use
+#'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
@@ -184,7 +218,7 @@ plot.raw_spct <-
            range = NULL,
            unit.out = "counts",
            pc.out = FALSE,
-           label.qty = "average",
+           label.qty = "mean",
            span = NULL,
            annotations = NULL,
            norm = NULL,

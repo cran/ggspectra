@@ -1,10 +1,7 @@
 #' Plot a filter spectrum.
 #'
 #' This function returns a ggplot object with an annotated plot of a source_spct
-#' object showing transmittance.
-#'
-#' @note Note that scales are expanded so as to make space for the annotations.
-#'   The object returned is a ggplot objects, and can be further manipulated.
+#' object showing absorptance.
 #'
 #' @param spct a filter_spct object
 #' @param w.band list of waveband objects
@@ -38,11 +35,11 @@ Afr_plot <- function(spct,
   if (!is.filter_spct(spct)) {
     stop("Afr_plot() can only plot filter_spct objects.")
   }
-  A2T(spct, byref = TRUE)
-  Tfr.type <- getTfrType(spct)
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
   }
+  A2T(spct, byref = TRUE)
+  Tfr.type <- getTfrType(spct)
   if (!is.null(w.band)) {
     w.band <- trim_wl(w.band, range = range(spct))
   }
@@ -117,10 +114,25 @@ Afr_plot <- function(spct,
     Afr.label <- ""
   }
 
-  y.max <- 1
-  y.min <- 0
+  y.max <- max(1, spct[["Afr"]], na.rm = TRUE)
+  y.min <- min(0, spct[["Afr"]], na.rm = TRUE)
 
   plot <- ggplot(spct, aes_(~w.length, ~Afr))
+
+  # We want data plotted on top of the boundary lines
+  if ("boundaries" %in% annotations) {
+    if (y.max > 1.01) {
+      plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "red")
+    } else {
+      plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "black")
+    }
+    if (y.min < -0.01) {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
+    } else {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
+    }
+  }
+
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.Afr.label)
 
@@ -203,11 +215,11 @@ T_plot <- function(spct,
   if (!is.filter_spct(spct)) {
     stop("T_plot() can only plot filter_spct objects.")
   }
-  A2T(spct, byref = TRUE)
-  Tfr.type <- getTfrType(spct)
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
   }
+  A2T(spct, byref = TRUE)
+  Tfr.type <- getTfrType(spct)
   if (!is.null(w.band)) {
     w.band <- trim_wl(w.band, range = range(spct))
   }
@@ -260,10 +272,26 @@ T_plot <- function(spct,
   } else {
     Tfr.label <- ""
   }
-  y.max <- 1
-  y.min <- 0
+
+  y.max <- max(1, spct[["Tfr"]], na.rm = TRUE)
+  y.min <- min(0, spct[["Tfr"]], na.rm = TRUE)
 
   plot <- ggplot(spct, aes_(~w.length, ~Tfr))
+
+  # We want data plotted on top of the boundary lines
+  if ("boundaries" %in% annotations) {
+    if (y.max > 1.01) {
+      plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "red")
+    } else {
+      plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "black")
+    }
+    if (y.min < -0.01) {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
+    } else {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
+    }
+  }
+
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.Tfr.label)
 
@@ -344,10 +372,10 @@ A_plot <- function(spct,
   if (!is.filter_spct(spct)) {
     stop("A_plot() can only plot filter_spct objects.")
   }
-  T2A(spct, action = "replace", byref = TRUE)
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
   }
+  T2A(spct, action = "replace", byref = TRUE)
   if (!is.null(w.band)) {
     w.band <- trim_wl(w.band, range = range(spct))
   }
@@ -385,8 +413,22 @@ A_plot <- function(spct,
   }
 
   y.max <- max(spct[["A"]], na.rm = TRUE)
-  y.min <- 0
+  y.min <- min(0, spct[["A"]], na.rm = TRUE)
+
   plot <- ggplot(spct, aes_(~w.length, ~A))
+
+  # We want data plotted on top of the boundary lines
+  if ("boundaries" %in% annotations) {
+    if (y.max > 6) {
+      plot <- plot + geom_hline(yintercept = 6, linetype = "dashed", colour = "red")
+    }
+    if (y.min < -0.01) {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
+    } else {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
+    }
+  }
+
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.A.label)
 
@@ -397,7 +439,7 @@ A_plot <- function(spct,
   plot <- plot + scale_fill_identity() + scale_color_identity()
 
   plot <- plot + decoration(w.band = w.band,
-                            y.max = y.max,
+                            y.max = min(y.max, 6),
                             y.min = y.min,
                             x.max = max(spct),
                             x.min = min(spct),
@@ -410,10 +452,10 @@ A_plot <- function(spct,
 
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries", "colour.guide", "reserve.space"), annotations)) > 0L) {
-    y.limits <- c(y.min, y.max * 1.25)
+    y.limits <- c(y.min, min(y.max, 6) * 1.25)
     x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
-    y.limits <- c(y.min, y.max)
+    y.limits <- c(y.min, min(y.max, 6))
     x.limits <- range(spct)
   }
   plot <- plot + scale_y_continuous(limits = y.limits)
@@ -423,8 +465,8 @@ A_plot <- function(spct,
 
 #' Plot a reflector spectrum
 #'
-#' This function returns a ggplot object with an annotated plot of a
-#' reflector_spct object.
+#' This function returns a ggplot object with an annotated plot of spectral
+#' reflectance.
 #'
 #' @note Note that scales are expanded so as to make space for the annotations.
 #'   The object returned is a ggplot objects, and can be further manipulated.
@@ -517,9 +559,25 @@ R_plot <- function(spct,
   } else {
     Rfr.label <- ""
   }
-  y.max <- 1
-  y.min <- 0
+  y.max <- max(1, spct[["Rfr"]], na.rm = TRUE)
+  y.min <- min(0, spct[["Rfr"]], na.rm = TRUE)
+
   plot <- ggplot(spct, aes_(~w.length, ~Rfr))
+
+  # We want data plotted on top of the boundary lines
+  if ("boundaries" %in% annotations) {
+    if (y.max > 1.01) {
+      plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "red")
+    } else {
+      plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "black")
+    }
+    if (y.min < -0.01) {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
+    } else {
+      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
+    }
+  }
+
   plot <- plot + geom_line(na.rm = na.rm)
   plot <- plot + labs(x = "Wavelength (nm)", y = s.Rfr.label)
 
@@ -556,14 +614,14 @@ R_plot <- function(spct,
     plot <- plot + scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1),
                                       limits = y.limits)
   }
-  plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 
+  plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 }
 
 #' Plot an object spectrum
 #'
-#' This function returns a ggplot object with an annotated plot of a object_spct
-#' object.
+#' This function returns a ggplot object with an annotated plot of spectral
+#' transmittance, absorptance and reflectance.
 #'
 #' @note Note that scales are expanded so as to make space for the annotations.
 #'   The object returned is a ggplot object, and can be further manipulated.
@@ -617,15 +675,27 @@ O_plot <- function(spct,
     Tfr.type <- "unknown"
   }
   if (Rfr.type != "total") {
-    stop("Only 'total' reflectance can be plotted in a combined plot")
+    warning("Only 'total' reflectance can be meaningfully plotted in a combined plot")
   }
-  if (Tfr.type != "internal") {
-    stop("Only 'internal' transmittance can be plotted in a combined plot")
+  if (Tfr.type != "total") {
+    warning("Only 'total' transmittance can be meaningfully plotted in a combined plot")
   }
   s.Rfr.label <- expression(atop(Spectral~~reflectance~R(lambda)~~spectral~~absorptance~~A(lambda), and~~spectral~~transmittance~T(lambda)))
-  y.max <- 1
-  y.min <- 0
   spct[["Afr"]] <- 1.0 - spct[["Tfr"]] - spct[["Rfr"]]
+  if (any((spct[["Afr"]]) < -0.01)) {
+    message("Bad data or fluorescence.")
+    if (stacked) {
+      warning("Changing mode to not stacked")
+      stacked <- FALSE
+    }
+  }
+  if (stacked) {
+    y.max <- 1.01 # take care of rounding off
+    y.min <- -0.01 # take care of rounding off
+  } else {
+    y.max <- max(1, spct[["Rfr"]], spct[["Tfr"]], spct[["Afr"]], na.rm = TRUE)
+    y.min <- min(0, spct[["Rfr"]], spct[["Tfr"]], spct[["Afr"]], na.rm = TRUE)
+  }
   molten.spct <-
     tidyr::gather_(dplyr::select_(spct, "w.length", "Tfr", "Afr", "Rfr"),
                    "variable", "value", c("Tfr", "Afr", "Rfr"))
@@ -704,8 +774,16 @@ O_plot <- function(spct,
 #' This function returns a ggplot object with an annotated plot of a filter_spct
 #' object.
 #'
-#' @note Note that scales are expanded so as to make space for the annotations.
-#'   The object returned is a ggplot objects, and can be further manipulated.
+#' @note The ggplot object returned can be further manipulated and added to.
+#'   Except when no annotations are added, limits are set for the x-axis and
+#'   y-axis scales. The y scale limits are expanded to include all data, or at
+#'   least to the range of expected values. The plotting of absorbance is an
+#'   exception as the y-axis is not extended past 6 a.u. In the case of
+#'   absorbance, values larger than 6 a.u. are rarely meaningful due to stray
+#'   light during measurement. However, when transmittance values below the
+#'   detection limit are rounded to zero, and later converted into absorbance,
+#'   values Inf a.u. result, disrupting the plot. Scales are further expanded so
+#'   as to make space for the annotations.
 #'
 #' @param x a filter_spct object
 #' @param ... other arguments passed along, such as \code{label.qty}
@@ -715,7 +793,7 @@ O_plot <- function(spct,
 #' @param plot.qty character string one of "transmittance" or "absorbance"
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
-#'   for labels
+#'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
@@ -733,9 +811,6 @@ O_plot <- function(spct,
 #' library(photobiology)
 #' plot(yellow_gel.spct)
 #' plot(yellow_gel.spct, pc.out = TRUE)
-#'
-#' plot(polyester.spct)
-#' plot(polyester.spct, plot.qty = "absorbance")
 #'
 #' @family plot functions
 #'
@@ -819,8 +894,11 @@ plot.filter_spct <-
 #' This function returns a ggplot object with an annotated plot of a
 #' reflector_spct object.
 #'
-#' @note Note that scales are expanded so as to make space for the annotations.
-#'   The object returned is a ggplot objects, and can be further manipulated.
+#' @note The ggplot object returned can be further manipulated and added to.
+#'   Except when no annotations are added, limits are set for the x-axis and
+#'   y-axis scales. The y scale limits are expanded to include all data, or at
+#'   least to the range of expected values. Scales are further expanded so
+#'   as to make space for the annotations.
 #'
 #' @param x a reflector_spct object
 #' @param ... other arguments passed along, such as \code{label.qty}
@@ -830,7 +908,7 @@ plot.filter_spct <-
 #' @param plot.qty character string (currently ignored)
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
-#'   for labels
+#'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
@@ -847,7 +925,7 @@ plot.filter_spct <-
 #' @examples
 #'
 #' library(photobiology)
-#' plot(as.reflector_spct(white_body.spct))
+#' plot(Ler_leaf_rflt.spct)
 #'
 #' @family plot functions
 #'
@@ -910,8 +988,11 @@ plot.reflector_spct <-
 #' This function returns a ggplot object with an annotated plot of an
 #' object_spct object.
 #'
-#' @note Note that scales are expanded so as to make space for the annotations.
-#'   The object returned is a ggplot objects, and can be further manipulated.
+#' @note The ggplot object returned can be further manipulated and added to.
+#'   Except when no annotations are added, limits are set for the x-axis and
+#'   y-axis scales. The y scale limits are expanded to include all data, or at
+#'   least to the range of expected values. Scales are further expanded so
+#'   as to make space for the annotations.
 #'
 #' @param x an object_spct object
 #' @param ... other arguments passed along, such as \code{label.qty}
@@ -922,7 +1003,7 @@ plot.reflector_spct <-
 #'   "absorbance", "absorptance", or "reflectance".
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
-#'   for labels
+#'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
@@ -940,9 +1021,7 @@ plot.reflector_spct <-
 #' @examples
 #'
 #' library(photobiology)
-#' plot(black_body.spct)
-#' plot(white_body.spct)
-#' plot(clear_body.spct)
+#' plot(Ler_leaf.spct)
 #'
 #' @family plot functions
 #'

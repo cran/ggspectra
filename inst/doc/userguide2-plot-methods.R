@@ -1,5 +1,6 @@
 ## ------------------------------------------------------------------------
 library(ggplot2)
+library(dplyr)
 library(photobiology)
 library(photobiologyWavebands)
 library(ggspectra)
@@ -46,7 +47,11 @@ plot(sun.spct, unit.out = "photon")
 
 ## ------------------------------------------------------------------------
 plot(sun.spct, 
-     annotations = c("=", "segments", "labels", "summaries", "color.guide", "peaks"))
+     annotations = c("+", "boundaries"))
+
+## ------------------------------------------------------------------------
+plot(sun.spct, 
+     annotations = c("=", "labels", "summaries", "color.guide", "peaks", "boundaries"))
 
 ## ------------------------------------------------------------------------
 plot(sun.spct, 
@@ -125,9 +130,25 @@ yellow_gel.spct$Rfr <- 1 - max(yellow_gel.spct$Tfr)
 plot(yellow_gel.spct, plot.qty = "absorptance", annotations = c("-", "peaks"))
 
 ## ------------------------------------------------------------------------
-plot(sun.spct) + geom_spct(fill = color(sun.spct)) + 
+plot(sun.spct) + geom_spct(fill = color_of(sun.spct)) + 
   geom_spct(data = yellow_gel.spct * sun.spct, color = "black", 
-            fill = color(yellow_gel.spct * sun.spct))
+            fill = color_of(yellow_gel.spct * sun.spct))
+
+## ------------------------------------------------------------------------
+plot(yellow_gel.spct)
+
+## ------------------------------------------------------------------------
+plot(yellow_gel.spct, annotations = c("+", "boundaries"))
+
+## ------------------------------------------------------------------------
+plot(white_led.raw_spct, annotations = c("+", "boundaries"))
+
+## ------------------------------------------------------------------------
+plot(select(white_led.raw_spct, w.length, counts_1),
+     annotations = c("+", "boundaries"))
+
+## ------------------------------------------------------------------------
+plot(yellow_gel.spct - 0.01)
 
 ## ------------------------------------------------------------------------
 two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct * 2))

@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{cps_spct}(x, ..., w.band = getOption("photobiology.plot.bands",
   default = list(UVC(), UVB(), UVA(), PAR())), range = NULL,
-  unit.out = "cps", pc.out = FALSE, label.qty = "average", span = NULL,
+  unit.out = "cps", pc.out = FALSE, label.qty = "mean", span = NULL,
   annotations = NULL, norm = NULL, text.size = 2.5, na.rm = TRUE)
 }
 \arguments{
@@ -23,7 +23,8 @@ min annd max wavelengths (nm)}
 
 \item{pc.out}{logical, if TRUE use percents instead of fraction of one}
 
-\item{label.qty}{character IGNORED}
+\item{label.qty}{character string giving the type of summary quantity to use
+for labels, one of "mean", "total", "contribution", and "relative".}
 
 \item{span}{a peak is defined as an element in a sequence which is greater
 than all other elements within a window of width span centered at that

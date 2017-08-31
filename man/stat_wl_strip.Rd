@@ -104,7 +104,7 @@ ggplot(sun.spct) + wl_guide(alpha = 0.33, color = NA) + geom_line()
 
 }
 \seealso{
-\code{\link[photobiology]{color}}, which is used internally.
+\code{\link[photobiology]{color_of}}, which is used internally.
 
 Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},

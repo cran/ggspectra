@@ -85,7 +85,6 @@
 #' library(photobiology)
 #' library(photobiologyWavebands)
 #' library(ggplot2)
-#' library(ggrepel)
 #' # ggplot() methods for spectral objects set a default mapping for x and y.
 #' ggplot(sun.spct) +
 #'   stat_wb_column(w.band = VIS_bands()) +
@@ -93,6 +92,9 @@
 #'   geom_line() +
 #'   scale_fill_identity() + scale_color_identity()
 #'
+#' \dontrun{
+#' # example takes long to run
+#' library(ggrepel)
 #' ggplot(sun.spct) +
 #'   geom_line() +
 #'   stat_wb_hbar(w.band = VIS_bands(), size = 1.5) +
@@ -100,6 +102,7 @@
 #'                geom = "label_repel", nudge_y = +0.03,
 #'                segment.colour = NA) +
 #'   scale_fill_identity() + scale_color_identity()
+#' }
 #'
 #' @export
 #' @family stats functions
@@ -169,7 +172,8 @@ StatWbMean <-
                        range <- range(wb)
                        mydata <- trim_tails(data$x, data$y, use.hinges = TRUE,
                                             low.limit = range[1],
-                                            high.limit = range[2])
+                                            high.limit = range[2],
+                                            verbose = FALSE)
                        if (is_effective(wb)) {
                          warning("BSWFs not supported by summary: using wavelength range for ",
                                  labels(wb)$label, "'.")
@@ -185,9 +189,9 @@ StatWbMean <-
                                                     ymax = max(data$y),
                                                     yint = yint.tmp,
                                                     ymean = ymean.tmp,
-                                                    wb.color = color(wb),
+                                                    wb.color = color_of(wb),
                                                     wb.name = labels(wb)$label,
-                                                    BW.color = black_or_white(color(wb)))
+                                                    BW.color = black_or_white(color_of(wb)))
                                          )
                      }
                      if (!is.null(xpos.fixed)) {

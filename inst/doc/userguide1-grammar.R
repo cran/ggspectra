@@ -1,5 +1,6 @@
 ## ------------------------------------------------------------------------
 library(ggplot2)
+library(scales)
 library(photobiology)
 library(photobiologyWavebands)
 library(ggspectra)
@@ -37,10 +38,24 @@ ggplot(two_suns.spct, aes(w.length, s.e.irrad, color = spct.idx)) + geom_line()
 ggplot(sun.spct, unit.out = "photon") + geom_line()
 
 ## ------------------------------------------------------------------------
+photon_as_default()
+ggplot(sun.spct) + geom_line()
+ggplot(sun.spct, unit.out = "energy") + geom_line()
+
+## ------------------------------------------------------------------------
+unset_user_defaults()
+
+## ------------------------------------------------------------------------
 ggplot(yellow_gel.spct) + geom_line()
 
 ## ------------------------------------------------------------------------
 ggplot(yellow_gel.spct, plot.qty = "absorbance") + geom_line()
+
+## ------------------------------------------------------------------------
+Afr_as_default()
+ggplot(yellow_gel.spct) + geom_line()
+ggplot(polyester.spct) + geom_line()
+unset_user_defaults()
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + 
@@ -110,16 +125,53 @@ ggplot(sun.spct) +
   scale_y_s.e.irrad_continuous(-3)
 
 ## ------------------------------------------------------------------------
+ggplot(sun.spct, unit.out = "photon") + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.q.irrad_continuous(unit.exponent = 0,
+                               labels = scientific_format())
+
+## ------------------------------------------------------------------------
+library(scales)
+ggplot(sun.spct, unit.out = "photon") + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.q.irrad_continuous(unit.exponent = 0,
+                               labels = SI_tg_format(exponent = -6))
+
+## ------------------------------------------------------------------------
+ggplot(sun.spct, unit.out = "photon") + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.q.irrad_continuous(unit.exponent = 0,
+                               trans = "log10",
+                               labels = trans_format("log10", math_format()))
+
+## ------------------------------------------------------------------------
 ggplot(ccd.spct, unit.out = "photon") + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_s.q.response_continuous()
 
 ## ------------------------------------------------------------------------
+ggplot(ccd.spct, unit.out = "photon") + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.q.response_continuous(trans = "log10",
+                                  labels = trans_format("log10", math_format()))
+
+## ------------------------------------------------------------------------
 ggplot(yellow_gel.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_Tfr_total_continuous()
+  
+
+## ------------------------------------------------------------------------
+ggplot(yellow_gel.spct) + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_Tfr_total_continuous(labels = percent)
   
 
 ## ------------------------------------------------------------------------
@@ -281,7 +333,7 @@ ggplot(sun.spct) +
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) +
-  stat_wl_summary(range = c(400,500), geom = "rect", alpha = 0.2, fill = color(450)) +
+  stat_wl_summary(range = c(400,500), geom = "rect", alpha = 0.2, fill = color_of(450)) +
   stat_wl_summary(range = c(400,500), label.fmt = "Mean = %.3g", vjust = -0.3, geom = "text") + 
   geom_line()
 
@@ -618,11 +670,11 @@ ggplot(sun.spct) + geom_spct()
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + 
-  geom_spct(fill = color(sun.spct))
+  geom_spct(fill = color_of(sun.spct))
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct * yellow_gel.spct) + 
-  geom_spct(fill = color(sun.spct * yellow_gel.spct))
+  geom_spct(fill = color_of(sun.spct * yellow_gel.spct))
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + 
