@@ -47,6 +47,10 @@ plot(sun.spct, unit.out = "photon")
 
 ## ------------------------------------------------------------------------
 plot(sun.spct, 
+     annotations = c("+", "title:when:where"))
+
+## ------------------------------------------------------------------------
+plot(sun.spct, 
      annotations = c("+", "boundaries"))
 
 ## ------------------------------------------------------------------------
@@ -64,7 +68,7 @@ plot(sun.spct, annotations = c("-", "summaries", "peaks"))
 plot(sun.spct, annotations = c("+", "valleys"), span = 41)
 
 ## ------------------------------------------------------------------------
-plot(sun.spct, annotations = c("+", "peak.labels", "valley.labels"), span = 41)
+plot(sun.spct, annotations = c("+", "peak.labels", "valley.labels"), span = 71)
 
 ## ------------------------------------------------------------------------
 plot(sun.spct, annotations = "")

@@ -9,7 +9,7 @@
   UVA(), PAR())), range = NULL,
   plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
   pc.out = FALSE, label.qty = NULL, span = NULL, annotations = NULL,
-  text.size = 2.5, na.rm = TRUE)
+  time.format = "", tz = "UTC", text.size = 2.5, na.rm = TRUE)
 }
 \arguments{
 \item{x}{a filter_spct object}
@@ -33,6 +33,10 @@ than all other elements within a window of width span centered at that
 element.}
 
 \item{annotations}{a character vector}
+
+\item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
+
+\item{tz}{character Time zone to use for title and/or subtitle.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
 
@@ -64,7 +68,8 @@ plot(yellow_gel.spct, pc.out = TRUE)
 
 }
 \seealso{
-Other plot functions: \code{\link{plot.cps_spct}},
+Other plot functions: \code{\link{plot.calibration_spct}},
+  \code{\link{plot.cps_spct}},
   \code{\link{plot.object_spct}},
   \code{\link{plot.raw_spct}},
   \code{\link{plot.reflector_spct}},

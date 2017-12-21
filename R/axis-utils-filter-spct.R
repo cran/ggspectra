@@ -15,10 +15,10 @@
 #'
 #' @examples
 #' A_internal_label()
-#' A_internal_label(3)
+#' A_internal_label(-3)
 #' A_internal_label(format = "R.expression")
 #' A_internal_label(format = "LaTeX")
-#' A_internal_label(3, format = "LaTeX")
+#' A_internal_label(-3, format = "LaTeX")
 #'
 A_internal_label <- function(unit.exponent = 0,
                              format = getOption("photobiology.math",
@@ -57,10 +57,10 @@ A_internal_label <- function(unit.exponent = 0,
 #'
 #' @examples
 #' A_total_label()
-#' A_total_label(3)
+#' A_total_label(-3)
 #' A_total_label(format = "R.expression")
 #' A_total_label(format = "LaTeX")
-#' A_total_label(3, format = "LaTeX")
+#' A_total_label(-3, format = "LaTeX")
 #'
 A_total_label <- function(unit.exponent = 0,
                           format = getOption("photobiology.math",
@@ -103,7 +103,7 @@ A_total_label <- function(unit.exponent = 0,
 #' @param ... other named arguments passed to \code{scale_y_continuous}
 #'
 #' @note This function only alters two default arguments, please, see
-#' documentation for \code{\link[ggplot2]{scale_y_continuous}}
+#' documentation for \code{\link[ggplot2]{scale_continuous}}
 #'
 #' @export
 #'
@@ -243,7 +243,7 @@ Tfr_total_label <- function(unit.exponent = 0,
 #' @param ... other named arguments passed to \code{scale_y_continuous}
 #'
 #' @note This function only alters two default arguments, please, see
-#' documentation for \code{\link[ggplot2]{scale_y_continuous}}
+#' documentation for \code{\link[ggplot2]{scale_continuous}}
 #'
 #' @export
 #'
@@ -392,7 +392,7 @@ Rfr_total_label <- function(unit.exponent = 0,
 #' @param ... other named arguments passed to \code{scale_y_continuous}
 #'
 #' @note This function only alters two default arguments, please, see
-#' documentation for \code{\link[ggplot2]{scale_y_continuous}}
+#' documentation for \code{\link[ggplot2]{scale_continuous}}
 #'
 #' @export
 #'

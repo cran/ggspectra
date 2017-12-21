@@ -7,7 +7,8 @@
 \method{plot}{cps_spct}(x, ..., w.band = getOption("photobiology.plot.bands",
   default = list(UVC(), UVB(), UVA(), PAR())), range = NULL,
   unit.out = "cps", pc.out = FALSE, label.qty = "mean", span = NULL,
-  annotations = NULL, norm = NULL, text.size = 2.5, na.rm = TRUE)
+  annotations = NULL, time.format = "", tz = "UTC", norm = NULL,
+  text.size = 2.5, na.rm = TRUE)
 }
 \arguments{
 \item{x}{a cps_spct object}
@@ -32,6 +33,10 @@ element.}
 
 \item{annotations}{a character vector ("summaries" is ignored)}
 
+\item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
+
+\item{tz}{character Time zone to use for title and/or subtitle.}
+
 \item{norm}{numeric normalization wavelength (nm) or character string "max"
 for normalization at the wavelength of highest peak.}
 
@@ -51,7 +56,8 @@ Note that scales are expanded so as to make space for the annotations.
   The object returned is a ggplot objects, and can be further manipulated.
 }
 \seealso{
-Other plot functions: \code{\link{plot.filter_spct}},
+Other plot functions: \code{\link{plot.calibration_spct}},
+  \code{\link{plot.filter_spct}},
   \code{\link{plot.object_spct}},
   \code{\link{plot.raw_spct}},
   \code{\link{plot.reflector_spct}},

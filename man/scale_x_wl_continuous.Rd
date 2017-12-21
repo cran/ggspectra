@@ -26,7 +26,7 @@ Scale x continuous with defaults suitable for wavelengths in nanometres.
 }
 \note{
 This function only alters two default arguments, please, see
-documentation for \code{\link[ggplot2]{scale_x_continuous}}
+documentation for \code{\link[ggplot2]{scale_continuous}}
 }
 \examples{
 library(ggplot2)

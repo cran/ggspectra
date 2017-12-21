@@ -30,7 +30,7 @@ element.}
 \item{unit.in}{the type of unit we assume as reference "energy" or "photon"
 based}
 
-\item{annotations}{a character vector}
+\item{annotations}{a character vector.}
 
 \item{wb.trim}{logical}
 
@@ -71,7 +71,8 @@ plot(waveband(c(400, 500)))
 
 }
 \seealso{
-Other plot functions: \code{\link{plot.cps_spct}},
+Other plot functions: \code{\link{plot.calibration_spct}},
+  \code{\link{plot.cps_spct}},
   \code{\link{plot.filter_spct}},
   \code{\link{plot.object_spct}},
   \code{\link{plot.raw_spct}},

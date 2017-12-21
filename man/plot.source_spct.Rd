@@ -8,8 +8,8 @@
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
   UVA(), PAR())), range = NULL,
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
-  label.qty = NULL, span = NULL, annotations = NULL, text.size = 2.5,
-  na.rm = TRUE)
+  label.qty = NULL, span = NULL, annotations = NULL, time.format = "",
+  tz = "UTC", text.size = 2.5, na.rm = TRUE)
 }
 \arguments{
 \item{x}{a source_spct object}
@@ -33,6 +33,10 @@ element.}
 
 \item{annotations}{a character vector}
 
+\item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
+
+\item{tz}{character Time zone to use for title and/or subtitle.}
+
 \item{text.size}{numeric size of text in the plot decorations.}
 
 \item{na.rm}{logical.}
@@ -55,7 +59,8 @@ plot(sun.spct, unit.out = "photon")
 
 }
 \seealso{
-Other plot functions: \code{\link{plot.cps_spct}},
+Other plot functions: \code{\link{plot.calibration_spct}},
+  \code{\link{plot.cps_spct}},
   \code{\link{plot.filter_spct}},
   \code{\link{plot.object_spct}},
   \code{\link{plot.raw_spct}},

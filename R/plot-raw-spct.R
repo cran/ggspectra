@@ -54,6 +54,9 @@ raw_plot <- function(spct,
   linearized <- getInstrSettings(spct)[["linearized"]]
   if (!(is.null(linearized) || linearized)) {
     upper.boundary <- getInstrDesc(spct)[["max.counts"]]
+    if (is.null(upper.boundary)) {
+      upper.boundary <- NA_real_
+    }
   } else {
     upper.boundary <- NA_real_
   }
@@ -198,6 +201,8 @@ raw_plot <- function(spct,
 #'   than all other elements within a window of width span centered at that
 #'   element.
 #' @param annotations a character vector ("summaries" is ignored)
+#' @param time.format character Format as accepted by \code{\link[base]{strptime}}.
+#' @param tz character Time zone to use for title and/or subtitle.
 #' @param norm numeric normalization wavelength (nm) or character string "max"
 #' for normalization at the wavelength of highest peak.
 #' @param text.size numeric size of text in the plot decorations.
@@ -221,12 +226,15 @@ plot.raw_spct <-
            label.qty = "mean",
            span = NULL,
            annotations = NULL,
+           time.format = "",
+           tz = "UTC",
            norm = NULL,
            text.size = 2.5,
            na.rm = TRUE) {
     annotations.default <-
       getOption("photobiology.plot.annotations",
-                default = c("boxes", "labels", "colour.guide", "peaks"))
+                default = c("boxes", "labels", "colour.guide",
+                            "peaks", "boundaries"))
     annotations <- decode_annotations(annotations,
                                       annotations.default)
     if (length(w.band) == 0) {
@@ -239,21 +247,22 @@ plot.raw_spct <-
       }
     }
 
-    out.ggplot <- raw_plot(spct = x,
-                           w.band = w.band,
-                           range = range,
-                           label.qty = label.qty,
-                           span = span,
-                           pc.out = pc.out,
-                           annotations = annotations,
-                           norm = norm,
-                           text.size = text.size,
-                           na.rm = na.rm,
-                           ...)
-    if ("title" %in% annotations) {
-      out.ggplot <- out.ggplot + labs(title = deparse(substitute(x)))
-    }
-    out.ggplot
+    raw_plot(spct = x,
+             w.band = w.band,
+             range = range,
+             label.qty = label.qty,
+             span = span,
+             pc.out = pc.out,
+             annotations = annotations,
+             norm = norm,
+             text.size = text.size,
+             na.rm = na.rm,
+             ...) +
+      ggtitle_spct(x = x,
+                   time.format = time.format,
+                   tz = tz,
+                   x.name = deparse(substitute(x)),
+                   annotations = annotations)
   }
 
 

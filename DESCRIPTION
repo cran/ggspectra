@@ -1,8 +1,8 @@
 Package: ggspectra
 Type: Package
 Title: Extensions to 'ggplot2' for Radiation Spectra
-Version: 0.2.2
-Date: 2017-08-30
+Version: 0.2.3
+Date: 2017-12-16
 Authors@R: 
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "cre")),
@@ -19,19 +19,19 @@ LazyData: TRUE
 LazyLoad: TRUE
 ByteCompile: TRUE
 Depends: R (>= 3.3.0)
-Imports: photobiology (>= 0.9.17), photobiologyWavebands (>= 0.4.2),
-        scales (>= 0.4.1), ggplot2 (>= 2.2.1), ggrepel (>= 0.6.5),
-        dplyr (>= 0.7.1), lubridate (>= 1.6.0), tidyr (>= 0.6.3),
-        reshape2 (>= 1.4.2)
-Suggests: knitr (>= 1.16), rmarkdown (>= 1.6)
+Imports: photobiology (>= 0.9.18), photobiologyWavebands (>= 0.4.2),
+        scales (>= 0.4.1), ggplot2 (>= 2.2.1), ggrepel (>= 0.7.0),
+        dplyr (>= 0.7.4), lubridate (>= 1.7.1), tidyr (>= 0.7.2),
+        reshape2 (>= 1.4.3)
+Suggests: knitr (>= 1.17), rmarkdown (>= 1.8)
 URL: http://www.r4photobiology.info,
         https://bitbucket.org/aphalo/ggspectra
 BugReports: https://bitbucket.org/aphalo/ggspectra
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2017-08-31 22:19:57 UTC; aphalo
+Packaged: 2017-12-21 00:39:43 UTC; aphalo
 Author: Pedro J. Aphalo [aut, cre],
   Titta K. Kotilainen [ctb]
 Repository: CRAN
-Date/Publication: 2017-08-31 22:32:47 UTC
+Date/Publication: 2017-12-21 05:29:58 UTC

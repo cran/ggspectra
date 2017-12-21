@@ -9,7 +9,8 @@
   UVA(), PAR())), range = NULL,
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
   pc.out = FALSE, label.qty = NULL, span = NULL, annotations = NULL,
-  norm = "max", text.size = 2.5, na.rm = TRUE)
+  time.format = "", tz = "UTC", norm = "max", text.size = 2.5,
+  na.rm = TRUE)
 }
 \arguments{
 \item{x}{a response_spct object}
@@ -34,6 +35,10 @@ than all other elements within a window of width span centered at that
 element.}
 
 \item{annotations}{a character vector}
+
+\item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
+
+\item{tz}{character Time zone to use for title and/or subtitle.}
 
 \item{norm}{numeric normalization wavelength (nm) or character string "max"
 for normalization at the wavelength of highest peak.}
@@ -61,7 +66,8 @@ plot(photodiode.spct, unit.out = "photon")
 
 }
 \seealso{
-Other plot functions: \code{\link{plot.cps_spct}},
+Other plot functions: \code{\link{plot.calibration_spct}},
+  \code{\link{plot.cps_spct}},
   \code{\link{plot.filter_spct}},
   \code{\link{plot.object_spct}},
   \code{\link{plot.raw_spct}},

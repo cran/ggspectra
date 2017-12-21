@@ -7,6 +7,7 @@
 \alias{ggplot.filter_spct}
 \alias{ggplot.reflector_spct}
 \alias{ggplot.cps_spct}
+\alias{ggplot.calibration_spct}
 \alias{ggplot.raw_spct}
 \alias{ggplot.object_spct}
 \title{Create a new ggplot plot from spectral data.}
@@ -27,6 +28,9 @@
   environment = parent.frame())
 
 \method{ggplot}{cps_spct}(data, mapping = NULL, ...,
+  environment = parent.frame())
+
+\method{ggplot}{calibration_spct}(data, mapping = NULL, ...,
   environment = parent.frame())
 
 \method{ggplot}{raw_spct}(data, mapping = NULL, ...,

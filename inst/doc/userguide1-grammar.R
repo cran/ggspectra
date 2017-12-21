@@ -140,12 +140,14 @@ ggplot(sun.spct, unit.out = "photon") +
                                labels = SI_tg_format(exponent = -6))
 
 ## ------------------------------------------------------------------------
-ggplot(sun.spct, unit.out = "photon") + 
-  geom_line() +
+temp.spct <- clean(sun.spct, range.s.data = c(1e-20, Inf), fill = 1e-20)
+ggplot(temp.spct, unit.out = "photon") + 
+  geom_line(na.rm = TRUE) +
   scale_x_wl_continuous() +
   scale_y_s.q.irrad_continuous(unit.exponent = 0,
                                trans = "log10",
-                               labels = trans_format("log10", math_format()))
+                               labels = trans_format("log10", math_format()),
+                               limits = c(1e-12, NA))
 
 ## ------------------------------------------------------------------------
 ggplot(ccd.spct, unit.out = "photon") + 
@@ -219,12 +221,12 @@ ggplot(sun.spct) + geom_line() +
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(shape = 21, span = 25, size = 2) + 
-  stat_label_peaks(geom = "label_repel", span = 25, 
+  stat_label_peaks(geom = "label_repel", span = 41, 
                    size = 3.5, nudge_y = 0.075, segment.colour = "black") +
   stat_valleys(shape = 21, span = 25, size = 2) + 
-  stat_label_valleys(geom = "label_repel", span = 25, 
+  stat_label_valleys(geom = "label_repel", span = 51, 
                      size = 3.5, nudge_y = -0.075, segment.colour = "black") +
-  scale_fill_identity() +scale_color_identity() +
+  scale_fill_identity() + scale_color_identity() +
   expand_limits(y = c(-0.08, 0.9))
 
 ## ------------------------------------------------------------------------

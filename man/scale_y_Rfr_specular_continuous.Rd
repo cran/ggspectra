@@ -27,7 +27,7 @@ Scale y continuous with defaults suitable for spectral transmittance.
 }
 \note{
 This function only alters two default arguments, please, see
-documentation for \code{\link[ggplot2]{scale_y_continuous}}
+documentation for \code{\link[ggplot2]{scale_continuous}}
 }
 \examples{
 library(ggplot2)

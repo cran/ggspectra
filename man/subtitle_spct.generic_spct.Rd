@@ -2,7 +2,7 @@
 % Please edit documentation in R/build-plot-title.R
 \name{subtitle_spct.generic_spct}
 \alias{subtitle_spct.generic_spct}
-\title{Build a plot subtitle from object metadata}
+\title{Build a plot subtitle from object metadata (deprecated!)}
 \usage{
 subtitle_spct.generic_spct(x, default.when = character(0),
   default.where = character(0), ...)
@@ -21,3 +21,4 @@ and \code{lon}.}
 Build a character string to be used as plot title by quering spectral
 object for its  metadata.
 }
+\keyword{internal}

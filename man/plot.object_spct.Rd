@@ -7,8 +7,8 @@
 \method{plot}{object_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
   UVA(), PAR())), range = NULL, plot.qty = "all", pc.out = FALSE,
-  label.qty = NULL, span = 61, annotations = NULL, stacked = TRUE,
-  text.size = 2.5, na.rm = TRUE)
+  label.qty = NULL, span = 61, annotations = NULL, time.format = "",
+  tz = "UTC", stacked = TRUE, text.size = 2.5, na.rm = TRUE)
 }
 \arguments{
 \item{x}{an object_spct object}
@@ -33,6 +33,10 @@ than all other elements within a window of width span centered at that
 element.}
 
 \item{annotations}{a character vector}
+
+\item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
+
+\item{tz}{character Time zone to use for title and/or subtitle.}
 
 \item{stacked}{logical}
 
@@ -61,7 +65,8 @@ plot(Ler_leaf.spct)
 
 }
 \seealso{
-Other plot functions: \code{\link{plot.cps_spct}},
+Other plot functions: \code{\link{plot.calibration_spct}},
+  \code{\link{plot.cps_spct}},
   \code{\link{plot.filter_spct}},
   \code{\link{plot.raw_spct}},
   \code{\link{plot.reflector_spct}},

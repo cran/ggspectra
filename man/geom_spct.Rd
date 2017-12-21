@@ -10,7 +10,7 @@ geom_spct(mapping = NULL, data = NULL, stat = "identity",
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
-\code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_string}}. Only needs
+\code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_}}. Only needs
 to be set at the layer level if you are overriding the plot defaults.}
 
 \item{data}{A data frame. If specified, overrides the default data frame
@@ -44,7 +44,7 @@ For each continuous x value, \code{geom_spct} displays a y interval.
 the range is fixed to 0, but stacking is not enabled.
 }
 \details{
-An spectrum plot is the analog of a line plot (see \code{\link{geom_line}}),
+An spectrum plot is the analog of a line plot (see \code{\link[ggplot2]{geom_path}}),
 and can be used to show y varies over the range of x. The difference is that
 the area under the line is filled.
 }
@@ -60,7 +60,7 @@ ggplot(sun.spct) + geom_spct()
 
 }
 \seealso{
-\code{\link[ggplot2]{geom_area}} for stacked areas,
-\code{\link[ggplot2]{geom_line}} for lines (lines),
+\code{\link[ggplot2]{geom_ribbon}} for stacked areas,
+\code{\link[ggplot2]{geom_path}} for lines (lines),
 \code{\link[ggplot2]{geom_point}} for scatter plots.
 }
