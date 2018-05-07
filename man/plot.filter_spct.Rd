@@ -2,7 +2,8 @@
 % Please edit documentation in R/plot-filter-spct.R
 \name{plot.filter_spct}
 \alias{plot.filter_spct}
-\title{Plot method for filter spectra.}
+\alias{plot.filter_mspct}
+\title{Plot methods for filter spectra.}
 \usage{
 \method{plot}{filter_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
@@ -10,20 +11,22 @@
   plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
   pc.out = FALSE, label.qty = NULL, span = NULL, annotations = NULL,
   time.format = "", tz = "UTC", text.size = 2.5, na.rm = TRUE)
+
+\method{plot}{filter_mspct}(x, ..., range = NULL)
 }
 \arguments{
-\item{x}{a filter_spct object}
+\item{x}{a filter_spct object or a filter_mspct object.}
 
-\item{...}{other arguments passed along, such as \code{label.qty}}
+\item{...}{other arguments passed along, such as \code{label.qty}.}
 
-\item{w.band}{a single waveband object or a list of waveband objects}
+\item{w.band}{a single waveband object or a list of waveband objects.}
 
 \item{range}{an R object on which range() returns a vector of length 2, with
-min annd max wavelengths (nm)}
+min annd max wavelengths (nm).}
 
-\item{plot.qty}{character string one of "transmittance" or "absorbance"}
+\item{plot.qty}{character string one of "transmittance" or "absorbance".}
 
-\item{pc.out}{logical, if TRUE use percents instead of fraction of one}
+\item{pc.out}{logical, if TRUE use percents instead of fraction of one.}
 
 \item{label.qty}{character string giving the type of summary quantity to use
 for labels, one of "mean", "total", "contribution", and "relative".}
@@ -32,7 +35,7 @@ for labels, one of "mean", "total", "contribution", and "relative".}
 than all other elements within a window of width span centered at that
 element.}
 
-\item{annotations}{a character vector}
+\item{annotations}{a character vector.}
 
 \item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
 
@@ -46,7 +49,8 @@ element.}
 a \code{ggplot} object.
 }
 \description{
-This function returns a ggplot object with an annotated plot of a filter_spct
+These methods return a ggplot object with an annotated plot of a
+filter_spct object or of the spectra contained in a filter_mspct
 object.
 }
 \note{

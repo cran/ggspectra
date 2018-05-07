@@ -69,7 +69,7 @@ with default \code{integrate_xy}.
   \item{xmax}{w.band maximum}
   \item{ymin}{data$y minimum}
   \item{ymax}{data$y maximum}
-  \item{ymean}{yint divided by spread(w.band)}
+  \item{ymean}{yint divided by wl_expanse(w.band)}
   \item{y}{ymeam}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}

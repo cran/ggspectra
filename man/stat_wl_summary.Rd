@@ -60,7 +60,7 @@ with default \code{integrate_xy}.
   \item{x}{w.band-midpoint}
   \item{xmin}{range minimum}
   \item{xmax}{range maximum}
-  \item{y}{data$y integral for the range by the spread of the range}
+  \item{y}{data$y integral for the range by the expanse of the range}
 }
 }
 

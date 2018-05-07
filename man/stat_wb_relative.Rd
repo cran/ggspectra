@@ -83,7 +83,7 @@ to the data, with default \code{integrate_xy}.
   \item{ymax}{data$y maximum}
   \item{yint}{data$y integral for each mebmer of w.band / sum of data$y
   integrals for all wavebands in w.band}
-  \item{xmean}{yint divided by spread(w.band)}
+  \item{xmean}{yint divided by wl_expanse(w.band)}
   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}

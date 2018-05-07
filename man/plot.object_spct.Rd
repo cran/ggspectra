@@ -2,6 +2,7 @@
 % Please edit documentation in R/plot-filter-spct.R
 \name{plot.object_spct}
 \alias{plot.object_spct}
+\alias{plot.object_mspct}
 \title{Plot method for object spectra.}
 \usage{
 \method{plot}{object_spct}(x, ...,
@@ -9,6 +10,8 @@
   UVA(), PAR())), range = NULL, plot.qty = "all", pc.out = FALSE,
   label.qty = NULL, span = 61, annotations = NULL, time.format = "",
   tz = "UTC", stacked = TRUE, text.size = 2.5, na.rm = TRUE)
+
+\method{plot}{object_mspct}(x, ..., range = NULL)
 }
 \arguments{
 \item{x}{an object_spct object}

@@ -2,27 +2,30 @@
 % Please edit documentation in R/plot-calibration-spct.R
 \name{plot.calibration_spct}
 \alias{plot.calibration_spct}
-\title{Plot method for spectral irradiation calibrations.}
+\alias{plot.calibration_mspct}
+\title{Plot methods for spectral irradiation calibrations.}
 \usage{
 \method{plot}{calibration_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
   UVA(), PAR())), range = NULL, unit.out = "counts", pc.out = FALSE,
   label.qty = "mean", span = NULL, annotations = NULL, time.format = "",
   tz = "UTC", norm = NULL, text.size = 2.5, na.rm = TRUE)
+
+\method{plot}{calibration_mspct}(x, ..., range = NULL)
 }
 \arguments{
-\item{x}{a calibration_spct object}
+\item{x}{a calibration_spct object or a calibration_mspct object.}
 
-\item{...}{other arguments passed along, such as \code{label.qty}}
+\item{...}{other arguments passed along, such as \code{label.qty}.}
 
-\item{w.band}{a single waveband object or a list of waveband objects}
+\item{w.band}{a single waveband object or a list of waveband objects.}
 
 \item{range}{an R object on which range() returns a vector of length 2,
-with min annd max wavelengths (nm)}
+with min annd max wavelengths (nm).}
 
-\item{unit.out}{character IGNORED}
+\item{unit.out}{character IGNORED.}
 
-\item{pc.out}{logical, if TRUE use percents instead of fraction of one}
+\item{pc.out}{logical, if TRUE use percents instead of fraction of one.}
 
 \item{label.qty}{character string giving the type of summary quantity to use
 for labels, one of "mean", "total", "contribution", and "relative".}
@@ -31,7 +34,7 @@ for labels, one of "mean", "total", "contribution", and "relative".}
 than all other elements within a window of width span centered at that
 element.}
 
-\item{annotations}{a character vector ("summaries" is ignored)}
+\item{annotations}{a character vector ("summaries" is ignored).}
 
 \item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
 
@@ -48,8 +51,9 @@ for normalization at the wavelength of highest peak.}
 a \code{ggplot} object.
 }
 \description{
-This function returns a ggplot object with an annotated plot of a
-calibration_spct object.
+These methods return a ggplot object with an annotated plot of a
+calibration_spct object or of the spectra contained in a calibration_mspct
+object.
 }
 \note{
 Note that scales are expanded so as to make space for the annotations.

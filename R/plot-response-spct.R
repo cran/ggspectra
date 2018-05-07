@@ -161,7 +161,12 @@ e_rsp_plot <- function(spct,
     rsp.label <- ""
   }
 
-  plot <- ggplot(spct, aes_(~w.length, ~s.e.response))
+  plot <- ggplot(spct)
+  if (getMultipleWl(spct) == 1L) {
+    plot <- plot + aes_(~w.length, ~s.e.response)
+  } else {
+    plot <- plot + aes_(~w.length, ~s.e.response, linetype = ~spct.idx)
+  }
 
   # We want data plotted on top of the boundary lines
   # Negative response is valid!
@@ -205,7 +210,7 @@ e_rsp_plot <- function(spct,
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
-    x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
     y.limits <- c(y.min, y.max)
     x.limits <- range(spct)
@@ -383,7 +388,12 @@ q_rsp_plot <- function(spct,
     rsp.label <- ""
   }
 
-  plot <- ggplot(spct, aes_(~w.length, ~s.q.response))
+  plot <- ggplot(spct)
+  if (getMultipleWl(spct) == 1L) {
+    plot <- plot + aes_(~w.length, ~s.q.response)
+  } else {
+    plot <- plot + aes_(~w.length, ~s.q.response, linetype = ~spct.idx)
+  }
 
   # We want data plotted on top of the boundary lines
   # Negative response is valid!
@@ -427,7 +437,7 @@ q_rsp_plot <- function(spct,
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
-    x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
     y.limits <- c(y.min, y.max)
     x.limits <- range(spct)
@@ -442,15 +452,16 @@ q_rsp_plot <- function(spct,
   plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 }
 
-#' Plot method for response spectra.
+#' Plot methods for response spectra.
 #'
-#' This function returns a ggplot object with an annotated plot of a
-#' response_spct object.
+#' These methods return a ggplot object with an annotated plot of a
+#' response_spct object or of the spectra contained in a response_mspct object.
 #'
 #' @note Note that scales are expanded so as to make space for the annotations.
-#'   The object returned is a ggplot objects, and can be further manipulated.
+#'   The object returned is a ggplot object, and can be further manipulated and
+#'   added to.
 #'
-#' @param x a response_spct object
+#' @param x a response_spct object or a response_mspct object.
 #' @param ... other arguments passed along, such as \code{label.qty}
 #' @param w.band a single waveband object or a list of waveband objects
 #' @param range an R object on which range() returns a vector of length 2, with
@@ -464,7 +475,8 @@ q_rsp_plot <- function(spct,
 #'   than all other elements within a window of width span centered at that
 #'   element.
 #' @param annotations a character vector
-#' @param time.format character Format as accepted by \code{\link[base]{strptime}}.
+#' @param time.format character Format as accepted by
+#'   \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param norm numeric normalization wavelength (nm) or character string "max"
 #'   for normalization at the wavelength of highest peak.
@@ -503,6 +515,9 @@ plot.response_spct <-
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
+    if (getMultipleWl(x) > 1L) {
+      annotations.default <- setdiff(annotations.default, "summaries")
+    }
     annotations <- decode_annotations(annotations,
                                       annotations.default)
     if (is.null(label.qty)) {
@@ -556,4 +571,16 @@ plot.response_spct <-
                    annotations = annotations)
   }
 
+#' @rdname plot.response_spct
+#'
+#' @export
+#'
+plot.response_mspct <-
+  function(x, ..., range = NULL) {
+    if (!is.null(range)) {
+      x <- trim_wl(x, range = range, use.hinges = TRUE, fill = NULL)
+    }
+    z <- rbindspct(x)
+    plot(x = z, range = NULL, ...)
+  }
 

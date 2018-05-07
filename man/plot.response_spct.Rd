@@ -2,7 +2,8 @@
 % Please edit documentation in R/plot-response-spct.R
 \name{plot.response_spct}
 \alias{plot.response_spct}
-\title{Plot method for response spectra.}
+\alias{plot.response_mspct}
+\title{Plot methods for response spectra.}
 \usage{
 \method{plot}{response_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
@@ -11,9 +12,11 @@
   pc.out = FALSE, label.qty = NULL, span = NULL, annotations = NULL,
   time.format = "", tz = "UTC", norm = "max", text.size = 2.5,
   na.rm = TRUE)
+
+\method{plot}{response_mspct}(x, ..., range = NULL)
 }
 \arguments{
-\item{x}{a response_spct object}
+\item{x}{a response_spct object or a response_mspct object.}
 
 \item{...}{other arguments passed along, such as \code{label.qty}}
 
@@ -36,7 +39,8 @@ element.}
 
 \item{annotations}{a character vector}
 
-\item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
+\item{time.format}{character Format as accepted by
+\code{\link[base]{strptime}}.}
 
 \item{tz}{character Time zone to use for title and/or subtitle.}
 
@@ -51,12 +55,13 @@ for normalization at the wavelength of highest peak.}
 a \code{ggplot} object.
 }
 \description{
-This function returns a ggplot object with an annotated plot of a
-response_spct object.
+These methods return a ggplot object with an annotated plot of a
+response_spct object or of the spectra contained in a response_mspct object.
 }
 \note{
 Note that scales are expanded so as to make space for the annotations.
-  The object returned is a ggplot objects, and can be further manipulated.
+  The object returned is a ggplot object, and can be further manipulated and
+  added to.
 }
 \examples{
 library(photobiology)

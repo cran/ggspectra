@@ -10,47 +10,53 @@
 \alias{ggplot.calibration_spct}
 \alias{ggplot.raw_spct}
 \alias{ggplot.object_spct}
+\alias{ggplot.generic_mspct}
 \title{Create a new ggplot plot from spectral data.}
 \usage{
-\method{ggplot}{source_spct}(data, mapping = NULL, ...,
+\method{ggplot}{source_spct}(data, mapping = NULL, ..., range = NULL,
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
   environment = parent.frame())
 
-\method{ggplot}{response_spct}(data, mapping = NULL, ...,
+\method{ggplot}{response_spct}(data, mapping = NULL, ..., range = NULL,
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
   environment = parent.frame())
 
-\method{ggplot}{filter_spct}(data, mapping = NULL, ...,
+\method{ggplot}{filter_spct}(data, mapping = NULL, ..., range = NULL,
   plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
   environment = parent.frame())
 
-\method{ggplot}{reflector_spct}(data, mapping = NULL, ..., plot.qty = NULL,
+\method{ggplot}{reflector_spct}(data, mapping = NULL, ..., range = NULL,
+  plot.qty = NULL, environment = parent.frame())
+
+\method{ggplot}{cps_spct}(data, mapping = NULL, ..., range = NULL,
   environment = parent.frame())
 
-\method{ggplot}{cps_spct}(data, mapping = NULL, ...,
+\method{ggplot}{calibration_spct}(data, mapping = NULL, ..., range = NULL,
   environment = parent.frame())
 
-\method{ggplot}{calibration_spct}(data, mapping = NULL, ...,
+\method{ggplot}{raw_spct}(data, mapping = NULL, ..., range = NULL,
   environment = parent.frame())
 
-\method{ggplot}{raw_spct}(data, mapping = NULL, ...,
-  environment = parent.frame())
-
-\method{ggplot}{object_spct}(data, mapping = NULL, ...,
+\method{ggplot}{object_spct}(data, mapping = NULL, ..., range = NULL,
   plot.qty = getOption("photobiology.object.qty", default = "all"),
+  environment = parent.frame())
+
+\method{ggplot}{generic_mspct}(data, mapping = NULL, ..., range = NULL,
   environment = parent.frame())
 }
 \arguments{
 \item{data}{Default spectrum dataset to use for plot. If not a spectrum, the
-methods used will be those defined in package \code{ggplot2}. See \code{\link[ggplot2]{ggplot}}.
-If not specified,
-must be suppled in each layer added to the plot.}
+methods used will be those defined in package \code{ggplot2}. See
+\code{\link[ggplot2]{ggplot}}. If not specified, must be suppled in each
+layer added to the plot.}
 
-\item{mapping}{Default list of aesthetic mappings to use for plot.
-If not specified, in the case of spectral objects, a default mapping will
-be used.}
+\item{mapping}{Default list of aesthetic mappings to use for plot. If not
+specified, in the case of spectral objects, a default mapping will be used.}
 
-\item{...}{Other arguments passed on to methods. Not currently used.}
+\item{...}{Other arguments passed on to methods.}
+
+\item{range}{an R object on which range() returns a vector of length 2, with
+min annd max wavelengths (nm).}
 
 \item{unit.out}{character string indicating type of units to use for
 plotting.}
@@ -64,49 +70,57 @@ filter_spct, and one of "transmittance", "reflectance" or "all" for
 object_spct.}
 }
 \description{
-\code{ggplot()} initializes a ggplot object. It can be used to
-declare the input spectral object for a graphic and to optionally specify the
-set of plot aesthetics intended to be common throughout all
-subsequent layers unless specifically overridden.
+\code{ggplot()} initializes a ggplot object. It can be used to declare the
+input spectral object for a graphic and to optionally specify the set of plot
+aesthetics intended to be common throughout all subsequent layers unless
+specifically overridden.
 }
 \details{
-\code{ggplot()} is typically used to construct a plot
-incrementally, using the + operator to add layers to the
-existing ggplot object. This is advantageous in that the
-code is explicit about which layers are added and the order
-in which they are added. For complex graphics with multiple
-layers, initialization with \code{ggplot} is recommended.
+\code{ggplot()} is typically used to construct a plot incrementally, using
+the \code{+} operator to add layers to the existing ggplot object. This is
+advantageous in that the code is explicit about which layers are added and
+the order in which they are added. For complex graphics with multiple layers,
+initialization with \code{ggplot} is recommended.
 
-There are three common ways to invoke \code{ggplot}:
+We show seven common ways to invoke \code{ggplot} for spectra and
+collections of spectra:
 \itemize{
-   \item \code{ggplot(spct, aes(x, y, <other aesthetics>))}
-   \item \code{ggplot(spct, unit.out = <unit.to.use>)}
    \item \code{ggplot(spct)}
+   \item \code{ggplot(spct, unit.out = <unit.to.use>)}
+   \item \code{ggplot(spct, plot.qty = <quantity.to.plot>)}
+   \item \code{ggplot(spct, range = <wavelength.range>)}
+   \item \code{ggplot(spct) + aes(<other aesthetics>)}
+   \item \code{ggplot(spct, aes(x, y, <other aesthetics>))}
+   \item \code{ggplot(spct, aes())}
   }
-The first method is recommended if all layers use the same
-data and the same set of aesthetics, although this method
-can also be used to add a layer using data from another
-data frame. See the first example below. The second
-method specifies the default spectrum object to use for the plot, and the
-units to be used for y in the plot,
-but no aesthetics are defined up front. This is useful when
-one data frame is used predominantly as layers are added,
-but the aesthetics may vary from one layer to another. The
-third method specifies the default spectrum object to use for the plot,
-but no aesthetics are defined up front. This is useful when
-one spectrum is used predominantly as layers are added,
-but the aesthetics may vary from one layer to another.
+The first method is recommended if all layers use the same data and the same
+set of automatic default x and y aesthetics. The second, third and fourth use
+automatic default x and y aesthetics but first transform or trim the spectral
+data to be plotted. The fifth uses automatic default x and y aesthetics and
+adds mappings for other aesthetics. These patterns can be combined as needed.
+The sixth disables the use of a default automatic mapping, while the seventh
+delays the mapping of aesthetics and can be convenient when using different
+mappings for different geoms.
 }
 \note{
-Current implementation does not merge default mapping with user
+Current implementation does not merge the default mapping with user
 supplied mapping. If user supplies a mapping, it is used as is, and
 variables should be present in the spectral object. In contrast, when
 using the default mapping, unit conversion is done on the fly when needed.
-To add to the default mapping, aes() can be used by itself to compose
+To add to the default mapping, \code{aes()} can be used by itself to compose
 the ggplot.
 
 plot.qty is ignored for reflectors.
 }
+\section{Collections of spectra}{
+ The method for collections of spectra
+  accepts arguments for the same parameters as the corresponding methods for
+  single spectra. Heterogeneous generic collections of spectra are not
+  supported. When plotting collections of spectra the factor \code{spct.idx}
+  contains as levels the names of the individual members of the collection,
+  and can be mapped to aesthetics or used for faceting.
+}
+
 \examples{
 library(photobiology)
 library(ggplot2)

@@ -99,7 +99,7 @@ What it is named integral below is the result of appying \code{irrad},
   \item{ymax}{data$y maximum}
   \item{yeff}{weighted irradiance if \code{w.band} describes a BSWF}
   \item{yint}{not weighted irradiance for the range of \code{w.band}}
-  \item{xmean}{yint divided by spread(w.band)}
+  \item{xmean}{yint divided by wl_expanse(w.band)}
   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}

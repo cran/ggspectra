@@ -5,17 +5,10 @@ library(photobiology)
 library(photobiologyWavebands)
 library(ggspectra)
 
-## ----setup, include = FALSE, eval = FALSE--------------------------------
-#  library(svglite)
-#  knitr::opts_chunk$set(
-#    dev = "svglite",
-#    fig.ext = ".svg"
-#  )
-
 ## ---- include=FALSE, echo=FALSE------------------------------------------
 library(knitr)
 opts_chunk$set(fig.path = 'figure/plot-pos-', fig.align = 'center', fig.show = 'hold',
-               fig.width = 7, fig.height = 4)
+               fig.width = 7, fig.height = 4, cache = FALSE)
 options(warnPartialMatchArgs = FALSE)
 
 ## ------------------------------------------------------------------------
@@ -155,41 +148,32 @@ plot(select(white_led.raw_spct, w.length, counts_1),
 plot(yellow_gel.spct - 0.01)
 
 ## ------------------------------------------------------------------------
-two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct * 2))
-
-## ---- fig.width = 7, fig.height = 8--------------------------------------
-multiplot(plotlist = mslply(two_suns.mspct, plot))
-
-## ---- fig.width = 7, fig.height = 8--------------------------------------
-plot(rbindspct(two_suns.mspct)) + facet_wrap(~spct.idx, ncol = 1)
+two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct / 2))
+mixed.mspct <- generic_mspct(list(sun = sun.spct, filter = polyester.spct))
 
 ## ------------------------------------------------------------------------
-plot(rbindspct(two_suns.mspct), 
-     annotations = c("-", "summaries")) + 
-  aes(linetype = spct.idx)
+plot(two_suns.mspct)
+
+## ---- fig.width = 7, fig.height = 8--------------------------------------
+plot(two_suns.mspct, annotations = c("+", "summaries")) + 
+  facet_wrap(~spct.idx, ncol = 1)
+
+## ---- fig.width = 7, fig.height = 8--------------------------------------
+multiplot(plotlist = mslply(mixed.mspct, plot))
 
 ## ------------------------------------------------------------------------
-plot(rbindspct(two_suns.mspct), 
-     annotations = c("-", "summaries"), span = 301) + 
+plot(two_suns.mspct) + 
   aes(color = ifelse(spct.idx == "sun1", "darkgreen", "darkred"))
 
 ## ------------------------------------------------------------------------
-plot(rbindspct(two_suns.mspct), annotations = "") + 
-  aes(linetype = spct.idx) +
-  wl_guide(ymax = -0.05)
+plot(two_suns.mspct, annotations = c("color.guide", "valleys", "peaks"), span = 51)
 
 ## ------------------------------------------------------------------------
-plot(sun.spct, annotations = c("-", "peaks")) +
+plot(two_suns.mspct, annotations = c("-", "peaks")) +
   stat_peaks(span = NULL, color = "red") +
   stat_peaks(span = NULL, geom = "text", 
              label.fmt = "max at %3.1f nm",
              vjust = -0.4, color = "red")
-
-## ------------------------------------------------------------------------
-ggplot(rbindspct(two_suns.mspct)) + 
-  aes(linetype = spct.idx) +
-  wl_guide(ymax = -0.05) +
-  geom_line()
 
 ## ------------------------------------------------------------------------
 plot(VIS())

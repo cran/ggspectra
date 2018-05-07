@@ -51,6 +51,10 @@ cal_plot <- function(spct,
   }
 
   mult.cols <- names(spct)[grep("^irrad.mult", names(spct))]
+  num.mult.cols <- length(mult.cols)
+  if (num.mult.cols > 1L && getMultipleWl(spct) != 1L) {
+    stop("Error: spectra can be either in wide or long format, but not both.")
+  }
 #  other.cols <- setdiff(names(x), mult.cols)
   if (is.null(norm)) {
     # we will use the original data
@@ -99,15 +103,26 @@ cal_plot <- function(spct,
     counts.label <- ""
   }
 
-  spct <- reshape2::melt(spct,
-                         id.vars = "w.length",
-                         measure.vars = mult.cols,
-                         variable.name = "scan",
-                         value.name = "irrad.mult")
-  setCalibrationSpct(spct, multiple.wl = length(mult.cols))
-  y.max <- max(spct[["irrad.mult"]], 0, na.rm = TRUE)
-  y.min <- min(spct[["irrad.mult"]], 0, na.rm = TRUE)
-  plot <- ggplot(spct) + aes_(linetype = ~scan)
+  if (num.mult.cols > 1L) {
+    spct <- tidyr::gather(spct,
+                          .dots = mult.cols,
+                          key = "scan",
+                          value = "irrad.mult")
+    setCalibrationSpct(spct, multiple.wl = length(mult.cols))
+    y.max <- max(spct[["irrad.mult"]], 0, na.rm = TRUE)
+    y.min <- min(spct[["irrad.mult"]], 0, na.rm = TRUE)
+  }
+
+  plot <- ggplot(spct)
+  if (getMultipleWl(spct) == 1L) {
+    if (num.mult.cols > 1L) {
+      plot <- plot + aes_(~w.length, ~irrad.mult, linetype = ~scan)
+    } else {
+      plot <- plot + aes_(~w.length, ~irrad.mult)
+    }
+  } else {
+    plot <- plot + aes_(~w.length, ~irrad.mult, linetype = ~spct.idx)
+  }
 
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
@@ -146,7 +161,7 @@ cal_plot <- function(spct,
                          "summaries", "colour.guide", "reserve.space"),
                        annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
-    x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
     y.limits <- c(y.min, y.max)
     x.limits <- range(spct)
@@ -157,28 +172,28 @@ cal_plot <- function(spct,
 
 }
 
-
-#' Plot method for spectral irradiation calibrations.
+#' Plot methods for spectral irradiation calibrations.
 #'
-#' This function returns a ggplot object with an annotated plot of a
-#' calibration_spct object.
+#' These methods return a ggplot object with an annotated plot of a
+#' calibration_spct object or of the spectra contained in a calibration_mspct
+#' object.
 #'
 #' @note Note that scales are expanded so as to make space for the annotations.
 #' The object returned is a ggplot objects, and can be further manipulated.
 #'
-#' @param x a calibration_spct object
-#' @param ... other arguments passed along, such as \code{label.qty}
-#' @param w.band a single waveband object or a list of waveband objects
+#' @param x a calibration_spct object or a calibration_mspct object.
+#' @param ... other arguments passed along, such as \code{label.qty}.
+#' @param w.band a single waveband object or a list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2,
-#' with min annd max wavelengths (nm)
-#' @param unit.out character IGNORED
-#' @param pc.out logical, if TRUE use percents instead of fraction of one
+#' with min annd max wavelengths (nm).
+#' @param unit.out character IGNORED.
+#' @param pc.out logical, if TRUE use percents instead of fraction of one.
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector ("summaries" is ignored)
+#' @param annotations a character vector ("summaries" is ignored).
 #' @param time.format character Format as accepted by \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param norm numeric normalization wavelength (nm) or character string "max"
@@ -242,4 +257,16 @@ plot.calibration_spct <-
                    annotations = annotations)
   }
 
+#' @rdname plot.calibration_spct
+#'
+#' @export
+#'
+plot.calibration_mspct <-
+  function(x, ..., range = NULL) {
+    if (!is.null(range)) {
+      x <- trim_wl(x, range = range, use.hinges = TRUE, fill = NULL)
+    }
+    z <- rbindspct(x)
+    plot(x = z, range = NULL, ...)
+  }
 

@@ -6,21 +6,18 @@ library(photobiologyWavebands)
 library(ggspectra)
 library(ggrepel)
 
-## ----setup, include = FALSE, eval = FALSE--------------------------------
-#  library(svglite)
-#  knitr::opts_chunk$set(
-#    dev = "svglite",
-#    fig.ext = ".svg"
-#  )
-
 ## ---- include=FALSE, echo=FALSE------------------------------------------
 library(knitr)
 opts_chunk$set(fig.path = 'figure/guide-pos-', fig.align = 'center', 
-               fig.show = 'hold', fig.width = 7, fig.height = 4)
+               fig.show = 'hold', fig.width = 7, fig.height = 4,
+               cache = FALSE)
 options(warnPartialMatchArgs = FALSE)
 
 ## ------------------------------------------------------------------------
-two_suns.spct <- rbindspct(list(sun1 = sun.spct, sun2 = sun.spct * 2))
+two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct / 2))
+
+## ------------------------------------------------------------------------
+two_suns.spct <- rbindspct(two_suns.mspct)
 
 ## ------------------------------------------------------------------------
 theme_set(theme_bw())
@@ -56,6 +53,26 @@ Afr_as_default()
 ggplot(yellow_gel.spct) + geom_line()
 ggplot(polyester.spct) + geom_line()
 unset_user_defaults()
+
+## ------------------------------------------------------------------------
+ggplot(two_suns.mspct) + 
+  aes(linetype = spct.idx) +
+  wl_guide(ymax = -0.05) +
+  geom_line()
+
+## ------------------------------------------------------------------------
+ggplot(two_suns.mspct) + 
+  wl_guide(ymax = -0.05) +
+  geom_spct() +
+  geom_line() +
+  facet_wrap(~spct.idx, ncol = 1L)
+
+## ------------------------------------------------------------------------
+ggplot(two_suns.mspct) + 
+  wl_guide(ymax = -0.05) +
+  geom_spct() +
+  geom_line() +
+  facet_wrap(~spct.idx, ncol = 1L, scales = "free_y")
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + 

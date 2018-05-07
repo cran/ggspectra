@@ -111,8 +111,12 @@ e_plot <- function(spct,
   y.max <- max(c(spct[["s.e.irrad"]], 0), na.rm = TRUE)
   y.min <- min(c(spct[["s.e.irrad"]], 0), na.rm = TRUE)
 
-  plot <- ggplot(spct, aes_(~w.length, ~s.e.irrad))
-
+  plot <- ggplot(spct)
+  if (getMultipleWl(spct) == 1L) {
+    plot <- plot + aes_(~w.length, ~s.e.irrad)
+  } else {
+    plot <- plot + aes_(~w.length, ~s.e.irrad, linetype = ~spct.idx)
+  }
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
     if (y.min < (-0.01 * y.max)) {
@@ -175,7 +179,7 @@ e_plot <- function(spct,
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
-    x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
     y.limits <- c(y.min, y.max * 1.05)
     x.limits <- range(spct)
@@ -314,7 +318,12 @@ q_plot <- function(spct,
   y.max <- max(c(spct[["s.q.irrad"]], 0), na.rm = TRUE)
   y.min <- min(c(spct[["s.q.irrad"]], 0), na.rm = TRUE)
 
-  plot <- ggplot(spct, aes_(~w.length, ~s.q.irrad))
+  plot <- ggplot(spct)
+  if (getMultipleWl(spct) == 1L) {
+    plot <- plot + aes_(~w.length, ~s.q.irrad)
+  } else {
+    plot <- plot + aes_(~w.length, ~s.q.irrad, linetype = ~spct.idx)
+  }
 
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
@@ -377,7 +386,7 @@ q_plot <- function(spct,
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
-    x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
     y.limits <- c(y.min, y.max * 1.05)
     x.limits <- range(spct)
@@ -393,27 +402,28 @@ q_plot <- function(spct,
   plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 }
 
-#' Plot method for light-source spectra.
+#' Plot methods for light-source spectra.
 #'
-#' This function returns a ggplot object with an annotated plot of a source_spct
-#' object.
+#' These methods return a ggplot object with an annotated plot of a source_spct
+#' object or of the spectra contained in a source_mspct object.
 #'
 #' @note Note that scales are expanded so as to make space for the annotations.
-#'   The object returned is a ggplot objects, and can be further manipulated.
+#'   The object returned is a ggplot object, and can be further manipulated
+#'   and added to.
 #'
-#' @param x a source_spct object
-#' @param ... other arguments passed along, such as \code{label.qty}
-#' @param w.band a single waveband object or a list of waveband objects
+#' @param x a source_spct or a source_mspct object.
+#' @param ... other arguments passed along, such as \code{label.qty}.
+#' @param w.band a single waveband object or a list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm)
+#'   min annd max wavelengths (nm).
 #' @param unit.out character string indicating type of radiation units to use
-#'   for plotting: "photon" or its synomin "quantum", or "energy"
+#'   for plotting: "photon" or its synomin "quantum", or "energy".
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector
+#' @param annotations a character vector.
 #' @param time.format character Format as accepted by \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param text.size numeric size of text in the plot decorations.
@@ -449,6 +459,9 @@ plot.source_spct <-
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
+    if (getMultipleWl(x) > 1L) {
+      annotations.default <- setdiff(annotations.default, "summaries")
+    }
     annotations <- decode_annotations(annotations,
                                       annotations.default)
     if (is.null(label.qty)) {
@@ -493,4 +506,17 @@ plot.source_spct <-
                    time.format = time.format,
                    tz = tz,
                    annotations = annotations)
+  }
+
+#' @rdname plot.source_spct
+#'
+#' @export
+#'
+plot.source_mspct <-
+  function(x, ..., range = NULL) {
+    if (!is.null(range)) {
+      x <- trim_wl(x, range = range, use.hinges = TRUE, fill = NULL)
+    }
+    z <- rbindspct(x)
+    plot(x = z, range = NULL, ...)
   }

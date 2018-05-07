@@ -10,7 +10,8 @@ Additional annotations, and stats for plotting "light"
 spectra with 'ggplot2', together with specializations of ggplot()
 and plot() methods for spectral data stored in objects of the classes
 defined in package 'photobiology' and a plot() method for objects of
-class "waveband", also defined in package 'photobiology'.
+class "waveband", also defined in package 'photobiology'. Part of the
+'r4photobiology' suite, Aphalo P. J. (2015) <doi:10.19232/uv4pb.2015.1.14>.
 }
 \details{
 Package `ggspectra` provides a set of stats, geoms and methods
@@ -45,7 +46,7 @@ some other extensions to package 'ggplot2' such as packages 'ggrepel' and
 
 This package is part of a suite of R packages for photobiological
 calculations described at the
-[r4photobiology](http://www.r4photobiology.info) web site.
+[r4photobiology](https://www.r4photobiology.info) web site.
 }
 \note{
 This package makes use of the new features of 'ggplot2' 2.0.0 that make
@@ -64,7 +65,7 @@ ggplot(sun.spct, aes(w.length, s.e.irrad)) + geom_line() +
   stat_peaks(span = 51, geom = "text", colour = "red", vjust = -0.3,
              label.fmt = "\%3.0f nm")
 
-ggplot(polyester.spct) + geom_line()
+ggplot(polyester.spct, range = UV()) + geom_line()
 
 plot(sun.spct)
 
@@ -73,6 +74,9 @@ plot(polyester.spct, UV_bands(), range = UV(),
 
 }
 \references{
+Aphalo, Pedro J. (2015) The r4photobiology suite. UV4Plants Bulletin, 2015:1,
+21-29. \url{https://doi.org/10.19232/uv4pb.2015.1.14}.
+
 \code{ggplot2} web site at \url{http://ggplot2.org/}\cr
 \code{ggplot2} source code at \url{https://github.com/hadley/ggplot2}\cr
 Function \code{multiplot} from \url{http://www.cookbook-r.com/}
@@ -80,18 +84,18 @@ Function \code{multiplot} from \url{http://www.cookbook-r.com/}
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://www.r4photobiology.info}
+  \item \url{https://www.r4photobiology.info}
   \item \url{https://bitbucket.org/aphalo/ggspectra}
   \item Report bugs at \url{https://bitbucket.org/aphalo/ggspectra}
 }
 
 }
 \author{
-\strong{Maintainer}: Pedro J. Aphalo \email{pedro.aphalo@helsinki.fi}
+\strong{Maintainer}: Pedro J. Aphalo \email{pedro.aphalo@helsinki.fi} (0000-0003-3385-972X)
 
 Other contributors:
 \itemize{
-  \item Titta K. Kotilainen \email{titta.kotilainen@helsinki.fi} [contributor]
+  \item Titta K. Kotilainen (0000-0002-2822-9734) [contributor]
 }
 
 }

@@ -98,11 +98,10 @@ cps_plot <- function(spct,
     cps.label <- ""
   }
 
-  spct <- reshape2::melt(spct,
-                         id.vars = "w.length",
-                         measure.vars = cps.cols,
-                         variable.name = "scan",
-                         value.name = "cps")
+  spct <- tidyr::gather(spct,
+                        .dots = cps.cols,
+                        key = "scan",
+                        value = "cps")
   setCpsSpct(spct, multiple.wl = length(cps.cols))
   y.max <- max(c(spct[["cps"]], 0), na.rm = TRUE)
   y.min <- min(c(spct[["cps"]], 0), na.rm = TRUE)
@@ -141,7 +140,7 @@ cps_plot <- function(spct,
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries", "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
-    x.limits <- c(min(spct) - spread(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
     y.limits <- c(y.min, y.max)
     x.limits <- range(spct)

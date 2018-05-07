@@ -1,5 +1,12 @@
-ggspectra 0.2.3
-===============
+ggspectra 0.2.4 (2018-05-05)
+============================
+
+Revise to track changes in 'photobiology' 0.9.20 to avoid spurious messages.
+* Add ggplot() method specialization for collections of spectra.
+* Add plot() method specializations for collections of spectra.
+
+ggspectra 0.2.3 (2017-12-18)
+============================
 
 Track changes in package 'photobiology' 0.9.18.
 * Add plot.calibration_spct()

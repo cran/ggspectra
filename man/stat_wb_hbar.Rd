@@ -69,7 +69,7 @@ If the argument passed to \code{w.band} is a BSWF it is silently
   \item{x}{w.band-midpoint} \item{xmin}{w.band minimum} \item{xmax}{w.band
   maximum} \item{ymin}{data$y minimum} \item{ymax}{data$y maximum}
   \item{yint}{data$y integral for the range of \code{w.band}}
-  \item{ymean}{yint divided by spread(w.band)} \item{y}{ypos.fixed or mean of
+  \item{ymean}{yint divided by wl_expanse(w.band)} \item{y}{ypos.fixed or mean of
   data} \item{wb.color}{color of the w.band} \item{wb.name}{label of w.band}
   }
 }

@@ -2,7 +2,8 @@
 % Please edit documentation in R/plot-source-spct.r
 \name{plot.source_spct}
 \alias{plot.source_spct}
-\title{Plot method for light-source spectra.}
+\alias{plot.source_mspct}
+\title{Plot methods for light-source spectra.}
 \usage{
 \method{plot}{source_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
@@ -10,19 +11,21 @@
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
   label.qty = NULL, span = NULL, annotations = NULL, time.format = "",
   tz = "UTC", text.size = 2.5, na.rm = TRUE)
+
+\method{plot}{source_mspct}(x, ..., range = NULL)
 }
 \arguments{
-\item{x}{a source_spct object}
+\item{x}{a source_spct or a source_mspct object.}
 
-\item{...}{other arguments passed along, such as \code{label.qty}}
+\item{...}{other arguments passed along, such as \code{label.qty}.}
 
-\item{w.band}{a single waveband object or a list of waveband objects}
+\item{w.band}{a single waveband object or a list of waveband objects.}
 
 \item{range}{an R object on which range() returns a vector of length 2, with
-min annd max wavelengths (nm)}
+min annd max wavelengths (nm).}
 
 \item{unit.out}{character string indicating type of radiation units to use
-for plotting: "photon" or its synomin "quantum", or "energy"}
+for plotting: "photon" or its synomin "quantum", or "energy".}
 
 \item{label.qty}{character string giving the type of summary quantity to use
 for labels, one of "mean", "total", "contribution", and "relative".}
@@ -31,7 +34,7 @@ for labels, one of "mean", "total", "contribution", and "relative".}
 than all other elements within a window of width span centered at that
 element.}
 
-\item{annotations}{a character vector}
+\item{annotations}{a character vector.}
 
 \item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
 
@@ -45,12 +48,13 @@ element.}
 a \code{ggplot} object.
 }
 \description{
-This function returns a ggplot object with an annotated plot of a source_spct
-object.
+These methods return a ggplot object with an annotated plot of a source_spct
+object or of the spectra contained in a source_mspct object.
 }
 \note{
 Note that scales are expanded so as to make space for the annotations.
-  The object returned is a ggplot objects, and can be further manipulated.
+  The object returned is a ggplot object, and can be further manipulated
+  and added to.
 }
 \examples{
 library(photobiology)

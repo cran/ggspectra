@@ -2,7 +2,8 @@
 % Please edit documentation in R/plot-filter-spct.R
 \name{plot.reflector_spct}
 \alias{plot.reflector_spct}
-\title{Plot method for reflector spectra.}
+\alias{plot.reflector_mspct}
+\title{Plot methods for reflector spectra.}
 \usage{
 \method{plot}{reflector_spct}(x, ...,
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
@@ -10,9 +11,11 @@
   plot.qty = getOption("photobiology.reflector.qty", default = "reflectance"),
   pc.out = FALSE, label.qty = NULL, span = NULL, annotations = NULL,
   time.format = "", tz = "UTC", text.size = 2.5, na.rm = TRUE)
+
+\method{plot}{reflector_mspct}(x, ..., range = NULL)
 }
 \arguments{
-\item{x}{a reflector_spct object}
+\item{x}{a reflector_spct object or a reflector_mspct object.}
 
 \item{...}{other arguments passed along, such as \code{label.qty}}
 
@@ -34,7 +37,8 @@ element.}
 
 \item{annotations}{a character vector}
 
-\item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
+\item{time.format}{character Format as accepted by
+\code{\link[base]{strptime}}.}
 
 \item{tz}{character Time zone to use for title and/or subtitle.}
 
@@ -46,15 +50,16 @@ element.}
 a \code{ggplot} object.
 }
 \description{
-This function returns a ggplot object with an annotated plot of a
-reflector_spct object.
+These methods return a ggplot object with an annotated plot of a
+reflector_spct object or of the spectra contained in a reflector_mspct
+object.
 }
 \note{
 The ggplot object returned can be further manipulated and added to.
   Except when no annotations are added, limits are set for the x-axis and
   y-axis scales. The y scale limits are expanded to include all data, or at
-  least to the range of expected values. Scales are further expanded so
-  as to make space for the annotations.
+  least to the range of expected values. Scales are further expanded so as to
+  make space for the annotations.
 }
 \examples{
 
