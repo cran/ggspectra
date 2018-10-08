@@ -6,18 +6,20 @@
 \title{Plot methods for light-source spectra.}
 \usage{
 \method{plot}{source_spct}(x, ...,
-  w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
-  UVA(), PAR())), range = NULL,
-  unit.out = getOption("photobiology.radiation.unit", default = "energy"),
-  label.qty = NULL, span = NULL, annotations = NULL, time.format = "",
-  tz = "UTC", text.size = 2.5, na.rm = TRUE)
+  w.band = getOption("photobiology.plot.bands", default = list(UVC(),
+  UVB(), UVA(), PAR())), range = NULL,
+  unit.out = getOption("photobiology.radiation.unit", default =
+  "energy"), label.qty = NULL, span = NULL, annotations = NULL,
+  time.format = "", tz = "UTC", text.size = 2.5, idfactor = NULL,
+  ylim = c(NA, NA), na.rm = TRUE)
 
 \method{plot}{source_mspct}(x, ..., range = NULL)
 }
 \arguments{
 \item{x}{a source_spct or a source_mspct object.}
 
-\item{...}{other arguments passed along, such as \code{label.qty}.}
+\item{...}{in the case of collections of spectra, additional arguments passed
+to the plot methods for individual spectra, otherwise currently ignored.}
 
 \item{w.band}{a single waveband object or a list of waveband objects.}
 
@@ -36,11 +38,20 @@ element.}
 
 \item{annotations}{a character vector.}
 
-\item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
+\item{time.format}{character Format as accepted by
+\code{\link[base]{strptime}}.}
 
 \item{tz}{character Time zone to use for title and/or subtitle.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{idfactor}{character Name of an index column in data holding a
+\code{factor} with each spectrum in a long-form multispectrum object
+corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+the factor is retrieved from metadata or if no metadata found, the default
+"spct.idx" is tried.}
+
+\item{ylim}{numeric y axis limits,}
 
 \item{na.rm}{logical.}
 }
@@ -53,8 +64,8 @@ object or of the spectra contained in a source_mspct object.
 }
 \note{
 Note that scales are expanded so as to make space for the annotations.
-  The object returned is a ggplot object, and can be further manipulated
-  and added to.
+  The object returned is a ggplot object, and can be further manipulated and
+  added to.
 }
 \examples{
 library(photobiology)
@@ -63,7 +74,8 @@ plot(sun.spct, unit.out = "photon")
 
 }
 \seealso{
-Other plot functions: \code{\link{plot.calibration_spct}},
+Other plot functions: \code{\link{autoplot.generic_spct}},
+  \code{\link{plot.calibration_spct}},
   \code{\link{plot.cps_spct}},
   \code{\link{plot.filter_spct}},
   \code{\link{plot.object_spct}},
@@ -72,4 +84,5 @@ Other plot functions: \code{\link{plot.calibration_spct}},
   \code{\link{plot.response_spct}},
   \code{\link{plot.waveband}}
 }
+\concept{plot functions}
 \keyword{hplot}

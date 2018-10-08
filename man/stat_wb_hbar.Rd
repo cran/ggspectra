@@ -123,6 +123,8 @@ ggplot(sun.spct) +
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
+  \code{\link{stat_find_qtys}},
+  \code{\link{stat_find_wls}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
   \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
@@ -133,3 +135,4 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
+\concept{stats functions}

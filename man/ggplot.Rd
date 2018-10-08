@@ -14,25 +14,25 @@
 \title{Create a new ggplot plot from spectral data.}
 \usage{
 \method{ggplot}{source_spct}(data, mapping = NULL, ..., range = NULL,
-  unit.out = getOption("photobiology.radiation.unit", default = "energy"),
-  environment = parent.frame())
+  unit.out = getOption("photobiology.radiation.unit", default =
+  "energy"), environment = parent.frame())
 
 \method{ggplot}{response_spct}(data, mapping = NULL, ..., range = NULL,
-  unit.out = getOption("photobiology.radiation.unit", default = "energy"),
-  environment = parent.frame())
+  unit.out = getOption("photobiology.radiation.unit", default =
+  "energy"), environment = parent.frame())
 
 \method{ggplot}{filter_spct}(data, mapping = NULL, ..., range = NULL,
-  plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
-  environment = parent.frame())
+  plot.qty = getOption("photobiology.filter.qty", default =
+  "transmittance"), environment = parent.frame())
 
-\method{ggplot}{reflector_spct}(data, mapping = NULL, ..., range = NULL,
-  plot.qty = NULL, environment = parent.frame())
+\method{ggplot}{reflector_spct}(data, mapping = NULL, ...,
+  range = NULL, plot.qty = NULL, environment = parent.frame())
 
 \method{ggplot}{cps_spct}(data, mapping = NULL, ..., range = NULL,
   environment = parent.frame())
 
-\method{ggplot}{calibration_spct}(data, mapping = NULL, ..., range = NULL,
-  environment = parent.frame())
+\method{ggplot}{calibration_spct}(data, mapping = NULL, ...,
+  range = NULL, environment = parent.frame())
 
 \method{ggplot}{raw_spct}(data, mapping = NULL, ..., range = NULL,
   environment = parent.frame())
@@ -59,15 +59,17 @@ specified, in the case of spectral objects, a default mapping will be used.}
 min annd max wavelengths (nm).}
 
 \item{unit.out}{character string indicating type of units to use for
-plotting.}
+plotting spectral irradiance or spectral response, \code{"photon"} or
+\code{"energy"}.}
 
-\item{environment}{If an variable defined in the aesthetic mapping is not
+\item{environment}{If a variable defined in the aesthetic mapping is not
 found in the data, ggplot will look for it in this environment. It defaults
 to using the environment in which \code{ggplot()} is called.}
 
-\item{plot.qty}{character string one of "transmittance" or "absorbance" for
-filter_spct, and one of "transmittance", "reflectance" or "all" for
-object_spct.}
+\item{plot.qty}{character string one of \code{"transmittance"} or
+\code{"absorbance"} for \code{filter_spct}, and one of
+\code{"transmittance"}, \code{"reflectance"} or \code{"all"} for
+\code{object_spct}.}
 }
 \description{
 \code{ggplot()} initializes a ggplot object. It can be used to declare the

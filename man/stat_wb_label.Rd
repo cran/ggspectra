@@ -4,9 +4,10 @@
 \alias{stat_wb_label}
 \title{Label ranges under spectral curve.}
 \usage{
-stat_wb_label(mapping = NULL, data = NULL, geom = "text", w.band = NULL,
-  label.fmt = "\%s", ypos.fixed = 0, position = "identity",
-  na.rm = TRUE, show.legend = NA, inherit.aes = TRUE, ...)
+stat_wb_label(mapping = NULL, data = NULL, geom = "text",
+  w.band = NULL, label.fmt = "\%s", ypos.fixed = 0,
+  position = "identity", na.rm = TRUE, show.legend = NA,
+  inherit.aes = TRUE, ...)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -61,8 +62,8 @@ geoms displaying "boundaries" and "names" of wavebands.
 
 \describe{
   \item{x}{w.band-midpoint}
-  \item{xmin}{w.band minimum}
-  \item{xmax}{w.band maximum}
+  \item{wb.xmin}{w.band minimum}
+  \item{wb.xmax}{w.band maximum}
   \item{y}{ypos.fixed or zero}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}
@@ -76,8 +77,8 @@ Set by the statistic and available to geoms.
 \describe{
   \item{label}{..wb.label..}
   \item{x}{..x..}
-  \item{xmin}{..xmin..}
-  \item{xmax}{..xmax..}
+  \item{xmin}{..wb.xmin..}
+  \item{xmax}{..wb.xmax..}
   \item{fill}{..wb.color..}
 }
 }
@@ -111,6 +112,8 @@ ggplot(sun.spct) +
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
+  \code{\link{stat_find_qtys}},
+  \code{\link{stat_find_wls}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
   \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
@@ -121,3 +124,4 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
+\concept{stats functions}

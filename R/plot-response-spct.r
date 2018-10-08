@@ -6,22 +6,28 @@
 #' @note Note that scales are expanded so as to make space for the annotations.
 #'   The object returned is a ggplot objects, and can be further manipulated.
 #'
-#' @param spct a response_spct object
-#' @param w.band list of waveband objects
+#' @param spct a response_spct object.
+#' @param w.band list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm)
-#' @param pc.out logical, if TRUE use percents instead of fraction of one
+#'   min annd max wavelengths (nm).
+#' @param pc.out logical, if TRUE use percents instead of fraction of one.
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector
+#' @param annotations a character vector.
 #' @param norm numeric normalization wavelength (nm) or character string "max"
 #'   for normalization at the wavelength of highest peak.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried.
 #' @param na.rm logical.
-#' @param ... other arguments passed to e_response()
+#' @param ylim numeric y axis limits,
+#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -36,10 +42,15 @@ e_rsp_plot <- function(spct,
                        annotations,
                        norm,
                        text.size,
+                       idfactor,
+                       ylim,
                        na.rm,
                        ...) {
   if (!is.response_spct(spct)) {
     stop("e_Rsp_plot() can only plot response_spct objects.")
+  }
+  if (is.null(ylim) || !is.numeric(ylim)) {
+    ylim <- rep(NA_real_, 2L)
   }
   q2e(spct, action="replace", byref=TRUE)
   if (!is.null(range)) {
@@ -142,8 +153,13 @@ e_rsp_plot <- function(spct,
     rsp.label.avg  <- bquote(atop(bar(R[E](lambda)/R[E](lambda = norm)), (.(multiplier.label))))
   }
   spct[["s.e.response"]] <- spct[["s.e.response"]] * scale.factor
-  y.max <- max(c(spct[["s.e.response"]], 0), na.rm = TRUE)
-  y.min <- min(c(spct[["s.e.response"]], 0), na.rm = TRUE)
+
+  y.min <- ifelse(!is.na(ylim[1]),
+                  ylim[1],
+                  min(c(spct[["s.e.response"]], 0), na.rm = TRUE))
+  y.max <- ifelse(!is.na(ylim[2]),
+                  ylim[2],
+                  max(c(spct[["s.e.response"]], 0), na.rm = TRUE))
 
   if (label.qty == "total") {
     rsp.label <- "integral(R[E](lambda))"
@@ -161,12 +177,12 @@ e_rsp_plot <- function(spct,
     rsp.label <- ""
   }
 
-  plot <- ggplot(spct)
-  if (getMultipleWl(spct) == 1L) {
-    plot <- plot + aes_(~w.length, ~s.e.response)
-  } else {
-    plot <- plot + aes_(~w.length, ~s.e.response, linetype = ~spct.idx)
-  }
+  plot <- ggplot(spct, aes_(~w.length, ~s.e.response))
+  temp <- find_idfactor(spct = spct,
+                        idfactor = idfactor,
+                        annotations = annotations)
+  plot <- plot + temp$ggplot_comp
+  annotations <- temp$annotations
 
   # We want data plotted on top of the boundary lines
   # Negative response is valid!
@@ -233,22 +249,28 @@ e_rsp_plot <- function(spct,
 #' @note Note that scales are expanded so as to make space for the annotations.
 #'   The object returned is a ggplot objects, and can be further manipulated.
 #'
-#' @param spct a response_spct object
-#' @param w.band list of waveband objects
+#' @param spct a response_spct object.
+#' @param w.band list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm)
-#' @param pc.out logical, if TRUE use percents instead of fraction of one
+#'   min annd max wavelengths (nm).
+#' @param pc.out logical, if TRUE use percents instead of fraction of one.
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector
+#' @param annotations a character vector.
 #' @param norm numeric normalization wavelength (nm) or character string "max"
 #'   for normalization at the wavelength of highest peak.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried.
+#' @param ylim numeric y axis limits,
 #' @param na.rm logical.
-#' @param ... other arguments passed to q_response()
+#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -263,10 +285,15 @@ q_rsp_plot <- function(spct,
                        annotations,
                        norm,
                        text.size,
+                       idfactor,
+                       ylim,
                        na.rm,
                        ...) {
   if (!is.response_spct(spct)) {
     stop("q_Rsp_plot() can only plot response_spct objects.")
+  }
+  if (is.null(ylim) || !is.numeric(ylim)) {
+    ylim <- rep(NA_real_, 2L)
   }
   e2q(spct, action="replace", byref=TRUE)
   if (!is.null(range)) {
@@ -369,8 +396,13 @@ q_rsp_plot <- function(spct,
     rsp.label.avg  <- bquote(atop(bar(R[Q](lambda)/R[Q](lambda = norm)), (.(multiplier.label))))
   }
   spct[["s.q.response"]] <- spct[["s.q.response"]] * scale.factor
-  y.max <- max(c(spct[["s.q.response"]], 0), na.rm = TRUE)
-  y.min <- min(c(spct[["s.q.response"]], 0), na.rm = TRUE)
+
+  y.min <- ifelse(!is.na(ylim[1]),
+                  ylim[1],
+                  min(c(spct[["s.q.response"]], 0), na.rm = TRUE))
+  y.max <- ifelse(!is.na(ylim[2]),
+                  ylim[2],
+                  max(c(spct[["s.q.response"]], 0), na.rm = TRUE))
 
   if (label.qty == "total") {
     rsp.label <- "integral(R[Q](lambda))"
@@ -388,12 +420,12 @@ q_rsp_plot <- function(spct,
     rsp.label <- ""
   }
 
-  plot <- ggplot(spct)
-  if (getMultipleWl(spct) == 1L) {
-    plot <- plot + aes_(~w.length, ~s.q.response)
-  } else {
-    plot <- plot + aes_(~w.length, ~s.q.response, linetype = ~spct.idx)
-  }
+  plot <- ggplot(spct, aes_(x = ~w.length, y = ~s.q.response))
+  temp <- find_idfactor(spct = spct,
+                        idfactor = idfactor,
+                        annotations = annotations)
+  plot <- plot + temp$ggplot_comp
+  annotations <- temp$annotations
 
   # We want data plotted on top of the boundary lines
   # Negative response is valid!
@@ -443,7 +475,7 @@ q_rsp_plot <- function(spct,
     x.limits <- range(spct)
   }
 
-  if (abs(y.min) < 5e-2 && (abs(y.max - 1) < 5.e-2)) {
+  if ((abs(y.min) < 5e-2) && (abs(y.max - 1) < 5.e-2)) {
     plot <- plot +
       scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1), limits = y.limits)
   } else {
@@ -462,25 +494,32 @@ q_rsp_plot <- function(spct,
 #'   added to.
 #'
 #' @param x a response_spct object or a response_mspct object.
-#' @param ... other arguments passed along, such as \code{label.qty}
-#' @param w.band a single waveband object or a list of waveband objects
+#' @param ... in the case of collections of spectra, additional arguments passed
+#'   to the plot methods for individual spectra, otherwise currently ignored.
+#' @param w.band a single waveband object or a list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm)
+#'   min annd max wavelengths (nm).
 #' @param unit.out character string indicating type of radiation units to use
-#'   for plotting: "photon" or its synomin "quantum", or "energy"
+#'   for plotting: "photon" or its synomin "quantum", or "energy".
 #' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector
+#' @param annotations a character vector.
 #' @param time.format character Format as accepted by
 #'   \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param norm numeric normalization wavelength (nm) or character string "max"
 #'   for normalization at the wavelength of highest peak.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried.
+#' @param ylim numeric y axis limits,
 #' @param na.rm logical.
 #'
 #' @return a \code{ggplot} object.
@@ -511,13 +550,12 @@ plot.response_spct <-
            tz = "UTC",
            norm = "max",
            text.size = 2.5,
+           idfactor = NULL,
+           ylim = c(NA, NA),
            na.rm = TRUE) {
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
-    if (getMultipleWl(x) > 1L) {
-      annotations.default <- setdiff(annotations.default, "summaries")
-    }
     annotations <- decode_annotations(annotations,
                                       annotations.default)
     if (is.null(label.qty)) {
@@ -547,6 +585,8 @@ plot.response_spct <-
                                annotations = annotations,
                                norm = norm,
                                text.size = text.size,
+                               idfactor = idfactor,
+                               ylim = ylim,
                                na.rm = na.rm,
                                ...)
     } else if (unit.out=="energy") {
@@ -558,6 +598,8 @@ plot.response_spct <-
                                span = span,
                                annotations = annotations, norm = norm,
                                text.size = text.size,
+                               idfactor = idfactor,
+                               ylim = ylim,
                                na.rm = na.rm,
                                ...)
     } else {

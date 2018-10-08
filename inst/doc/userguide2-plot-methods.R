@@ -5,9 +5,11 @@ library(photobiology)
 library(photobiologyWavebands)
 library(ggspectra)
 
+good_label_repel <- packageVersion('ggrepel') != "0.8.0"
+
 ## ---- include=FALSE, echo=FALSE------------------------------------------
 library(knitr)
-opts_chunk$set(fig.path = 'figure/plot-pos-', fig.align = 'center', fig.show = 'hold',
+opts_chunk$set(fig.align = 'center', fig.show = 'hold',
                fig.width = 7, fig.height = 4, cache = FALSE)
 options(warnPartialMatchArgs = FALSE)
 
@@ -21,6 +23,12 @@ theme_set(theme_bw(10))
 plot(sun.spct)
 
 ## ------------------------------------------------------------------------
+plot(sun.spct, unit.out = "photon")
+
+## ------------------------------------------------------------------------
+plot(two_suns.spct)
+
+## ------------------------------------------------------------------------
 plot(sun.spct, label.qty = "mean")
 
 ## ------------------------------------------------------------------------
@@ -28,15 +36,6 @@ plot(sun.spct, label.qty = "contribution")
 
 ## ------------------------------------------------------------------------
 plot(sun.spct, label.qty = "relative")
-
-## ------------------------------------------------------------------------
-plot(sun.spct, label.qty = "mean", unit.out = "photon")
-
-## ------------------------------------------------------------------------
-plot(sun.spct, label.qty = "relative.pc")
-
-## ------------------------------------------------------------------------
-plot(sun.spct, unit.out = "photon")
 
 ## ------------------------------------------------------------------------
 plot(sun.spct, 
@@ -60,8 +59,8 @@ plot(sun.spct, annotations = c("-", "summaries", "peaks"))
 ## ------------------------------------------------------------------------
 plot(sun.spct, annotations = c("+", "valleys"), span = 41)
 
-## ------------------------------------------------------------------------
-plot(sun.spct, annotations = c("+", "peak.labels", "valley.labels"), span = 71)
+## ---- eval=good_label_repel----------------------------------------------
+#  plot(sun.spct, annotations = c("+", "peak.labels", "valley.labels"), span = 71)
 
 ## ------------------------------------------------------------------------
 plot(sun.spct, annotations = "")
@@ -72,6 +71,9 @@ plot(sun.spct, annotations = "reserve.space")
 ## ------------------------------------------------------------------------
 plot(sun.spct, annotations = c("=", "segments", "labels", "color.guide"), 
      text.size = 3.5)
+
+## ------------------------------------------------------------------------
+plot(sun.spct, ylim = c(NA, 1))
 
 ## ------------------------------------------------------------------------
 plot(sun.spct, range = VIS())
@@ -102,16 +104,13 @@ getTimeUnit(sun.daily.spct)
 plot(sun.daily.spct)
 
 ## ------------------------------------------------------------------------
-plot(two_suns.spct, label.qty = "mean") + facet_wrap(~spct.idx)
+plot(two_suns.spct, idfactor = NA) + facet_wrap(~spct.idx)
 
 ## ------------------------------------------------------------------------
-plot(two_suns.spct, annotations = c("-", "summaries")) + 
-  aes(linetype = spct.idx)
-
-## ------------------------------------------------------------------------
-plot(rbindspct(list(sun = sun.spct, filtered = yellow_gel.spct * sun.spct)),
-     annotations = c("-", "summaries")) + 
-  aes(linetype = spct.idx)
+filter_no_yes.spct <- 
+  rbindspct(list(sun = sun.spct, filtered = yellow_gel.spct * sun.spct), 
+            idfactor = "Source")
+plot(filter_no_yes.spct)
 
 ## ------------------------------------------------------------------------
 plot(yellow_gel.spct, annotations = c("-", "peaks"))
@@ -132,20 +131,18 @@ plot(sun.spct) + geom_spct(fill = color_of(sun.spct)) +
             fill = color_of(yellow_gel.spct * sun.spct))
 
 ## ------------------------------------------------------------------------
-plot(yellow_gel.spct)
-
-## ------------------------------------------------------------------------
 plot(yellow_gel.spct, annotations = c("+", "boundaries"))
 
 ## ------------------------------------------------------------------------
 plot(white_led.raw_spct, annotations = c("+", "boundaries"))
 
 ## ------------------------------------------------------------------------
-plot(select(white_led.raw_spct, w.length, counts_1),
+plot(dplyr::select(white_led.raw_spct, w.length, counts = counts_1),
      annotations = c("+", "boundaries"))
 
 ## ------------------------------------------------------------------------
-plot(yellow_gel.spct - 0.01)
+plot(dplyr::select(white_led.raw_spct, w.length, counts_1, counts_3),
+     annotations = c("+", "boundaries"))
 
 ## ------------------------------------------------------------------------
 two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct / 2))
@@ -155,7 +152,7 @@ mixed.mspct <- generic_mspct(list(sun = sun.spct, filter = polyester.spct))
 plot(two_suns.mspct)
 
 ## ---- fig.width = 7, fig.height = 8--------------------------------------
-plot(two_suns.mspct, annotations = c("+", "summaries")) + 
+plot(two_suns.mspct, idfactor = NA) + 
   facet_wrap(~spct.idx, ncol = 1)
 
 ## ---- fig.width = 7, fig.height = 8--------------------------------------

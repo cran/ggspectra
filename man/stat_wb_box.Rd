@@ -4,9 +4,10 @@
 \alias{stat_wb_box}
 \title{Draw colour boxes for wavebands}
 \usage{
-stat_wb_box(mapping = NULL, data = NULL, geom = "rect", w.band = NULL,
-  ypos.mult = 1.07, ypos.fixed = NULL, position = "identity",
-  na.rm = FALSE, show.legend = NA, inherit.aes = TRUE, ...)
+stat_wb_box(mapping = NULL, data = NULL, geom = "rect",
+  w.band = NULL, ypos.mult = 1.07, ypos.fixed = NULL,
+  position = "identity", na.rm = FALSE, show.legend = NA,
+  inherit.aes = TRUE, ...)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -66,10 +67,10 @@ What it is named integral below is the result of appying \code{integral.fun}
 to the data, with default \code{integrate_xy}.
 \describe{
   \item{x}{w.band-midpoint}
-  \item{xmin}{w.band minimum}
-  \item{xmax}{w.band maximum}
-  \item{ymin}{data$y minimum}
-  \item{ymax}{data$y maximum}
+  \item{wb.xmin}{w.band minimum}
+  \item{wb.xmax}{w.band maximum}
+  \item{wb.ymin}{data$y minimum}
+  \item{wb.ymax}{data$y maximum}
   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}
@@ -81,10 +82,10 @@ to the data, with default \code{integrate_xy}.
 
 Set by the statistic and available to geoms.
 \describe{
-  \item{xmin}{..xmin..}
-  \item{xmax}{..xmax..}
-  \item{ymin}{..y.. - (..ymax.. - ..ymin..) * 0.03}
-  \item{ymax}{..y.. + (..ymax.. - ..ymin..) * 0.03}
+  \item{xmin}{..wb.xmin..}
+  \item{xmax}{..wb.xmax..}
+  \item{ymin}{..y.. - (..wb.ymax.. - ..wb.ymin..) * 0.03}
+  \item{ymax}{..y.. + (..wb.ymax.. - ..wb.ymin..) * 0.03}
   \item{fill}{..wb.color..}
 }
 }
@@ -115,6 +116,8 @@ ggplot(sun.spct) +
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
+  \code{\link{stat_find_qtys}},
+  \code{\link{stat_find_wls}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
   \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
@@ -125,3 +128,4 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
+\concept{stats functions}

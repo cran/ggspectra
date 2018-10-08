@@ -6,17 +6,19 @@
 \title{Plot methods for spectral irradiation calibrations.}
 \usage{
 \method{plot}{calibration_spct}(x, ...,
-  w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(),
-  UVA(), PAR())), range = NULL, unit.out = "counts", pc.out = FALSE,
-  label.qty = "mean", span = NULL, annotations = NULL, time.format = "",
-  tz = "UTC", norm = NULL, text.size = 2.5, na.rm = TRUE)
+  w.band = getOption("photobiology.plot.bands", default = list(UVC(),
+  UVB(), UVA(), PAR())), range = NULL, unit.out = "counts",
+  pc.out = FALSE, label.qty = "mean", span = NULL,
+  annotations = NULL, time.format = "", tz = "UTC", norm = NULL,
+  text.size = 2.5, idfactor = NULL, ylim = c(NA, NA), na.rm = TRUE)
 
 \method{plot}{calibration_mspct}(x, ..., range = NULL)
 }
 \arguments{
 \item{x}{a calibration_spct object or a calibration_mspct object.}
 
-\item{...}{other arguments passed along, such as \code{label.qty}.}
+\item{...}{in the case of collections of spectra, additional arguments passed
+to the plot methods for individual spectra, otherwise currently ignored.}
 
 \item{w.band}{a single waveband object or a list of waveband objects.}
 
@@ -45,6 +47,16 @@ for normalization at the wavelength of highest peak.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
 
+\item{idfactor}{character Name of an index column in data holding a
+\code{factor} with each spectrum in a long-form multispectrum object
+corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+the factor is retrieved from metadata or if no metadata found, the
+default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+to the spectra and the user needs to use 'ggplot2' functions to manually
+map an aesthetic or use facets for the spectra.}
+
+\item{ylim}{numeric y axis limits,}
+
 \item{na.rm}{logical.}
 }
 \value{
@@ -60,7 +72,8 @@ Note that scales are expanded so as to make space for the annotations.
 The object returned is a ggplot objects, and can be further manipulated.
 }
 \seealso{
-Other plot functions: \code{\link{plot.cps_spct}},
+Other plot functions: \code{\link{autoplot.generic_spct}},
+  \code{\link{plot.cps_spct}},
   \code{\link{plot.filter_spct}},
   \code{\link{plot.object_spct}},
   \code{\link{plot.raw_spct}},
@@ -69,4 +82,5 @@ Other plot functions: \code{\link{plot.cps_spct}},
   \code{\link{plot.source_spct}},
   \code{\link{plot.waveband}}
 }
+\concept{plot functions}
 \keyword{hplot}

@@ -57,9 +57,9 @@ What it is named integral below is the result of appying \code{integral.fun},
 with default \code{integrate_xy}.
 \describe{
   \item{y.label}{y formatted according to \code{label.fmt}}
-  \item{x}{w.band-midpoint}
-  \item{xmin}{range minimum}
-  \item{xmax}{range maximum}
+  \item{x}{range-midpoint}
+  \item{wb.xmin}{range minimum}
+  \item{wb.xmax}{range maximum}
   \item{y}{data$y integral for the range by the expanse of the range}
 }
 }
@@ -70,8 +70,8 @@ Set by the statistic and available to geoms.
 \describe{
   \item{label}{..label..}
   \item{x}{..x..}
-  \item{xmin}{..xmin..}
-  \item{xmax}{..xmax..}
+  \item{xmin}{..wb.xmin..}
+  \item{xmax}{..wb.xmax..}
   \item{y}{..y..}
   \item{ymin}{0}
   \item{ymax}{..y..}
@@ -101,6 +101,8 @@ ggplot(sun.spct) + geom_line() +
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
+  \code{\link{stat_find_qtys}},
+  \code{\link{stat_find_wls}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
   \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
@@ -110,3 +112,4 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wb_sirrad}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}}
 }
+\concept{stats functions}

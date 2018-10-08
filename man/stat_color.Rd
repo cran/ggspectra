@@ -4,9 +4,9 @@
 \alias{stat_color}
 \title{Calculate colours from wavelength.}
 \usage{
-stat_color(mapping = NULL, data = NULL, geom = "point", type = "CMF",
-  position = "identity", na.rm = FALSE, show.legend = FALSE,
-  inherit.aes = TRUE, ...)
+stat_color(mapping = NULL, data = NULL, geom = "point",
+  type = "CMF", position = "identity", na.rm = FALSE,
+  show.legend = FALSE, inherit.aes = TRUE, ...)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -49,7 +49,7 @@ The original data frame with a variable with color definitions added.
 \section{Computed variable}{
 
 \describe{
-  \item{color}{color corresponding to x-value giving wavelength in
+  \item{wl.color}{color corresponding to x-value giving wavelength in
   nanometres.}
 }
 }
@@ -58,8 +58,8 @@ The original data frame with a variable with color definitions added.
 
 Set by the statistic and available to geoms.
 \describe{
-  \item{color}{..color..}
-  \item{fill}{..color..}
+  \item{color}{..wl.color..}
+  \item{fill}{..wl.color..}
 }
 }
 
@@ -82,9 +82,10 @@ ggplot(sun.spct) + geom_line() +
 \seealso{
 \code{\link[photobiology]{color_of}}, which is used internally.
 
-Other stats functions: \code{\link{stat_label_peaks}},
-  \code{\link{stat_peaks}}, \code{\link{stat_wb_box}},
-  \code{\link{stat_wb_column}},
+Other stats functions: \code{\link{stat_find_qtys}},
+  \code{\link{stat_find_wls}},
+  \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
+  \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
   \code{\link{stat_wb_hbar}}, \code{\link{stat_wb_irrad}},
   \code{\link{stat_wb_label}}, \code{\link{stat_wb_mean}},
@@ -93,3 +94,4 @@ Other stats functions: \code{\link{stat_label_peaks}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
+\concept{stats functions}

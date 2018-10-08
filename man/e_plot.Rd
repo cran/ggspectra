@@ -4,15 +4,16 @@
 \alias{e_plot}
 \title{Plot a source spectrum.}
 \usage{
-e_plot(spct, w.band, range, label.qty, span, annotations, text.size, na.rm, ...)
+e_plot(spct, w.band, range, label.qty, span, annotations, text.size,
+  idfactor, ylim, na.rm, ...)
 }
 \arguments{
-\item{spct}{a source_spct object}
+\item{spct}{a source_spct object.}
 
-\item{w.band}{list of waveband objects}
+\item{w.band}{list of waveband objects.}
 
 \item{range}{an R object on which range() returns a vector of length 2, with
-min annd max wavelengths (nm)}
+min annd max wavelengths (nm).}
 
 \item{label.qty}{character string giving the type of summary quantity to use
 for labels, one of "mean", "total", "contribution", and "relative".}
@@ -21,15 +22,23 @@ for labels, one of "mean", "total", "contribution", and "relative".}
 than all other elements within a window of width span centered at that
 element.}
 
-\item{annotations}{a character vector}
+\item{annotations}{a character vector.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
 
+\item{idfactor}{character Name of an index column in data holding a
+\code{factor} with each spectrum in a long-form multispectrum object
+corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+the factor is retrieved from metadata or if no metadata found, the
+default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+to the spectra and the user needs to use 'ggplot2' functions to manually
+map an aesthetic or use facets for the spectra.}
+
+\item{ylim}{numeric y axis limits,}
+
 \item{na.rm}{logical.}
 
-\item{...}{other arguments passed to annotate_plot()}
-
-\item{annotations.default}{a character vector}
+\item{...}{currently ignored.}
 }
 \value{
 a \code{ggplot} object.

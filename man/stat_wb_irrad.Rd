@@ -6,11 +6,11 @@
 \alias{stat_wb_q_irrad}
 \title{Integrate irradiance for wavebands.}
 \usage{
-stat_wb_irrad(mapping = NULL, data = NULL, geom = "text", w.band = NULL,
-  time.unit, unit.in, label.qty = "total", label.mult = 1,
-  label.fmt = "\%.3g", ypos.mult = 1.07, ypos.fixed = NULL,
-  position = "identity", na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE, ...)
+stat_wb_irrad(mapping = NULL, data = NULL, geom = "text",
+  w.band = NULL, time.unit, unit.in, label.qty = "total",
+  label.mult = 1, label.fmt = "\%.3g", ypos.mult = 1.07,
+  ypos.fixed = NULL, position = "identity", na.rm = FALSE,
+  show.legend = NA, inherit.aes = TRUE, ...)
 
 stat_wb_e_irrad(mapping = NULL, data = NULL, geom = "text",
   w.band = NULL, time.unit = "second", unit.in = "energy",
@@ -91,13 +91,13 @@ What it is named integral below is the result of appying \code{irrad},
   \item{y.label}{yeff multiplied by \code{label.mult} and formatted
   according to \code{label.fmt}}
   \item{x}{w.band-midpoint}
-  \item{xmin}{w.band minimum}
-  \item{xmax}{w.band maximum}
-  \item{ymin}{data$y minimum}
-  \item{ymax}{data$y maximum}
-  \item{yeff}{weighted irradiance if \code{w.band} describes a BSWF}
-  \item{yint}{not weighted irradiance for the range of \code{w.band}}
-  \item{xmean}{yint divided by wl_expanse(w.band)}
+  \item{wb.xmin}{w.band minimum}
+  \item{wb.xmax}{w.band maximum}
+  \item{wb.ymin}{data$y minimum}
+  \item{wb.ymax}{data$y maximum}
+  \item{wb.yeff}{weighted irradiance if \code{w.band} describes a BSWF}
+  \item{wb.yint}{not weighted irradiance for the range of \code{w.band}}
+  \item{wb.xmean}{yint divided by wl_expanse(w.band)}
   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}
@@ -111,11 +111,11 @@ Set by the statistic and available to geoms.
 \describe{
   \item{label}{..y.label..}
   \item{x}{..x..}
-  \item{xmin}{..xmin..}
-  \item{xmax}{..xmax..}
-  \item{ymin}{..y.. - (..ymax.. - ..ymin..) * 0.03}
-  \item{ymax}{..y.. + (..ymax.. - ..ymin..) * 0.03}
-  \item{yintercept}{..ymean..}
+  \item{xmin}{..wb.xmin..}
+  \item{xmax}{..wb.xmax..}
+  \item{ymin}{..y.. - (..wb.ymax.. - ..wb.ymin..) * 0.03}
+  \item{ymax}{..y.. + (..wb.ymax.. - ..wb.ymin..) * 0.03}
+  \item{yintercept}{..wb.ymean..}
   \item{fill}{..wb.color..}
 }
 }
@@ -153,6 +153,8 @@ ggplot(sun.spct) +
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
+  \code{\link{stat_find_qtys}},
+  \code{\link{stat_find_wls}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
   \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
@@ -163,3 +165,4 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
+\concept{stats functions}

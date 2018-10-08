@@ -4,8 +4,8 @@
 #' calibration_spct object.
 #'
 #' @note Note that scales are expanded so as to make space for the annotations.
-#'   The object returned is a ggplot objects, and can be further manipulated.
-#'   When spct has more than one column with spectral data, each of these
+#'   The object returned is a ggplot object, and can be further manipulated.
+#'   When \code{spct} has more than one column with spectral data, each of these
 #'   columns is normalized individually.
 #'
 #' @param spct a calibration_spct object
@@ -22,8 +22,16 @@
 #' @param norm numeric normalization wavelength (nm) or character string "max"
 #'   for normalization at the wavelength of highest peak.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
 #' @param na.rm logical.
-#' @param ... other arguments
+#' @param ylim numeric y axis limits,
+#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -38,10 +46,15 @@ cal_plot <- function(spct,
                      annotations,
                      norm,
                      text.size,
+                     idfactor,
+                     ylim,
                      na.rm,
                      ...) {
   if (!is.calibration_spct(spct)) {
     stop("cal_plot() can only plot calibration_spct objects.")
+  }
+  if (is.null(ylim) || !is.numeric(ylim)) {
+    ylim <- rep(NA_real_, 2L)
   }
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
@@ -109,20 +122,21 @@ cal_plot <- function(spct,
                           key = "scan",
                           value = "irrad.mult")
     setCalibrationSpct(spct, multiple.wl = length(mult.cols))
-    y.max <- max(spct[["irrad.mult"]], 0, na.rm = TRUE)
-    y.min <- min(spct[["irrad.mult"]], 0, na.rm = TRUE)
   }
 
-  plot <- ggplot(spct)
-  if (getMultipleWl(spct) == 1L) {
-    if (num.mult.cols > 1L) {
-      plot <- plot + aes_(~w.length, ~irrad.mult, linetype = ~scan)
-    } else {
-      plot <- plot + aes_(~w.length, ~irrad.mult)
-    }
-  } else {
-    plot <- plot + aes_(~w.length, ~irrad.mult, linetype = ~spct.idx)
-  }
+  y.min <- ifelse(!is.na(ylim[1]),
+                  ylim[1],
+                  min(spct[["irrad.mult"]], 0, na.rm = TRUE))
+  y.max <- ifelse(!is.na(ylim[2]),
+                  ylim[2],
+                  max(spct[["irrad.mult"]], 0, na.rm = TRUE))
+
+  plot <- ggplot(spct, aes_(x = ~w.length, y = ~irrad.mult))
+  temp <- find_idfactor(spct = spct,
+                        idfactor = idfactor,
+                        annotations = annotations)
+  plot <- plot + temp$ggplot_comp
+  annotations <- temp$annotations
 
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
@@ -182,7 +196,8 @@ cal_plot <- function(spct,
 #' The object returned is a ggplot objects, and can be further manipulated.
 #'
 #' @param x a calibration_spct object or a calibration_mspct object.
-#' @param ... other arguments passed along, such as \code{label.qty}.
+#' @param ... in the case of collections of spectra, additional arguments passed
+#'   to the plot methods for individual spectra, otherwise currently ignored.
 #' @param w.band a single waveband object or a list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2,
 #' with min annd max wavelengths (nm).
@@ -199,6 +214,14 @@ cal_plot <- function(spct,
 #' @param norm numeric normalization wavelength (nm) or character string "max"
 #' for normalization at the wavelength of highest peak.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
+#' @param ylim numeric y axis limits,
 #' @param na.rm logical.
 #'
 #' @return a \code{ggplot} object.
@@ -223,6 +246,8 @@ plot.calibration_spct <-
            tz = "UTC",
            norm = NULL,
            text.size = 2.5,
+           idfactor = NULL,
+           ylim = c(NA, NA),
            na.rm = TRUE) {
     annotations.default <-
       getOption("photobiology.plot.annotations",
@@ -248,7 +273,9 @@ plot.calibration_spct <-
              annotations = annotations,
              norm = norm,
              text.size = text.size,
+             idfactor = idfactor,
              na.rm = na.rm,
+             ylim = ylim,
              ...) +
       ggtitle_spct(x = x,
                    time.format = time.format,

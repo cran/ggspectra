@@ -10,8 +10,8 @@ scale_y_counts_continuous(unit.exponent = 3,
   labels = SI_pl_format(exponent = unit.exponent), ...)
 
 scale_y_counts_tg_continuous(unit.exponent = 3,
-  name = counts_label(unit.exponent = 0), labels = SI_tg_format(exponent =
-  unit.exponent), ...)
+  name = counts_label(unit.exponent = 0),
+  labels = SI_tg_format(exponent = unit.exponent), ...)
 }
 \arguments{
 \item{unit.exponent}{integer}

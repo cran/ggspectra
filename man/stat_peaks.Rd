@@ -6,14 +6,16 @@
 \title{Find peaks and valleys.}
 \usage{
 stat_peaks(mapping = NULL, data = NULL, geom = "point", span = 5,
-  ignore_threshold = 0, strict = FALSE, label.fmt = "\%.3g",
-  x.label.fmt = label.fmt, y.label.fmt = label.fmt, position = "identity",
-  na.rm = FALSE, show.legend = FALSE, inherit.aes = TRUE, ...)
+  ignore_threshold = 0.01, strict = FALSE, label.fmt = "\%.3g",
+  x.label.fmt = label.fmt, y.label.fmt = label.fmt,
+  position = "identity", na.rm = FALSE, show.legend = FALSE,
+  inherit.aes = TRUE, ...)
 
 stat_valleys(mapping = NULL, data = NULL, geom = "point", span = 5,
-  ignore_threshold = 0, strict = FALSE, label.fmt = "\%.3g",
-  x.label.fmt = label.fmt, y.label.fmt = label.fmt, position = "identity",
-  na.rm = FALSE, show.legend = FALSE, inherit.aes = TRUE, ...)
+  ignore_threshold = -0.01, strict = FALSE, label.fmt = "\%.3g",
+  x.label.fmt = label.fmt, y.label.fmt = label.fmt,
+  position = "identity", na.rm = FALSE, show.legend = FALSE,
+  inherit.aes = TRUE, ...)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -99,7 +101,7 @@ These stats work nicely together with geoms
   \item{y}{y-value at the peak (or valley) as numeric}
   \item{x.label}{x-value at the peak (or valley) formatted as character}
   \item{y.label}{y-value at the peak (or valley) formatted as character}
-  \item{color}{color definition calculated by assuming that x-values are
+  \item{wl.color}{color definition calculated by assuming that x-values are
   wavelengths expressed in nanometres.}
 }
 }
@@ -111,7 +113,7 @@ Set by the statistic and available to geoms.
   \item{label}{..x.label..}
   \item{xintercept}{..x..}
   \item{yintercept}{..y..}
-  \item{fill}{..color..}
+  \item{fill}{..wl.color..}
 }
 }
 
@@ -141,6 +143,8 @@ ggplot(sun.spct, unit.out = "photon") + geom_point() +
 \code{\link[photobiology]{find_peaks}}, which is used internally.
 
 Other stats functions: \code{\link{stat_color}},
+  \code{\link{stat_find_qtys}},
+  \code{\link{stat_find_wls}},
   \code{\link{stat_label_peaks}},
   \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
   \code{\link{stat_wb_contribution}},
@@ -151,3 +155,4 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
+\concept{stats functions}

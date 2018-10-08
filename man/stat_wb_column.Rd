@@ -65,12 +65,12 @@ What it is named integral below is the result of appying \code{integral.fun},
 with default \code{integrate_xy}.
 \describe{
   \item{x}{w.band-midpoint}
-  \item{xmin}{w.band minimum}
-  \item{xmax}{w.band maximum}
-  \item{ymin}{data$y minimum}
-  \item{ymax}{data$y maximum}
-  \item{ymean}{yint divided by wl_expanse(w.band)}
-  \item{y}{ymeam}
+  \item{wb.xmin}{w.band minimum}
+  \item{wb.xmax}{w.band maximum}
+  \item{wb.ymin}{data$y minimum}
+  \item{wb.ymax}{data$y maximum}
+  \item{wb.ymean}{yint divided by wl_expanse(w.band)}
+  \item{y}{wb.ymeam}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}
   \item{BW.color}{\code{black_or_white(wb.color)}}
@@ -81,10 +81,10 @@ with default \code{integrate_xy}.
 
 Set by the statistic and available to geoms.
 \describe{
-  \item{xmin}{..xmin..}
-  \item{xmax}{..xmax..}
+  \item{xmin}{..wb.xmin..}
+  \item{xmax}{..wb.xmax..}
   \item{ymin}{0}
-  \item{ymax}{..ymean..}
+  \item{ymax}{..wb.ymean..}
   \item{fill}{..wb.color..}
 }
 }
@@ -116,6 +116,8 @@ ggplot(sun.spct) +
 }
 \seealso{
 Other stats functions: \code{\link{stat_color}},
+  \code{\link{stat_find_qtys}},
+  \code{\link{stat_find_wls}},
   \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
   \code{\link{stat_wb_box}},
   \code{\link{stat_wb_contribution}},
@@ -126,3 +128,4 @@ Other stats functions: \code{\link{stat_color}},
   \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
   \code{\link{stat_wl_summary}}
 }
+\concept{stats functions}

@@ -6,9 +6,12 @@ library(photobiologyWavebands)
 library(ggspectra)
 library(ggrepel)
 
+good_label_repel <- packageVersion('ggrepel') != "0.8.0"
+
+
 ## ---- include=FALSE, echo=FALSE------------------------------------------
 library(knitr)
-opts_chunk$set(fig.path = 'figure/guide-pos-', fig.align = 'center', 
+opts_chunk$set(fig.align = 'center', 
                fig.show = 'hold', fig.width = 7, fig.height = 4,
                cache = FALSE)
 options(warnPartialMatchArgs = FALSE)
@@ -215,6 +218,9 @@ ggplot(sun.spct, unit.out = "photon") + geom_line() + stat_peaks(color = "red")
 ggplot(sun.spct) + geom_line() + stat_valleys(color = "blue")
 
 ## ------------------------------------------------------------------------
+ggplot(yellow_gel.spct) + geom_line() + stat_find_wls(color = "darkgreen")
+
+## ------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(shape = 21, color = "black") + scale_fill_identity()
 
@@ -235,22 +241,21 @@ ggplot(sun.spct) + geom_line() +
              geom = "label", span = 25, vjust = "bottom", size = 3) + 
   scale_color_identity()
 
-## ------------------------------------------------------------------------
-ggplot(sun.spct) + geom_line() + 
-  stat_peaks(shape = 21, span = 25, size = 2) + 
-  stat_label_peaks(geom = "label_repel", span = 41, 
-                   size = 3.5, nudge_y = 0.075, segment.colour = "black") +
-  stat_valleys(shape = 21, span = 25, size = 2) + 
-  stat_label_valleys(geom = "label_repel", span = 51, 
-                     size = 3.5, nudge_y = -0.075, segment.colour = "black") +
-  scale_fill_identity() + scale_color_identity() +
-  expand_limits(y = c(-0.08, 0.9))
+## ---- eval=good_label_repel----------------------------------------------
+#  ggplot(sun.spct) + geom_line() +
+#    stat_peaks(shape = 21, span = 25, size = 2) +
+#    stat_label_peaks(geom = "label_repel", span = 41,
+#                     size = 3.5, nudge_y = 0.075, segment.colour = "black") +
+#    stat_valleys(shape = 21, span = 25, size = 2) +
+#    stat_label_valleys(geom = "label_repel", span = 51,
+#                       size = 3.5, nudge_y = -0.075, segment.colour = "black") +
+#    scale_fill_identity() + scale_color_identity() +
+#    expand_limits(y = c(-0.08, 0.9))
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(shape = 21, span = 25, size = 2) + scale_fill_identity() +
-  stat_label_peaks(geom = "label", span = 25, vjust = "bottom", size = 3, 
-                   aes(label = ifelse(..is_peak.., ..x.label.., NA)), na.rm = TRUE) +
+  stat_label_peaks(geom = "label", span = 25, size = 3, na.rm = TRUE) +
   scale_color_identity() +
   expand_limits(y = c(NA, 0.9))
 
@@ -259,13 +264,14 @@ ggplot(sun.spct) + geom_line() +
   stat_peaks(span = NULL, geom = "vline", linetype = "dotted", color = "red") +
   stat_peaks(span = NULL, geom = "hline", linetype = "dotted", color = "red")
 
-## ------------------------------------------------------------------------
-ggplot(sun.spct) + geom_line() + 
-  stat_label_peaks(span = 31, geom = "label_repel", aes(label = ..y.label..), 
-             label.fmt = "y = %1.2f", segment.colour = "red",
-             min.segment.length = unit(0.05, "lines")) +
-  expand_limits(y = 1) +
-  scale_fill_identity() + scale_color_identity()
+## ---- eval=good_label_repel----------------------------------------------
+#  ggplot(sun.spct) + geom_line() +
+#    stat_label_peaks(span = 31, geom = "label_repel",
+#               label.fmt = "y = %1.2f", segment.colour = "red",
+#               min.segment.length = unit(0.05, "lines"),
+#               nudge_y = 0.1) +
+#    expand_limits(y = 1) +
+#    scale_fill_identity() + scale_color_identity()
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
@@ -442,7 +448,7 @@ ggplot(sun.spct, unit.out = "photon") +
   stat_wb_box(w.band = PAR()) +
   stat_wb_irrad(w.band = PAR(),
                 unit.in = "photon", time.unit = "second", 
-                aes(label = sprintf("%s = %.3g", ..wb.name.., ..yint.. * 1e6))) +
+                aes(label = sprintf("%s = %.3g", ..wb.name.., ..wb.yint.. * 1e6))) +
   geom_line() + 
   scale_color_identity() + 
   scale_fill_identity() +  
@@ -501,12 +507,12 @@ ggplot(sun.spct, unit.out = "photon") +
   stat_wb_q_sirrad(w.band = PAR(), 
                    mapping =
                      aes(label = sprintf("Total %s = %.3g", 
-                                         ..wb.name.., ..yint.. * 1e6)), 
+                                         ..wb.name.., ..wb.yint.. * 1e6)), 
                    ypos.mult = 0.55) +
   stat_wb_q_sirrad(w.band = PAR(),
                    mapping = 
                      aes(label = sprintf("Mean %s = %.3g", 
-                                         ..wb.name.., ..ymean.. * 1e6)), 
+                                         ..wb.name.., ..wb.ymean.. * 1e6)), 
                    ypos.mult = 0.45) +
   geom_line() + 
   scale_color_identity() + 

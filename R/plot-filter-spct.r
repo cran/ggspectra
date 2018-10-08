@@ -3,20 +3,28 @@
 #' This function returns a ggplot object with an annotated plot of a source_spct
 #' object showing absorptance.
 #'
-#' @param spct a filter_spct object
-#' @param w.band list of waveband objects
+#' @param spct a filter_spct object.
+#' @param w.band list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm)
-#' @param pc.out logical, if TRUE use percents instead of fraction of one
+#'   min annd max wavelengths (nm).
+#' @param pc.out logical, if TRUE use percents instead of fraction of one.
 #' @param label.qty character string giving the type of summary quantity to use
-#'   for labels
+#'   for labels.
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector
+#' @param annotations a character vector.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
+#' @param ylim numeric y axis limits,
 #' @param na.rm logical.
-#' @param ... other arguments passed to transmittance()
+#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -30,10 +38,15 @@ Afr_plot <- function(spct,
                      span,
                      annotations,
                      text.size,
+                     idfactor,
+                     ylim,
                      na.rm,
                      ...) {
   if (!is.filter_spct(spct)) {
     stop("Afr_plot() can only plot filter_spct objects.")
+  }
+  if (is.null(ylim) || !is.numeric(ylim)) {
+    ylim <- rep(NA_real_, 2L)
   }
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
@@ -114,24 +127,34 @@ Afr_plot <- function(spct,
     Afr.label <- ""
   }
 
-  y.max <- max(1, spct[["Afr"]], na.rm = TRUE)
-  y.min <- min(0, spct[["Afr"]], na.rm = TRUE)
+  y.min <- ifelse(!is.na(ylim[1]),
+                  ylim[1],
+                  min(0, spct[["Afr"]], na.rm = TRUE))
+  y.max <- ifelse(!is.na(ylim[2]),
+                  ylim[2],
+                  max(1, spct[["Afr"]], na.rm = TRUE))
 
-  plot <- ggplot(spct)
-  if (getMultipleWl(spct) == 1L) {
-    plot <- plot + aes_(~w.length, ~Afr)
+  if (any(!is.na(ylim))) {
+    y.breaks <- scales::pretty_breaks(n = 6)
   } else {
-    plot <- plot + aes_(~w.length, ~Afr, linetype = ~spct.idx)
+    y.breaks <- c(0, 0.25, 0.5, 0.75, 1)
   }
+
+  plot <- ggplot(spct, aes_(x = ~w.length, y = ~Afr))
+  temp <- find_idfactor(spct = spct,
+                        idfactor = idfactor,
+                        annotations = annotations)
+  plot <- plot + temp$ggplot_comp
+  annotations <- temp$annotations
 
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
-    if (y.max > 1.01) {
+    if (y.max > 1.005) {
       plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "red")
     } else {
       plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "black")
     }
-    if (y.min < -0.01) {
+    if (y.min < -0.005) {
       plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
     } else {
       plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
@@ -168,11 +191,12 @@ Afr_plot <- function(spct,
     y.limits <- c(y.min, y.max)
     x.limits <- range(spct)
   }
+
   if (pc.out) {
-    plot <- plot + scale_y_continuous(labels = scales::percent, breaks = c(0, 0.25, 0.5, 0.75, 1),
+    plot <- plot + scale_y_continuous(labels = scales::percent, breaks = y.breaks,
                                       limits = y.limits)
   } else {
-    plot <- plot + scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1),
+    plot <- plot + scale_y_continuous(breaks = y.breaks,
                                       limits = y.limits)
   }
 
@@ -198,10 +222,18 @@ Afr_plot <- function(spct,
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector
+#' @param annotations a character vector.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
 #' @param na.rm logical.
-#' @param ... other arguments passed to transmittance()
+#' @param ylim numeric y axis limits,
+#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -215,10 +247,15 @@ T_plot <- function(spct,
                    span,
                    annotations,
                    text.size,
+                   idfactor,
                    na.rm,
+                   ylim,
                    ...) {
   if (!is.filter_spct(spct)) {
     stop("T_plot() can only plot filter_spct objects.")
+  }
+  if (is.null(ylim) || !is.numeric(ylim)) {
+    ylim <- rep(NA_real_, 2L)
   }
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
@@ -278,24 +315,34 @@ T_plot <- function(spct,
     Tfr.label <- ""
   }
 
-  y.max <- max(1, spct[["Tfr"]], na.rm = TRUE)
-  y.min <- min(0, spct[["Tfr"]], na.rm = TRUE)
+  y.min <- ifelse(!is.na(ylim[1]),
+                  ylim[1],
+                  min(0, spct[["Tfr"]], na.rm = TRUE))
+  y.max <- ifelse(!is.na(ylim[2]),
+                  ylim[2],
+                  max(1, spct[["Tfr"]], na.rm = TRUE))
 
-  plot <- ggplot(spct)
-  if (getMultipleWl(spct) == 1L) {
-    plot <- plot + aes_(~w.length, ~Tfr)
+  if (any(!is.na(ylim))) {
+    y.breaks <- scales::pretty_breaks(n = 6)
   } else {
-    plot <- plot + aes_(~w.length, ~Tfr, linetype = ~spct.idx)
+    y.breaks <- c(0, 0.25, 0.5, 0.75, 1)
   }
+
+  plot <- ggplot(spct, aes_(x = ~w.length, y = ~Tfr))
+  temp <- find_idfactor(spct = spct,
+                        idfactor = idfactor,
+                        annotations = annotations)
+  plot <- plot + temp$ggplot_comp
+  annotations <- temp$annotations
 
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
-    if (y.max > 1.01) {
+    if (y.max > 1.005) {
       plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "red")
     } else {
       plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "black")
     }
-    if (y.min < -0.01) {
+    if (y.min < -0.005) {
       plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
     } else {
       plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
@@ -333,10 +380,10 @@ T_plot <- function(spct,
     x.limits <- range(spct)
   }
   if (pc.out) {
-    plot <- plot + scale_y_continuous(labels = scales::percent, breaks = c(0, 0.25, 0.5, 0.75, 1),
+    plot <- plot + scale_y_continuous(labels = scales::percent, breaks = y.breaks,
                                       limits = y.limits)
   } else {
-    plot <- plot + scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1),
+    plot <- plot + scale_y_continuous(breaks = y.breaks,
                                       limits = y.limits)
   }
 
@@ -361,10 +408,18 @@ T_plot <- function(spct,
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector
+#' @param annotations a character vector.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
 #' @param na.rm logical.
-#' @param ... other arguments passed to absorbance()
+#' @param ylim numeric y axis limits,
+#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -377,10 +432,15 @@ A_plot <- function(spct,
                    span,
                    annotations,
                    text.size,
+                   idfactor,
                    na.rm,
+                   ylim,
                    ...) {
   if (!is.filter_spct(spct)) {
     stop("A_plot() can only plot filter_spct objects.")
+  }
+  if (is.null(ylim) || !is.numeric(ylim)) {
+    ylim <- rep(NA_real_, 2L)
   }
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
@@ -422,15 +482,25 @@ A_plot <- function(spct,
     A.label <- ""
   }
 
-  y.max <- max(spct[["A"]], na.rm = TRUE)
-  y.min <- min(0, spct[["A"]], na.rm = TRUE)
+  y.min <- ifelse(!is.na(ylim[1]),
+                  ylim[1],
+                  min(0, spct[["A"]], na.rm = TRUE))
+  y.max <- ifelse(!is.na(ylim[2]),
+                  ylim[2],
+                  max(spct[["A"]], na.rm = TRUE))
 
-  plot <- ggplot(spct)
-  if (getMultipleWl(spct) == 1L) {
-    plot <- plot + aes_(~w.length, ~A)
+  if (any(!is.na(ylim))) {
+    y.breaks <- scales::pretty_breaks(n = 6)
   } else {
-    plot <- plot + aes_(~w.length, ~A, linetype = ~spct.idx)
+    y.breaks <- c(0, 0.25, 0.5, 0.75, 1)
   }
+
+  plot <- ggplot(spct, aes_(x = ~w.length, y = ~A))
+  temp <- find_idfactor(spct = spct,
+                        idfactor = idfactor,
+                        annotations = annotations)
+  plot <- plot + temp$ggplot_comp
+  annotations <- temp$annotations
 
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
@@ -496,10 +566,18 @@ A_plot <- function(spct,
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector
+#' @param annotations a character vector.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
 #' @param na.rm logical.
-#' @param ... other arguments passed to reflectance()
+#' @param ylim numeric y axis limits,
+#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -513,10 +591,15 @@ R_plot <- function(spct,
                    span,
                    annotations,
                    text.size,
+                   idfactor,
+                   ylim,
                    na.rm,
                    ...) {
   if (!is.reflector_spct(spct)) {
     stop("R_plot() can only plot reflector_spct objects.")
+  }
+  if (is.null(ylim) || !is.numeric(ylim)) {
+    ylim <- rep(NA_real_, 2L)
   }
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
@@ -574,24 +657,35 @@ R_plot <- function(spct,
   } else {
     Rfr.label <- ""
   }
-  y.max <- max(1, spct[["Rfr"]], na.rm = TRUE)
-  y.min <- min(0, spct[["Rfr"]], na.rm = TRUE)
 
-  plot <- ggplot(spct)
-  if (getMultipleWl(spct) == 1L) {
-    plot <- plot + aes_(~w.length, ~Rfr)
+  y.min <- ifelse(!is.na(ylim[1]),
+                  ylim[1],
+                  min(0, spct[["Rfr"]], na.rm = TRUE))
+  y.max <- ifelse(!is.na(ylim[2]),
+                  ylim[2],
+                  max(1, spct[["Rfr"]], na.rm = TRUE))
+
+  if (any(!is.na(ylim))) {
+    y.breaks <- scales::pretty_breaks(n = 6)
   } else {
-    plot <- plot + aes_(~w.length, ~Rfr, linetype = ~spct.idx)
+    y.breaks <- c(0, 0.25, 0.5, 0.75, 1)
   }
+
+  plot <- ggplot(spct, aes_(x = ~w.length, y = ~Rfr))
+  temp <- find_idfactor(spct = spct,
+                        idfactor = idfactor,
+                        annotations = annotations)
+  plot <- plot + temp$ggplot_comp
+  annotations <- temp$annotations
 
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
-    if (y.max > 1.01) {
+    if (y.max > 1.005) {
       plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "red")
     } else {
       plot <- plot + geom_hline(yintercept = 1, linetype = "dashed", colour = "black")
     }
-    if (y.min < -0.01) {
+    if (y.min < -0.005) {
       plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
     } else {
       plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
@@ -628,10 +722,10 @@ R_plot <- function(spct,
     x.limits <- range(spct)
   }
   if (pc.out) {
-    plot <- plot + scale_y_continuous(labels = scales::percent, breaks = c(0, 0.25, 0.5, 0.75, 1),
+    plot <- plot + scale_y_continuous(labels = scales::percent, breaks = y.breaks,
                                       limits = y.limits)
   } else {
-    plot <- plot + scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1),
+    plot <- plot + scale_y_continuous(breaks = y.breaks,
                                       limits = y.limits)
   }
 
@@ -646,21 +740,22 @@ R_plot <- function(spct,
 #' @note Note that scales are expanded so as to make space for the annotations.
 #'   The object returned is a ggplot object, and can be further manipulated.
 #'
-#' @param spct an object_spct object
-#' @param w.band list of waveband objects
+#' @param spct an object_spct object.
+#' @param w.band list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm)
-#' @param pc.out logical, if TRUE use percents instead of fraction of one
+#'   min annd max wavelengths (nm).
+#' @param pc.out logical, if TRUE use percents instead of fraction of one.
 #' @param label.qty character string giving the type of summary quantity to use
-#'   for labels
+#'   for labels.
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector
-#' @param stacked logical
+#' @param annotations a character vector.
+#' @param stacked logical.
 #' @param text.size numeric size of text in the plot decorations.
 #' @param na.rm logical.
-#' @param ... other arguments passed to reflectance()
+#' @param ylim numeric y axis limits,
+#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -676,12 +771,19 @@ O_plot <- function(spct,
                    stacked,
                    text.size,
                    na.rm,
+                   ylim,
                    ...) {
   if (getMultipleWl(spct) > 1L) {
     stop("Only one object spectrum per plot supported")
   }
   if (!is.object_spct(spct)) {
     stop("O_plot() can only plot object_spct objects.")
+  }
+  if (is.null(ylim) || !is.numeric(ylim)) {
+    ylim <- rep(NA_real_, 2L)
+  }
+  if (stacked && !all(is.na(ylim))) {
+    warning("'ylim' not supported for stacked plots!")
   }
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
@@ -712,13 +814,27 @@ O_plot <- function(spct,
       stacked <- FALSE
     }
   }
+
   if (stacked) {
     y.max <- 1.01 # take care of rounding off
     y.min <- -0.01 # take care of rounding off
+    y.breaks <- c(0, 0.25, 0.5, 0.75, 1)
   } else {
-    y.max <- max(1, spct[["Rfr"]], spct[["Tfr"]], spct[["Afr"]], na.rm = TRUE)
-    y.min <- min(0, spct[["Rfr"]], spct[["Tfr"]], spct[["Afr"]], na.rm = TRUE)
+    y.min <- ifelse(!is.na(ylim[1]),
+                    ylim[1],
+                    min(0, spct[["Rfr"]], spct[["Tfr"]], spct[["Afr"]], na.rm = TRUE))
+    y.max <- ifelse(!is.na(ylim[2]),
+                    ylim[2],
+                    max(1, spct[["Rfr"]], spct[["Tfr"]], spct[["Afr"]], na.rm = TRUE))
+
+    if (any(!is.na(ylim))) {
+      y.breaks <- scales::pretty_breaks(n = 6)
+    } else {
+      y.breaks <- c(0, 0.25, 0.5, 0.75, 1)
+    }
+
   }
+
   molten.spct <-
     tidyr::gather_(dplyr::select_(spct, "w.length", "Tfr", "Afr", "Rfr"),
                    "variable", "value", c("Tfr", "Afr", "Rfr"))
@@ -783,9 +899,9 @@ O_plot <- function(spct,
     x.limits <- range(spct)
   }
   if (pc.out) {
-    plot <- plot + scale_y_continuous(labels = scales::percent, breaks = c(0, 0.25, 0.5, 0.75, 1), limits = y.limits)
+    plot <- plot + scale_y_continuous(labels = scales::percent, breaks = y.breaks, limits = y.limits)
   } else {
-    plot <- plot + scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1), limits = y.limits)
+    plot <- plot + scale_y_continuous(breaks = y.breaks, limits = y.limits)
   }
 
  plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
@@ -810,7 +926,8 @@ O_plot <- function(spct,
 #'   as to make space for the annotations.
 #'
 #' @param x a filter_spct object or a filter_mspct object.
-#' @param ... other arguments passed along, such as \code{label.qty}.
+#' @param ... in the case of collections of spectra, additional arguments passed
+#'   to the plot methods for individual spectra, otherwise currently ignored.
 #' @param w.band a single waveband object or a list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
 #'   min annd max wavelengths (nm).
@@ -825,6 +942,14 @@ O_plot <- function(spct,
 #' @param time.format character Format as accepted by \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
+#' @param ylim numeric y axis limits,
 #' @param na.rm logical.
 #'
 #' @return a \code{ggplot} object.
@@ -853,13 +978,12 @@ plot.filter_spct <-
            time.format = "",
            tz = "UTC",
            text.size = 2.5,
+           idfactor = NULL,
+           ylim = c(NA, NA),
            na.rm = TRUE) {
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
-    if (getMultipleWl(x) > 1L) {
-      annotations.default <- setdiff(annotations.default, "summaries")
-    }
     annotations <- decode_annotations(annotations,
                                       annotations.default)
     if (is.null(label.qty)) {
@@ -888,6 +1012,8 @@ plot.filter_spct <-
                            span = span,
                            annotations = annotations,
                            text.size = text.size,
+                           idfactor = idfactor,
+                           ylim = ylim,
                            na.rm = na.rm,
                            ...)
     } else if (plot.qty == "absorbance") {
@@ -898,6 +1024,8 @@ plot.filter_spct <-
                            span = span,
                            annotations = annotations,
                            text.size = text.size,
+                           idfactor = idfactor,
+                           ylim = ylim,
                            na.rm = na.rm,
                            ...)
     } else if (plot.qty == "absorptance") {
@@ -909,6 +1037,8 @@ plot.filter_spct <-
                              span = span,
                              annotations = annotations,
                              text.size = text.size,
+                             idfactor = idfactor,
+                             ylim = ylim,
                              na.rm = na.rm,
                              ...)
     } else {
@@ -948,22 +1078,31 @@ plot.filter_mspct <-
 #'   make space for the annotations.
 #'
 #' @param x a reflector_spct object or a reflector_mspct object.
-#' @param ... other arguments passed along, such as \code{label.qty}
-#' @param w.band a single waveband object or a list of waveband objects
+#' @param ... in the case of collections of spectra, additional arguments passed
+#'   to the plot methods for individual spectra, otherwise currently ignored.
+#' @param w.band a single waveband object or a list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm)
-#' @param plot.qty character string (currently ignored)
-#' @param pc.out logical, if TRUE use percents instead of fraction of one
+#'   min annd max wavelengths (nm).
+#' @param plot.qty character string (currently ignored).
+#' @param pc.out logical, if TRUE use percents instead of fraction of one.
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations a character vector
+#' @param annotations a character vector.
 #' @param time.format character Format as accepted by
 #'   \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
+#' @param ylim numeric y axis limits,
 #' @param na.rm logical.
 #'
 #' @return a \code{ggplot} object.
@@ -992,13 +1131,12 @@ plot.reflector_spct <-
            time.format = "",
            tz = "UTC",
            text.size = 2.5,
+           idfactor = NULL,
+           ylim = c(NA, NA),
            na.rm = TRUE) {
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
-    if (getMultipleWl(x) > 1L) {
-      annotations.default <- setdiff(annotations.default, "summaries")
-    }
     annotations <- decode_annotations(annotations,
                                       annotations.default)
     if (is.null(label.qty)) {
@@ -1026,6 +1164,8 @@ plot.reflector_spct <-
                            span = span,
                            annotations = annotations,
                            text.size = text.size,
+                           idfactor = idfactor,
+                           ylim = ylim,
                            na.rm = na.rm,
                            ...)
     } else {
@@ -1061,10 +1201,12 @@ plot.reflector_mspct <-
 #'   Except when no annotations are added, limits are set for the x-axis and
 #'   y-axis scales. The y scale limits are expanded to include all data, or at
 #'   least to the range of expected values. Scales are further expanded so
-#'   as to make space for the annotations.
+#'   as to make space for the annotations. When all \code{"all"} quantities are
+#'   plotted, a single set of spectra is accepted as input.
 #'
 #' @param x an object_spct object
-#' @param ... other arguments passed along, such as \code{label.qty}
+#' @param ... in the case of collections of spectra, additional arguments passed
+#'   to the plot methods for individual spectra, otherwise currently ignored.
 #' @param w.band a single waveband object or a list of waveband objects
 #' @param range an R object on which range() returns a vector of length 2, with
 #'   min annd max wavelengths (nm)
@@ -1081,6 +1223,14 @@ plot.reflector_mspct <-
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param stacked logical
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
+#' @param ylim numeric y axis limits,
 #' @param na.rm logical.
 #'
 #' @return a \code{ggplot} object.
@@ -1110,13 +1260,12 @@ plot.object_spct <-
            tz = "UTC",
            stacked = TRUE,
            text.size = 2.5,
+           idfactor = NULL,
+           ylim = c(NA, NA),
            na.rm = TRUE) {
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "colour.guide", "peaks"))
-    # if (getMultipleWl(x) > 1L) {
-    #   annotations.default <- setdiff(annotations.default, "summaries")
-    # }
     annotations <- decode_annotations(annotations,
                                       annotations.default)
     if (is.null(label.qty)) {
@@ -1145,6 +1294,7 @@ plot.object_spct <-
                          annotations = annotations,
                          stacked = stacked,
                          text.size = text.size,
+                         ylim = ylim,
                          na.rm = na.rm,
                          ...)
     } else if (plot.qty == "transmittance") {
@@ -1157,6 +1307,8 @@ plot.object_spct <-
                            span = span,
                            annotations = annotations,
                            text.size = text.size,
+                           idfactor = idfactor,
+                           ylim = ylim,
                            na.rm = na.rm,
                            ...)
     } else if (plot.qty == "absorbance") {
@@ -1168,6 +1320,8 @@ plot.object_spct <-
                            span = span,
                            annotations = annotations,
                            text.size = text.size,
+                           idfactor = idfactor,
+                           ylim = ylim,
                            na.rm = na.rm,
                            ...)
     } else if (plot.qty == "absorptance") {
@@ -1180,6 +1334,8 @@ plot.object_spct <-
                              span = span,
                              annotations = annotations,
                              text.size = text.size,
+                             idfactor = idfactor,
+                             ylim = ylim,
                              na.rm = na.rm,
                              ...)
     } else if (plot.qty == "reflectance") {
@@ -1192,6 +1348,8 @@ plot.object_spct <-
                            span = span,
                            annotations = annotations,
                            text.size = text.size,
+                           idfactor = idfactor,
+                           ylim = ylim,
                            na.rm = na.rm,
                            ...)
     } else {

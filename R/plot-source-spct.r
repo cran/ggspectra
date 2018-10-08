@@ -6,20 +6,27 @@
 #' @note Note that scales are expanded so as to make space for the annotations.
 #'   The object returned is a ggplot objects, and can be further manipulated.
 #'
-#' @param spct a source_spct object
-#' @param w.band list of waveband objects
+#' @param spct a source_spct object.
+#' @param w.band list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm)
+#'   min annd max wavelengths (nm).
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations.default a character vector
-#' @param annotations a character vector
+#' @param annotations a character vector.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
+#' @param ylim numeric y axis limits,
 #' @param na.rm logical.
-#' @param ... other arguments passed to annotate_plot()
+#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -32,10 +39,15 @@ e_plot <- function(spct,
                    span,
                    annotations,
                    text.size,
+                   idfactor,
+                   ylim,
                    na.rm,
                    ...) {
   if (!is.source_spct(spct)) {
     stop("e_plot() can only plot source_spct objects.")
+  }
+  if (is.null(ylim) || !is.numeric(ylim)) {
+    ylim <- rep(NA_real_, 2L)
   }
   q2e(spct, byref=TRUE)
   if (!is.null(range)) {
@@ -108,15 +120,21 @@ e_plot <- function(spct,
   }
   s.irrad.label <- parse(text = s.irrad.label)
   spct[["s.e.irrad"]] <- spct[["s.e.irrad"]] * scale.factor
-  y.max <- max(c(spct[["s.e.irrad"]], 0), na.rm = TRUE)
-  y.min <- min(c(spct[["s.e.irrad"]], 0), na.rm = TRUE)
 
-  plot <- ggplot(spct)
-  if (getMultipleWl(spct) == 1L) {
-    plot <- plot + aes_(~w.length, ~s.e.irrad)
-  } else {
-    plot <- plot + aes_(~w.length, ~s.e.irrad, linetype = ~spct.idx)
-  }
+  y.min <- ifelse(!is.na(ylim[1]),
+                  ylim[1],
+                  min(c(spct[["s.e.irrad"]], 0), na.rm = TRUE))
+  y.max <- ifelse(!is.na(ylim[2]),
+                  ylim[2],
+                  max(c(spct[["s.e.irrad"]], 0), na.rm = TRUE))
+
+  plot <- ggplot(spct, aes_(x = ~w.length, y = ~s.e.irrad))
+  temp <- find_idfactor(spct = spct,
+                        idfactor = idfactor,
+                        annotations = annotations)
+  plot <- plot + temp$ggplot_comp
+  annotations <- temp$annotations
+
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
     if (y.min < (-0.01 * y.max)) {
@@ -203,20 +221,27 @@ e_plot <- function(spct,
 #' @note Note that scales are expanded so as to make space for the annotations.
 #'   The object returned is a ggplot objects, and can be further manipulated.
 #'
-#' @param spct a source_spct object
-#' @param w.band list of waveband objects
+#' @param spct a source_spct object.
+#' @param w.band list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm)
+#'   min annd max wavelengths (nm).
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
-#' @param annotations.default a character vector
 #' @param annotations a character vector
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
+#' @param ylim numeric y axis limits,
 #' @param na.rm logical.
-#' @param ... other arguments passed to annotate_plot()
+#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -227,21 +252,17 @@ q_plot <- function(spct,
                    range,
                    label.qty,
                    span,
-                   annotations.default,
                    annotations,
                    text.size,
+                   idfactor,
+                   ylim,
                    na.rm,
                    ...) {
   if (!is.source_spct(spct)) {
     stop("q_plot() can only plot source_spct objects.")
   }
-  if ("color.guide" %in% annotations) {
-    annotations <- c(setdiff(annotations, "color.guide"), "colour.guide")
-  }
-  if (is.null(annotations)) {
-    annotations <- annotations.default
-  } else if (tolower(annotations[1]) %in% c("!", "not")) {
-    annotations <- setdiff(annotations.default, annotations[-1])
+  if (is.null(ylim) || !is.numeric(ylim)) {
+    ylim <- rep(NA_real_, 2L)
   }
   e2q(spct, byref = TRUE)
   if (!is.null(range)) {
@@ -315,15 +336,20 @@ q_plot <- function(spct,
   }
   s.irrad.label <- parse(text = s.irrad.label)
   spct[["s.q.irrad"]] <- spct[["s.q.irrad"]] * scale.factor
-  y.max <- max(c(spct[["s.q.irrad"]], 0), na.rm = TRUE)
-  y.min <- min(c(spct[["s.q.irrad"]], 0), na.rm = TRUE)
 
-  plot <- ggplot(spct)
-  if (getMultipleWl(spct) == 1L) {
-    plot <- plot + aes_(~w.length, ~s.q.irrad)
-  } else {
-    plot <- plot + aes_(~w.length, ~s.q.irrad, linetype = ~spct.idx)
-  }
+  y.min <- ifelse(!is.na(ylim[1]),
+                  ylim[1],
+                  min(c(spct[["s.q.irrad"]], 0), na.rm = TRUE))
+  y.max <- ifelse(!is.na(ylim[2]),
+                  ylim[2],
+                  max(c(spct[["s.q.irrad"]], 0), na.rm = TRUE))
+
+  plot <- ggplot(spct, aes_(x = ~w.length, y = ~s.q.irrad))
+  temp <- find_idfactor(spct = spct,
+                        idfactor = idfactor,
+                        annotations = annotations)
+  plot <- plot + temp$ggplot_comp
+  annotations <- temp$annotations
 
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
@@ -408,11 +434,12 @@ q_plot <- function(spct,
 #' object or of the spectra contained in a source_mspct object.
 #'
 #' @note Note that scales are expanded so as to make space for the annotations.
-#'   The object returned is a ggplot object, and can be further manipulated
-#'   and added to.
+#'   The object returned is a ggplot object, and can be further manipulated and
+#'   added to.
 #'
 #' @param x a source_spct or a source_mspct object.
-#' @param ... other arguments passed along, such as \code{label.qty}.
+#' @param ... in the case of collections of spectra, additional arguments passed
+#'   to the plot methods for individual spectra, otherwise currently ignored.
 #' @param w.band a single waveband object or a list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
 #'   min annd max wavelengths (nm).
@@ -424,9 +451,16 @@ q_plot <- function(spct,
 #'   than all other elements within a window of width span centered at that
 #'   element.
 #' @param annotations a character vector.
-#' @param time.format character Format as accepted by \code{\link[base]{strptime}}.
+#' @param time.format character Format as accepted by
+#'   \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param idfactor character Name of an index column in data holding a
+#'   \code{factor} with each spectrum in a long-form multispectrum object
+#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+#'   the factor is retrieved from metadata or if no metadata found, the default
+#'   "spct.idx" is tried.
+#' @param ylim numeric y axis limits,
 #' @param na.rm logical.
 #'
 #' @return a \code{ggplot} object.
@@ -455,13 +489,12 @@ plot.source_spct <-
            time.format = "",
            tz = "UTC",
            text.size = 2.5,
+           idfactor = NULL,
+           ylim = c(NA, NA),
            na.rm = TRUE) {
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
-    if (getMultipleWl(x) > 1L) {
-      annotations.default <- setdiff(annotations.default, "summaries")
-    }
     annotations <- decode_annotations(annotations,
                                       annotations.default)
     if (is.null(label.qty)) {
@@ -487,6 +520,8 @@ plot.source_spct <-
                            span = span,
                            annotations = annotations,
                            text.size = text.size,
+                           idfactor = idfactor,
+                           ylim = ylim,
                            na.rm = na.rm,
                            ...)
     } else if (unit.out == "energy") {
@@ -495,6 +530,8 @@ plot.source_spct <-
                            span = span,
                            annotations = annotations,
                            text.size = text.size,
+                           idfactor = idfactor,
+                           ylim = ylim,
                            na.rm = na.rm,
                            ...)
     } else {

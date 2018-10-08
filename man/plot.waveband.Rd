@@ -8,36 +8,38 @@
   fill = 0, span = NULL,
   unit.in = getOption("photobiology.radiation.unit", default = "energy"),
   annotations = NULL, wb.trim = TRUE, norm = NULL, text.size = 2.5,
-  na.rm = TRUE)
+  ylim = c(NA, NA), na.rm = TRUE)
 }
 \arguments{
-\item{x}{a waveband object}
+\item{x}{a waveband object.}
 
-\item{...}{other arguments passed to plot.response_spct()}
+\item{...}{currently ignored.}
 
 \item{w.length}{numeric vector of wavelengths (nm)}
 
 \item{range}{an R object on which range() returns a vector of length 2, with
-min annd max wavelengths (nm)}
+min annd max wavelengths (nm).}
 
 \item{fill}{value to use as response for wavelngths outside the waveband
-range}
+range.}
 
 \item{span}{a peak is defined as an element in a sequence which is greater
 than all other elements within a window of width span centered at that
 element.}
 
 \item{unit.in}{the type of unit we assume as reference "energy" or "photon"
-based}
+based.}
 
 \item{annotations}{a character vector.}
 
-\item{wb.trim}{logical}
+\item{wb.trim}{logical.}
 
 \item{norm}{numeric normalization wavelength (nm) or character string "max"
 for normalization at the wavelength of highest peak.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{ylim}{numeric y axis limits,}
 
 \item{na.rm}{logical.}
 }
@@ -71,7 +73,8 @@ plot(waveband(c(400, 500)))
 
 }
 \seealso{
-Other plot functions: \code{\link{plot.calibration_spct}},
+Other plot functions: \code{\link{autoplot.generic_spct}},
+  \code{\link{plot.calibration_spct}},
   \code{\link{plot.cps_spct}},
   \code{\link{plot.filter_spct}},
   \code{\link{plot.object_spct}},
@@ -80,4 +83,5 @@ Other plot functions: \code{\link{plot.calibration_spct}},
   \code{\link{plot.response_spct}},
   \code{\link{plot.source_spct}}
 }
+\concept{plot functions}
 \keyword{hplot}

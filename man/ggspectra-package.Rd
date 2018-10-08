@@ -7,11 +7,11 @@
 \title{ggspectra: Extensions to 'ggplot2' for Radiation Spectra}
 \description{
 Additional annotations, and stats for plotting "light"
-spectra with 'ggplot2', together with specializations of ggplot()
-and plot() methods for spectral data stored in objects of the classes
-defined in package 'photobiology' and a plot() method for objects of
-class "waveband", also defined in package 'photobiology'. Part of the
-'r4photobiology' suite, Aphalo P. J. (2015) <doi:10.19232/uv4pb.2015.1.14>.
+    spectra with 'ggplot2', together with specializations of ggplot()
+    and plot() methods for spectral data stored in objects of the classes
+    defined in package 'photobiology' and a plot() method for objects of
+    class "waveband", also defined in package 'photobiology'. Part of the 
+    'r4photobiology' suite, Aphalo P. J. (2015) <doi:10.19232/uv4pb.2015.1.14>.
 }
 \details{
 Package `ggspectra` provides a set of stats, geoms and methods
@@ -27,10 +27,10 @@ those relevant to photobiology. However, many of the functions in the package
 are more generaly useful for plotting UV, VIS and NIR spectra of light
 emission, transmittance, reflectance, absorptance, and responses.
 
-The available summary qantities are both simple statistical summaries and
+The available summary quantities are both simple statistical summaries and
 response-weighted summaries. Simple derived quantities represent summaries of a
 given range of wavelengths, and can be expressed either in energy or photon
-based units. Derived _biologically effective_ quantities are used to quantify
+based units. Derived biologically effective quantities are used to quantify
 the effect of radiation on different organisms or processes within organisms.
 These effects can range from damage to perception of informational light
 signals. Additional features of spectra may be important and worthwhile
@@ -49,8 +49,8 @@ calculations described at the
 [r4photobiology](https://www.r4photobiology.info) web site.
 }
 \note{
-This package makes use of the new features of 'ggplot2' 2.0.0 that make
-writing this kind of extensions really easy and is consequently not
+This package makes use of the new features of 'ggplot2' >= 2.0.0 that make
+writing this kind of extensions easy and is consequently not
 compatible with earlier versions of 'ggplot2'.
 }
 \examples{

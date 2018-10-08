@@ -5,7 +5,7 @@
 \title{Plot method for spectral irradiation calibrations.}
 \usage{
 cal_plot(spct, w.band, range, pc.out, label.qty, span, annotations, norm,
-  text.size, na.rm, ...)
+  text.size, idfactor, ylim, na.rm, ...)
 }
 \arguments{
 \item{spct}{a calibration_spct object}
@@ -31,9 +31,19 @@ for normalization at the wavelength of highest peak.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
 
+\item{idfactor}{character Name of an index column in data holding a
+\code{factor} with each spectrum in a long-form multispectrum object
+corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
+the factor is retrieved from metadata or if no metadata found, the
+default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+to the spectra and the user needs to use 'ggplot2' functions to manually
+map an aesthetic or use facets for the spectra.}
+
+\item{ylim}{numeric y axis limits,}
+
 \item{na.rm}{logical.}
 
-\item{...}{other arguments}
+\item{...}{currently ignored.}
 }
 \value{
 a \code{ggplot} object.
@@ -44,8 +54,8 @@ calibration_spct object.
 }
 \note{
 Note that scales are expanded so as to make space for the annotations.
-  The object returned is a ggplot objects, and can be further manipulated.
-  When spct has more than one column with spectral data, each of these
+  The object returned is a ggplot object, and can be further manipulated.
+  When \code{spct} has more than one column with spectral data, each of these
   columns is normalized individually.
 }
 \keyword{internal}

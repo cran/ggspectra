@@ -6,8 +6,8 @@
 \title{Spectral response y-scale}
 \usage{
 scale_y_s.e.response_continuous(unit.exponent = 0,
-  name = s.e.response_label(unit.exponent), labels = SI_pl_format(exponent =
-  -unit.exponent), ...)
+  name = s.e.response_label(unit.exponent),
+  labels = SI_pl_format(exponent = -unit.exponent), ...)
 
 scale_y_s.q.response_continuous(unit.exponent = 0,
   name = s.q.response_label(unit.exponent = unit.exponent),
