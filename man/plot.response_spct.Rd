@@ -45,8 +45,9 @@ element.}
 
 \item{tz}{character Time zone to use for title and/or subtitle.}
 
-\item{norm}{numeric normalization wavelength (nm) or character string "max"
-for normalization at the wavelength of highest peak.}
+\item{norm}{numeric normalization wavelength (nm) or character string \code{"max"}
+for normalization at the wavelength of highest peak, or \code{NULL} for
+plotting the spectrum as is.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
 

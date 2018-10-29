@@ -117,6 +117,16 @@ s.q.irrad_label <- function(unit.exponent = -6,
 #'   scale_y_s.q.irrad_continuous() +
 #'   scale_x_wl_continuous()
 #'
+#' ggplot(sun.spct) +
+#'   geom_line() +
+#'   scale_y_s.e.irrad_log10() +
+#'   scale_x_wl_continuous()
+#'
+#' ggplot(sun.spct, unit.out = "photon") +
+#'   geom_line() +
+#'   scale_y_s.q.irrad_log10() +
+#'   scale_x_wl_continuous()
+#'
 scale_y_s.e.irrad_continuous <-
   function(unit.exponent = 0,
            name = s.e.irrad_label(unit.exponent),
@@ -140,3 +150,49 @@ scale_y_s.q.irrad_continuous <-
                        labels = labels,
                        ...)
   }
+
+#' @rdname scale_y_s.e.irrad_continuous
+#'
+#' @export
+#'
+scale_y_s.q.irrad_log10 <-
+  function(unit.exponent = -6,
+           name = s.q.irrad_label(unit.exponent = unit.exponent),
+           labels = SI_pl_format(exponent = unit.exponent),
+           ...) {
+    scale_y_log10(name = name,
+                  labels = labels,
+                  ...)
+  }
+
+#' @rdname scale_y_s.e.irrad_continuous
+#'
+#' @export
+#'
+scale_y_s.e.irrad_log10 <-
+  function(unit.exponent = 0,
+           name = s.e.irrad_label(unit.exponent),
+           labels = SI_pl_format(exponent = unit.exponent),
+           ...) {
+    scale_y_log10(name = name,
+                  labels = labels,
+                  ...)
+  }
+
+## internal
+
+#' Convert lubridate duration objects to a string if possible
+#'
+#' @param time.unit lubridate::duration object or character
+#'
+#' @keywords internal
+#'
+duration2character <- function(time.unit) {
+  if (is.character(time.unit)) return(time.unit)
+  if (!lubridate::is.duration(time.unit)) return("unknown")
+  if (time.unit == lubridate::duration(1, "seconds")) return("second")
+  if (time.unit == lubridate::duration(1, "hours")) return("hour")
+  if (time.unit == lubridate::duration(1, "days")) return("day")
+  "duration"
+}
+

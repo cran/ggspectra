@@ -6,7 +6,8 @@ library(photobiologyWavebands)
 library(ggspectra)
 library(ggrepel)
 
-good_label_repel <- packageVersion('ggrepel') != "0.8.0"
+good_label_repel <- packageVersion('ggrepel') != "0.8.0" #||
+#  packageVersion('ggplot2') >= "3.1.0"
 
 
 ## ---- include=FALSE, echo=FALSE------------------------------------------
