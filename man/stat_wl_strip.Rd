@@ -93,8 +93,7 @@ Required by the statistic and need to be set with \code{aes()}.
 }
 
 \examples{
-library(photobiology)
-library(ggplot2)
+
 # ggplot() methods for spectral objects set a default mapping for x and y.
 ggplot(sun.spct) + geom_line() +
   stat_wl_strip(ymax = -0.02, ymin = -0.04) +

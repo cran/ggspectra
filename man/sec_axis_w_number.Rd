@@ -17,8 +17,6 @@ Secondary axes for wavelength data in nanometres. With suitable scaling and
 name (axis label) for frequency and wavenumber.
 }
 \examples{
-library(ggplot2)
-library(photobiology)
 
 ggplot(sun.spct) +
   geom_line() +

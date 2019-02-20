@@ -1,14 +1,14 @@
-#' Plot an instrument counts spectrum.
+#' Create a complete ggplot for an irradiation calibration spectrum.
 #'
 #' This function returns a ggplot object with an annotated plot of a
-#' cps_spct object.
+#' calibration_spct object.
 #'
 #' @note Note that scales are expanded so as to make space for the annotations.
 #'   The object returned is a ggplot object, and can be further manipulated.
-#'   When spct has more than one column with spectral data, each of these
+#'   When \code{spct} has more than one column with spectral data, each of these
 #'   columns is normalized individually.
 #'
-#' @param spct a cps_spct object
+#' @param spct a calibration_spct object
 #' @param w.band list of waveband objects
 #' @param range an R object on which range() returns a vector of length 2, with
 #'   min annd max wavelengths (nm)
@@ -26,16 +26,18 @@
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
 #'   the factor is retrieved from metadata or if no metadata found, the
-#'   default "spct.idx" is tried.
-#' @param ylim numeric y axis limits,
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
 #' @param na.rm logical.
+#' @param ylim numeric y axis limits,
 #' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
 #' @keywords internal
 #'
-cps_plot <- function(spct,
+cal_plot <- function(spct,
                      w.band,
                      range,
                      pc.out,
@@ -48,8 +50,8 @@ cps_plot <- function(spct,
                      ylim,
                      na.rm,
                      ...) {
-  if (!is.cps_spct(spct)) {
-    stop("cps_plot() can only plot response_spct objects.")
+  if (!is.calibration_spct(spct)) {
+    stop("cal_plot() can only plot calibration_spct objects.")
   }
   if (is.null(ylim) || !is.numeric(ylim)) {
     ylim <- rep(NA_real_, 2L)
@@ -60,15 +62,18 @@ cps_plot <- function(spct,
   if (!is.null(w.band)) {
     w.band <- trim_wl(w.band, range = range(spct))
   }
-  cps.cols <- names(spct)[grep("^cps", names(spct))]
-  num.cps.cols <- length(cps.cols)
-  stopifnot(num.cps.cols == 1L || getMultipleWl(spct) <= 1L)
-  #  other.cols <- setdiff(names(x), cps.cols)
+
+  mult.cols <- names(spct)[grep("^irrad.mult", names(spct))]
+  num.mult.cols <- length(mult.cols)
+  if (num.mult.cols > 1L && getMultipleWl(spct) != 1L) {
+    stop("Error: spectra can be either in wide or long format, but not both.")
+  }
+#  other.cols <- setdiff(names(x), mult.cols)
   if (is.null(norm)) {
     # we will use the original data
     scale.factor <- 1
   } else {
-    for (col in cps.cols) {
+    for (col in mult.cols) {
       if (is.character(norm)) {
         if (norm %in% c("max", "maximum")) {
           idx <- which.max(spct[[col]])
@@ -102,49 +107,50 @@ cps_plot <- function(spct,
     if (is.numeric(norm)) {
       norm <- signif(norm, digits = 4)
     }
-    s.cps.label <-
-      bquote(Pixel~~response~~rate~~N( italic(lambda) )/N( .(norm))~~(.(multiplier.label)))
-    cps.label <- ""
+    s.counts.label <-
+      bquote(Coefficients~~k[italic(lambda)]/k( .(norm))~~(.(multiplier.label)))
+    counts.label <- ""
   } else {
-    s.cps.label <-
-      expression(Pixel~~response~~rate~~N(lambda)~~(counts~~s^{-1}))
-    cps.label <- ""
+    s.counts.label <-
+      expression(Coefficients~~k[italic(lambda)]~~(J~m^{-2}~nm^{-1}~n^{-1}))
+    counts.label <- ""
   }
 
-  if (num.cps.cols > 1L) {
+  if (num.mult.cols > 1L) {
     spct <- tidyr::gather(spct,
-                          .dots = cps.cols,
+                          .dots = mult.cols,
                           key = "scan",
-                          value = "cps")
-    setCpsSpct(spct, multiple.wl = length(cps.cols))
-    plot <- ggplot(spct, aes_(x = ~w.length, y = ~cps, linetype = ~scan))
-  } else {
-    plot <- ggplot(spct, aes_(x = ~w.length, y = ~cps))
-    temp <- find_idfactor(spct = spct,
-                          idfactor = idfactor,
-                          annotations = annotations)
-    plot <- plot + temp$ggplot_comp
-    annotations <- temp$annotations
+                          value = "irrad.mult")
+    setCalibrationSpct(spct, multiple.wl = length(mult.cols))
   }
 
   y.min <- ifelse(!is.na(ylim[1]),
                   ylim[1],
-                  min(c(spct[["cps"]], 0), na.rm = TRUE))
+                  min(spct[["irrad.mult"]], 0, na.rm = TRUE))
   y.max <- ifelse(!is.na(ylim[2]),
                   ylim[2],
-                  max(c(spct[["cps"]], 0), na.rm = TRUE))
+                  max(spct[["irrad.mult"]], 0, na.rm = TRUE))
+
+  plot <- ggplot(spct, aes_(x = ~w.length, y = ~irrad.mult))
+  temp <- find_idfactor(spct = spct,
+                        idfactor = idfactor,
+                        annotations = annotations)
+  plot <- plot + temp$ggplot_comp
+  annotations <- temp$annotations
 
   # We want data plotted on top of the boundary lines
   if ("boundaries" %in% annotations) {
-    if (y.min < (-0.01 * y.max)) {
-      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "red")
+    if (y.min < -0.01 * y.max) {
+      plot <- plot + geom_hline(yintercept = 0,
+                                linetype = "dashed", colour = "red")
     } else {
-      plot <- plot + geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
+      plot <- plot + geom_hline(yintercept = 0,
+                                linetype = "dashed", colour = "black")
     }
   }
 
   plot <- plot + geom_line(na.rm = na.rm)
-  plot <- plot + labs(x = "Wavelength (nm)", y = s.cps.label)
+  plot <- plot + labs(x = "Wavelength (nm)", y = s.counts.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -160,12 +166,14 @@ cps_plot <- function(spct,
                             annotations = annotations,
                             label.qty = label.qty,
                             span = span,
-                            summary.label = cps.label,
+                            summary.label = counts.label,
                             text.size = text.size,
                             na.rm = TRUE)
 
   if (!is.null(annotations) &&
-      length(intersect(c("boxes", "segments", "labels", "summaries", "colour.guide", "reserve.space"), annotations)) > 0L) {
+      length(intersect(c("boxes", "segments", "labels",
+                         "summaries", "colour.guide", "reserve.space"),
+                       annotations)) > 0L) {
     y.limits <- c(y.min, y.max * 1.25)
     x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
@@ -178,22 +186,23 @@ cps_plot <- function(spct,
 
 }
 
-#' Plot method for spectra expressed as detector counts per second.
+#' Create a complete ggplot for an irradiation calibration spectrum.
 #'
-#' This function returns a ggplot object with an annotated plot of a
-#' response_spct object.
+#' These methods return a ggplot object with an annotated plot of a
+#' calibration_spct object or of the spectra contained in a calibration_mspct
+#' object.
 #'
 #' @note Note that scales are expanded so as to make space for the annotations.
-#'   The object returned is a ggplot objects, and can be further manipulated.
+#' The object returned is a ggplot objects, and can be further manipulated.
 #'
-#' @param x a cps_spct object.
+#' @param object a calibration_spct object or a calibration_mspct object.
 #' @param ... in the case of collections of spectra, additional arguments passed
 #'   to the plot methods for individual spectra, otherwise currently ignored.
-##' @param w.band a single waveband object or a list of waveband objects.
-#' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm).
+#' @param w.band a single waveband object or a list of waveband objects.
+#' @param range an R object on which range() returns a vector of length 2,
+#' with min annd max wavelengths (nm).
 #' @param unit.out character IGNORED.
-#' @param pc.out logical, if TRUE use percents instead of fraction of one
+#' @param pc.out logical, if TRUE use percents instead of fraction of one.
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
@@ -203,14 +212,17 @@ cps_plot <- function(spct,
 #' @param time.format character Format as accepted by \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param norm numeric normalization wavelength (nm) or character string "max"
-#'   for normalization at the wavelength of highest peak.
+#' for normalization at the wavelength of highest peak.
 #' @param text.size numeric size of text in the plot decorations.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
 #'   the factor is retrieved from metadata or if no metadata found, the
-#'   default "spct.idx" is tried.
+#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
+#'   to the spectra and the user needs to use 'ggplot2' functions to manually
+#'   map an aesthetic or use facets for the spectra.
 #' @param ylim numeric y axis limits,
+#' @param object.label character The name of the object being plotted.
 #' @param na.rm logical.
 #'
 #' @return a \code{ggplot} object.
@@ -219,14 +231,14 @@ cps_plot <- function(spct,
 #'
 #' @keywords hplot
 #'
-#' @family plot functions
+#' @family autoplot methods
 #'
-plot.cps_spct <-
-  function(x, ...,
+autoplot.calibration_spct <-
+  function(object, ...,
            w.band = getOption("photobiology.plot.bands",
                               default = list(UVC(), UVB(), UVA(), PAR())),
            range = NULL,
-           unit.out = "cps",
+           unit.out = "counts",
            pc.out = FALSE,
            label.qty = "mean",
            span = NULL,
@@ -237,6 +249,7 @@ plot.cps_spct <-
            text.size = 2.5,
            idfactor = NULL,
            ylim = c(NA, NA),
+           object.label = deparse(substitute(object)),
            na.rm = TRUE) {
     annotations.default <-
       getOption("photobiology.plot.annotations",
@@ -245,7 +258,7 @@ plot.cps_spct <-
                                       annotations.default)
     if (length(w.band) == 0) {
       if (is.null(range)) {
-        w.band <- waveband(x)
+        w.band <- waveband(object)
       } else if (is.waveband(range)) {
         w.band <- range
       } else {
@@ -253,21 +266,47 @@ plot.cps_spct <-
       }
     }
 
-    cps_plot(spct = x, w.band = w.band, range = range,
+    cal_plot(spct = object,
+             w.band = w.band,
+             range = range,
              label.qty = label.qty,
              span = span,
              pc.out = pc.out,
-             annotations = annotations, norm = norm,
+             annotations = annotations,
+             norm = norm,
              text.size = text.size,
              idfactor = idfactor,
-             ylim = ylim,
              na.rm = na.rm,
+             ylim = ylim,
              ...) +
-      ggtitle_spct(x = x,
+      ggtitle_spct(object = object,
                    time.format = time.format,
                    tz = tz,
-                   x.name = deparse(substitute(x)),
+                   object.label = object.label,
                    annotations = annotations)
   }
 
+#' @rdname autoplot.calibration_spct
+#'
+#' @param plot.data character Data to plot. Default is "as.is" plotting
+#'   one line per spectrum. When passing "mean" or "median" as
+#'   argument all the spectra must contain data at the same wavelength values.
+#'
+#' @export
+#'
+autoplot.calibration_mspct <-
+  function(object, ..., range = NULL, plot.data = "as.is") {
+    # We trim the spectra to avoid unnecesary computaions later
+    if (!is.null(range)) {
+      object <- trim_wl(object, range = range, use.hinges = TRUE, fill = NULL)
+    }
+    # we convert the collection of spectra into a single spectrum object
+    # containing a summary spectrum or multiple spectra in long form.
+    z <- switch(plot.data,
+                mean = photobiology::s_mean(object),
+                median = photobiology::s_median(object),
+                as.is = photobiology::rbindspct(object)
+    )
+    autoplot(object = z, range = NULL, ...)
+  }
 

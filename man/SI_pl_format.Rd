@@ -27,6 +27,7 @@ The labels generated represent numbers rescaled to compensate for a change
 in unit's by a factor of ten or by a power of ten.
 }
 \examples{
+
 SI_pl_format()(1:10)
 SI_pl_format()(runif(10))
 SI_pl_format(exponent = 2)(runif(10))

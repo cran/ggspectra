@@ -22,6 +22,7 @@ using SI scale factors. Output can be selected as character, expression (R
 default devices) or LaTeX (for tikz device).
 }
 \examples{
+
 counts_label()
 counts_label("R.expression")
 counts_label("LaTeX")

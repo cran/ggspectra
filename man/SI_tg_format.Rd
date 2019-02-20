@@ -32,6 +32,7 @@ If the exponent passed has no SI prefix defined, the exponent will
 be adjusted to match one.
 }
 \examples{
+
 SI_tg_format()(1:10)
 SI_tg_format()(runif(10))
 SI_tg_format(exponent = 2)(runif(10))

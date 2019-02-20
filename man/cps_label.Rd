@@ -22,6 +22,7 @@ using SI scale factors. Output can be selected as character, expression (R
 default devices) or LaTeX (for tikz device).
 }
 \examples{
+
 cps_label()
 cps_label(3)
 cps_label(format = "R.expression")

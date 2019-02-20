@@ -26,11 +26,13 @@ using SI scale factors. Output can be selected as character, expression (R
 default devices) or LaTeX (for tikz device).
 }
 \examples{
+
 Rfr_specular_label()
-Rfr_specular_label(3)
+Rfr_specular_label(-3)
 Rfr_specular_label(format = "R.expression")
 Rfr_specular_label(format = "LaTeX")
-Rfr_specular_label(3, format = "LaTeX")
+Rfr_specular_label(-3, format = "LaTeX")
+
 
 Rfr_total_label()
 Rfr_total_label(-2)

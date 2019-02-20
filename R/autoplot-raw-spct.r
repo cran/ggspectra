@@ -1,3 +1,5 @@
+#' Create a complete ggplot for raw detector-counts spectra.
+#'
 #' Plot method for spectra expressed as raw detector counts.
 #'
 #' This function returns a ggplot object with an annotated plot of a
@@ -206,15 +208,15 @@ raw_plot <- function(spct,
 }
 
 
-#' Plot method for spectra expressed as raw detector counts.
+#' Create a complete ggplot for raw detector-counts spectra.
 #'
 #' This function returns a ggplot object with an annotated plot of a
-#' response_spct object.
+#' raw_spct object.
 #'
 #' @note Note that scales are expanded so as to make space for the annotations.
 #' The object returned is a ggplot objects, and can be further manipulated.
 #'
-#' @param x a raw_spct object.
+#' @param object a raw_spct object.
 #' @param ... in the case of collections of spectra, additional arguments passed
 #'   to the plot methods for individual spectra, otherwise currently ignored.
 #' @param w.band a single waveband object or a list of waveband objects.
@@ -239,6 +241,7 @@ raw_plot <- function(spct,
 #'   the factor is retrieved from metadata or if no metadata found, the
 #'   default "spct.idx" is tried.
 #' @param ylim numeric y axis limits,
+#' @param object.label character The name of the object being plotted.
 #' @param na.rm logical.
 #'
 #' @return a \code{ggplot} object.
@@ -247,10 +250,10 @@ raw_plot <- function(spct,
 #'
 #' @keywords hplot
 #'
-#' @family plot functions
+#' @family autoplot methods
 #'
-plot.raw_spct <-
-  function(x, ...,
+autoplot.raw_spct <-
+  function(object, ...,
            w.band = getOption("photobiology.plot.bands",
                               default = list(UVC(), UVB(), UVA(), PAR())),
            range = NULL,
@@ -265,6 +268,7 @@ plot.raw_spct <-
            text.size = 2.5,
            idfactor = NULL,
            ylim = c(NA, NA),
+           object.label = deparse(substitute(object)),
            na.rm = TRUE) {
     annotations.default <-
       getOption("photobiology.plot.annotations",
@@ -274,7 +278,7 @@ plot.raw_spct <-
                                       annotations.default)
     if (length(w.band) == 0) {
       if (is.null(range)) {
-        w.band <- waveband(x)
+        w.band <- waveband(object)
       } else if (is.waveband(range)) {
         w.band <- range
       } else {
@@ -282,7 +286,7 @@ plot.raw_spct <-
       }
     }
 
-    raw_plot(spct = x,
+    raw_plot(spct = object,
              w.band = w.band,
              range = range,
              label.qty = label.qty,
@@ -295,10 +299,10 @@ plot.raw_spct <-
              ylim = ylim,
              na.rm = na.rm,
              ...) +
-      ggtitle_spct(x = x,
+      ggtitle_spct(object = object,
                    time.format = time.format,
                    tz = tz,
-                   x.name = deparse(substitute(x)),
+                   object.label = object.label,
                    annotations = annotations)
   }
 

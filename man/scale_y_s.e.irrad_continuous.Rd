@@ -40,8 +40,6 @@ This function only alters two default arguments, please, see
 documentation for \code{\link[ggplot2]{scale_continuous}}
 }
 \examples{
-library(ggplot2)
-library(photobiology)
 
 ggplot(sun.spct) +
   geom_line() +
@@ -58,13 +56,14 @@ ggplot(sun.spct, unit.out = "photon") +
   scale_y_s.q.irrad_continuous() +
   scale_x_wl_continuous()
 
-ggplot(sun.spct) +
+ggplot(clip_wl(sun.spct, c(295, NA))) +
   geom_line() +
   scale_y_s.e.irrad_log10() +
   scale_x_wl_continuous()
 
-ggplot(sun.spct, unit.out = "photon") +
-  geom_line() +
+ggplot(clip_wl(sun.spct, c(295, NA)),
+  unit.out = "photon") +
+  geom_line(na.rm = TRUE) +
   scale_y_s.q.irrad_log10() +
   scale_x_wl_continuous()
 

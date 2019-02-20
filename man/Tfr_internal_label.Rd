@@ -26,11 +26,13 @@ using SI scale factors. Output can be selected as character, expression (R
 default devices) or LaTeX (for tikz device).
 }
 \examples{
+
 Tfr_internal_label()
-Tfr_internal_label(3)
+Tfr_internal_label(-3)
 Tfr_internal_label(format = "R.expression")
 Tfr_internal_label(format = "LaTeX")
-Tfr_internal_label(3, format = "LaTeX")
+Tfr_internal_label(-3, format = "LaTeX")
+
 
 Tfr_total_label()
 Tfr_total_label(-2)

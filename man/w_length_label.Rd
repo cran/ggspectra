@@ -30,6 +30,7 @@ using SI scale factors. Output can be selected as character, expression (R
 default devices) or LaTeX (for tikz device).
 }
 \examples{
+
 w_length_label()
 w_length_label("R.expression")
 w_length_label("LaTeX")

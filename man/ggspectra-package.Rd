@@ -6,11 +6,10 @@
 \alias{ggspectra-package}
 \title{ggspectra: Extensions to 'ggplot2' for Radiation Spectra}
 \description{
-Additional annotations, and stats for plotting "light"
-    spectra with 'ggplot2', together with specializations of ggplot()
-    and plot() methods for spectral data stored in objects of the classes
-    defined in package 'photobiology' and a plot() method for objects of
-    class "waveband", also defined in package 'photobiology'. Part of the 
+Additional annotations, stats, geoms and scales for plotting 
+    "light" spectra with 'ggplot2', together with specializations of ggplot()
+    and autoplot() methods for spectral data and waveband definitions
+    stored in objects of classes defined in package 'photobiology'. Part of the 
     'r4photobiology' suite, Aphalo P. J. (2015) <doi:10.19232/uv4pb.2015.1.14>.
 }
 \details{
@@ -54,8 +53,7 @@ writing this kind of extensions easy and is consequently not
 compatible with earlier versions of 'ggplot2'.
 }
 \examples{
-library(ggplot2)
-library(photobiology)
+
 library(photobiologyWavebands)
 
 ggplot(sun.spct) + geom_line() + stat_peaks(span = NULL)
@@ -77,7 +75,7 @@ plot(polyester.spct, UV_bands(), range = UV(),
 Aphalo, Pedro J. (2015) The r4photobiology suite. UV4Plants Bulletin, 2015:1,
 21-29. \url{https://doi.org/10.19232/uv4pb.2015.1.14}.
 
-\code{ggplot2} web site at \url{http://ggplot2.org/}\cr
+\code{ggplot2} web site at \url{https://ggplot2.tidyverse.org/}\cr
 \code{ggplot2} source code at \url{https://github.com/hadley/ggplot2}\cr
 Function \code{multiplot} from \url{http://www.cookbook-r.com/}
 }

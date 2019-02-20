@@ -4,14 +4,15 @@
 \alias{ggtitle_spct}
 \title{Add title to a spectral plot}
 \usage{
-ggtitle_spct(x, x.name = deparse(substitute(x)), annotations = "title",
-  time.format = "", tz = lubridate::tz(getWhenMeasured(x)),
+ggtitle_spct(object, object.label = deparse(substitute(object)),
+  annotations = "title", time.format = "",
+  tz = lubridate::tz(getWhenMeasured(object)),
   default.title = "title:objt")
 }
 \arguments{
-\item{x}{generic_spct The spectral object plotted.}
+\item{object}{generic_spct The spectral object plotted.}
 
-\item{x.name}{character The name of the object being plotted.}
+\item{object.label}{character The name of the object being plotted.}
 
 \item{annotations}{character vector Annotations as described for
 \code{plot()} methods, values unrelated to title are ignored.}
@@ -31,7 +32,7 @@ Add a title to a spectral plot based on metadata stored in an spectral
 object.
 }
 \details{
-\code{ggtitle_spct()} retrieves from object \code{x} metadata and
+\code{ggtitle_spct()} retrieves from object \code{object} metadata and
 passes it to \code{ggplot2::ggtitle()} as arguments for \code{title} and
 \code{subtitle}. The specification for the tittle is passed as argument
 to \code{annotations}, and consists in the keyword \code{title} with optional
@@ -40,8 +41,6 @@ modifiers selecting the kind of metatdata to use, separated by colons.
 are recognized as modifiers to "title".
 }
 \examples{
-library(ggplot2)
-library(photobiology)
 
 p <- ggplot(sun.spct) +
   geom_line()

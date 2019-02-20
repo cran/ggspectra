@@ -25,8 +25,6 @@ This function only alters two default arguments, please, see
 documentation for \code{\link[ggplot2]{scale_continuous}}
 }
 \examples{
-library(ggplot2)
-library(photobiology)
 
 ggplot(white_led.cps_spct) +
   geom_line() +

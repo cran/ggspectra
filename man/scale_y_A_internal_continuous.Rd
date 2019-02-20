@@ -30,8 +30,6 @@ This function only alters two default arguments, please, see
 documentation for \code{\link[ggplot2]{scale_continuous}}
 }
 \examples{
-library(ggplot2)
-library(photobiology)
 
 ggplot(yellow_gel.spct, plot.qty = "absorbance") +
   geom_line() +
