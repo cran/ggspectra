@@ -14,7 +14,7 @@ vignette: >
 
 ## Introduction
 
-Package `ggspectra` extends `ggplot2` with stats, geoms, scales and annotations suitable for light spectra. It also defines `ggplot()` and  `plot()` methods specialized for the classes defined in package `photobiology` for storing different types of spectral data. The `plot()` methods are described separately in vignette 'Plot Methods'.
+Package `ggspectra` extends `ggplot2` with stats, geoms, scales and annotations suitable for light spectra. It also defines `ggplot()` and  `autoplot()` methods specialized for the classes defined in package `photobiology` for storing different types of spectral data. The `autoplot()` methods are described separately in vignette 'Autoplot Methods'.
 
 The new elements can be freely combined with methods and functions defined in packages `ggplot2`, `scales`, `ggrepel` and `cowplot`.
 
@@ -89,9 +89,9 @@ In addition secondary axis definitions, `sec_axis_w_number()` and `sec_axis_w_fr
 
 Function `color_chart()` makes a color chart of rectangular tiles from a vector R color definitions. The chart returned is a `ggplot` object. Function `black_or_white()` accepts a vector of color definitions and returns a vector with colors `"white"` or `"black"` depending on the approximate luminosity of each color in the input. The main use is to automatically achieve suitable contrast between text plotted on top of a color background.
 
-### What is function `ggtitle_spct()` for?
+### What is function `autotitle()` for?
 
-Function `ggtitle_spct()` adds a title and/or subtitle to a plot. The difference with `ggtitle()` from package 'ggplot2' is that this function can automatically retrieve metadata from the plotted object and display it in the title. It used internally by all `plot()` methods defined in package 'ggspectra' and its use is described in _User Guide 2: Plot Methods_ together with plot annotations.
+Function `autotitle()` adds a title, subtitle and/or a caption to a plot. The difference with `ggtitle()` from package 'ggplot2' is that `autotitle()` automatically retrieves metadata from an spectral object based on _keys_. It is used internally by all `autoplot()` methods defined in package 'ggspectra' and allowed syntax and key values are described in _User Guide 2: Plot Methods_ together with plot annotations.
 
 ## Set up 
 
@@ -199,7 +199,7 @@ ggplot(polyester.spct) + geom_line()
 unset_user_defaults()
 ```
 
-The names of the additional parameters are consistent with those used in the `plot()` methods defined in this package.
+The names of the additional parameters are consistent with those used in the `autoplot()` methods defined in this package.
 
 ## ggplot() methods for collections fof spectra
 
@@ -484,16 +484,20 @@ ggplot(sun.spct) + geom_line() +
   scale_color_identity()
 ```
 
-To avoid overlap between labels we can use the repulsive geoms from package 'ggrepel'. In this case we need to use `stat_label_peaks()`. Repulsion allows the use of larger labels. We also need to expand the $y$ limits to make space for the labels.
+To avoid overlap between labels we can use the repulsive geoms from package 'ggrepel'. In this case we need to use `stat_label_peaks()`. Repulsion allows the use of larger labels. We also need to expand the $y$ limits to make space for the labels. Here we also demonstrate the arguments passed to the geom for a nice display.
 
 ```{r, eval=good_label_repel}
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(shape = 21, span = 25, size = 2) + 
   stat_label_peaks(geom = "label_repel", span = 41,
-                   size = 3.5, nudge_y = 0.075, segment.colour = "black") +
+                   segment.color = "black",
+                   size = 3, vjust = 1, nudge_y = 0.1,
+                   direction = "y") + 
   stat_valleys(shape = 21, span = 25, size = 2) + 
   stat_label_valleys(geom = "label_repel", span = 51, 
-                     size = 3.5, nudge_y = -0.075, segment.colour = "black") +
+                     segment.color = "black",
+                     size = 3, vjust = 0, nudge_y = -0.1,
+                     direction = "y") +
   scale_fill_identity() + scale_color_identity() +
   expand_limits(y = c(-0.08, 0.9))
 ```
@@ -516,14 +520,15 @@ ggplot(sun.spct) + geom_line() +
   stat_peaks(span = NULL, geom = "hline", linetype = "dotted", color = "red")
 ```
 
-By default the `label` aesthetic is mapped to a calculated label `..x.label..` giving the wavelength in nanometres. This mapping can be changed to give to a label giving the _y_-value at the peak.
+By default the `label` aesthetic is mapped to a calculated label `x.label` giving the wavelength in nanometres. This mapping can be changed to give to a label giving the _y_-value at the peak.
 
 ```{r, eval=good_label_repel}
 ggplot(sun.spct) + geom_line() + 
-  stat_label_peaks(span = 31, geom = "label_repel", 
-             label.fmt = "y = %1.2f", segment.colour = "red",
-             min.segment.length = unit(0.05, "lines"),
-             nudge_y = 0.1) +
+  stat_label_peaks(aes(label = stat(y.label)), 
+                   span = 31, geom = "label_repel", size = 3,
+                   label.fmt = "y = %1.2f", segment.colour = "red",
+                   min.segment.length = unit(0.05, "lines"),
+                   nudge_y = 0.1) +
   expand_limits(y = 1) +
   scale_fill_identity() + scale_color_identity()
 ```
@@ -534,7 +539,7 @@ As _aesthetics_ can use values computed on-the-fly we can even use `paste()` to 
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(span = NULL, color = "red") +
   stat_peaks(span = NULL, geom = "text", vjust = -0.5, color = "red", 
-             aes(label = paste(..y.label.., "at", ..x.label.. , "nm"))) +
+             aes(label = paste(stat(y.label), "at", stat(x.label), "nm"))) +
   expand_limits(y = c(NA, 0.9))
 ```
 
@@ -553,11 +558,11 @@ This final example shows a few additional tricks used in this case to mark and l
 
 ```{r}
 ggplot(two_suns.spct) + aes(color = spct.idx) +
-  geom_line() + ylim(NA, 1.8) +
+  geom_line() + ylim(NA, 0.9) +
   stat_peaks(span = NULL, color = "black") +
   stat_peaks(span = NULL, geom = "text", vjust = -0.5, size = 3, 
              color = "black", 
-             aes(label = paste(..y.label.., "at", ..x.label.. , "nm"))) +
+             aes(label = paste(stat(y.label), "at", stat(x.label), "nm"))) +
   facet_grid(spct.idx~.)
 ```
 
@@ -1009,19 +1014,21 @@ ggplot(data.frame(w.length = 100:400), aes(w.length)) +
   stat_wb_label(w.band = UV_bands("ISO"), ypos.fixed = 2, size = 3) +
   stat_wl_strip(w.band = UV_bands("CIE"), ymax = 4, ymin = 6, color = "white") +
   stat_wb_label(w.band = UV_bands("CIE"), ypos.fixed = 5, size = 3) +
-  stat_wl_strip(w.band = UV_bands("none"), ymax = 7, ymin = 9, color = "white") +
-  stat_wb_label(w.band = UV_bands("none"), ypos.fixed = 8, size = 3) +  
-  stat_wl_strip(w.band = UV_bands("medical"), ymax = 10, ymin = 12, color = "white") +
-  stat_wb_label(w.band = UV_bands("medical"), ypos.fixed = 11, size = 3) +
+  stat_wl_strip(w.band = UV_bands("plants"), ymax = 7, ymin = 9, color = "white") +
+  stat_wb_label(w.band = UV_bands("plants"), ypos.fixed = 8, size = 3) +  
+  stat_wl_strip(w.band = UV_bands("none"), ymax = 10, ymin = 12, color = "white") +
+  stat_wb_label(w.band = UV_bands("none"), ypos.fixed = 11, size = 3) +
+  stat_wl_strip(w.band = UV_bands("medical"), ymax = 13, ymin = 15, color = "white") +
+  stat_wb_label(w.band = UV_bands("medical"), ypos.fixed = 14, size = 3) +  
 
   scale_fill_identity() + 
   scale_color_identity() + 
-  scale_y_continuous(labels = c("ISO", "CIE", "none", "medical"), 
-                     breaks = c(2,5,8,11),
-                     limits = c(0, 13),
-                     name = "Standard",
+  scale_y_continuous(labels = c("ISO", "CIE", "plants", "none", "medical"), 
+                     breaks = c(2,5,8,11,14),
+                     limits = c(0, 16),
+                     name = "Definition",
                      sec.axis = dup_axis(labels = 
-                      c("use", "use", "avoid!", "avoid!"), name = "Recommendation")) +
+                      c("use", "use", "use?", "avoid!", "avoid!"), name = "Recommendation")) +
   scale_x_continuous(breaks = c(seq(from = 100, to = 400, by = 50), 280, 315),
                      limits = c(100, 400),
                      sec.axis = 

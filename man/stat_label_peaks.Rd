@@ -135,6 +135,13 @@ ggplot(sun.spct) + geom_line() +
 ggplot(sun.spct) + geom_line() +
   stat_label_valleys(hjust = "right", span = 21, angle = 90, color = "blue")
 
+ggplot(sun.spct) + geom_line() +
+  stat_peaks(span = 41, shape = 21, size = 3) +
+  stat_label_peaks(span = 41, geom = "label", label.fmt = "\%3.0f nm") +
+  scale_fill_identity() +
+  scale_color_identity() +
+  expand_limits(y = c(NA, 1))
+
 # using 'ggrepel' to avoid overlaps
 # too slow for CRAN checks
 \dontrun{
@@ -143,7 +150,7 @@ library(ggrepel)
 ggplot(sun.spct) + geom_line() +
   stat_peaks(span = 41, shape = 21, size = 3) +
   stat_label_peaks(span = 41, geom = "label_repel", segment.colour = "red",
-                   nudge_y = 0.12, label.fmt = "\%3.0f nm") +
+                   nudge_y = 0.12, label.fmt = "\%3.0f nm", vjust = 1) +
   scale_fill_identity() +
   scale_color_identity() +
   expand_limits(y = c(NA, 1))

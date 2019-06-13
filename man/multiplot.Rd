@@ -4,17 +4,33 @@
 \alias{multiplot}
 \title{Multiple plot function}
 \usage{
-multiplot(..., plotlist = NULL, cols = 1, layout = NULL)
+multiplot(..., plotlist = NULL, ncol = 1, cols = ncol,
+  layout = NULL, title = "", title.position = "left",
+  title.fontsize = 12, title.fontfamily = "sans",
+  title.fontface = "bold", title.colour = "black")
 }
 \arguments{
-\item{...}{one or more ggplot objects}
+\item{...}{one or more ggplot objects.}
 
-\item{plotlist}{list of ggplot objects}
+\item{plotlist}{list of ggplot objects.}
 
-\item{cols}{numerical   Number of columns in layout}
+\item{ncol, cols}{numerical Number of columns in layout.}
 
 \item{layout}{A numeric matrix specifying the layout. If present, 'cols' is
 ignored.}
+
+\item{title}{character vector Title of the composite plot.}
+
+\item{title.position}{numeric or character, the horizontal position of the
+title.}
+
+\item{title.fontsize}{numeric}
+
+\item{title.fontfamily}{character e.g. "sans", "serif", "mono".}
+
+\item{title.fontface}{character e.g. "plain", "bold", "italic", "bold.italic".}
+
+\item{title.colour}{character e.g. "black", "red".}
 }
 \description{
 Grid based; allows multiple plots arraged in a matrix and \code{print}ed to
@@ -33,9 +49,12 @@ Licenced under CC BY-SA
 }
 \examples{
 
-multiplot(plot(sun.spct), plot(yellow_gel.spct), cols = 1)
+multiplot(plot(sun.spct), plot(yellow_gel.spct), ncol = 1)
+multiplot(plot(sun.spct), plot(yellow_gel.spct), ncol = 1,
+          title = "The sun and a yellow filter")
 
 }
 \references{
-from http://www.cookbook-r.com/
+\url{http://www.cookbook-r.com/}
+  \url{http://www.guru-gis.net/multiplot-function-for-ggplot/}
 }

@@ -70,9 +70,13 @@ decoration <- function(w.band,
     z <- c(z, stat_label_peaks(aes_(color = ~..BW.color..),
                          span = span, label.fmt = "%.4g",
                          ignore_threshold = 0.02,
+                         geom = "label_repel",
                          segment.colour = "red",
                          min.segment.length = unit(0.02, "lines"),
-                         geom = "label_repel", size = text.size,
+                         size = text.size,
+                         box.padding = unit(0.02, "lines"),
+                         direction = "y",
+                         vjust = 1,
                          na.rm = na.rm),
            stat_peaks(color = "red",
                       span = span,
@@ -92,9 +96,13 @@ decoration <- function(w.band,
   if ("valley.labels" %in% annotations) {
     z <- c(z, stat_label_valleys(span = span, label.fmt = "%.4g",
                                  ignore_threshold = 0.02,
+                                 geom = "label_repel",
                                  segment.colour = "blue",
                                  min.segment.length = unit(0.02, "lines"),
-                                 geom = "label_repel", size = text.size,
+                                 size = text.size,
+                                 box.padding = unit(0.02, "lines"),
+                                 direction = "y",
+                                 vjust = 0,
                                  na.rm = na.rm),
            stat_valleys(color = "blue",
                         span = span,
@@ -215,37 +223,155 @@ decoration <- function(w.band,
 #' Allow users to add and subract from default annotations in addition
 #' to providing a given set of annotations.
 #'
-#' @param annotations,annotations.default character vector
+#' @param annotations,annotations.default character vector or a list of
+#'   character vectors.
 #'
 #' @keywords internal
 #'
 decode_annotations <- function(annotations,
                                annotations.default = "colour.guide") {
-  if ("color.guide" %in% annotations) {
-    annotations <- c(setdiff(annotations, "color.guide"), "colour.guide")
+  if (length(annotations) == 0L) { # handle character(0) and NULL without delay
+    return(annotations.default)
+  } else if (is.list(annotations)) {
+    annotations.ls <- annotations
+  } else if (is.character(annotations)) {
+    annotations.ls <- list(annotations)
   }
-  if ("color.guide" %in% annotations.default) {
-    annotations.default <- c(setdiff(annotations.default, "color.guide"), "colour.guide")
+  annotations <- NULL
+
+  for (annotations in annotations.ls) {
+    stopifnot(is.character(annotations))
+    if ("color.guide" %in% annotations) {
+      annotations <- c(setdiff(annotations, "color.guide"), "colour.guide")
+    }
+    if ("color.guide" %in% annotations.default) {
+      annotations.default <- c(setdiff(annotations.default, "color.guide"), "colour.guide")
+    }
+    if (length(annotations) == 0L) { # we can receive character(0) from preceeding iteration
+      z <- annotations.default
+    } else if ("" %in% annotations) {
+      # no annotations and do not not expand y scale
+      z <- ""
+    } else if ("reserve.space" %in% annotations) {
+      # no annotations but expand y scale to accomodate them
+      z <- "reserve.space"
+    } else if (annotations[1] == "-") {
+      # remove any member of a "family" of annotations if '*' wildcard is present
+      if (any(grepl("^title[*]$", annotations))) {
+        annotations.default <- annotations.default[!grepl("^title.*", annotations.default)]
+      }
+      if (any(grepl("^peaks[*]", annotations))) {
+        annotations.default <- annotations.default[!grepl("^peak.*", annotations.default)]
+      }
+      if (any(grepl("^valleys[*]$", annotations))) {
+        annotations.default <- annotations.default[!grepl("^valley.*", annotations.default)]
+      }
+      # remove exact matches
+      z <- setdiff(annotations.default, annotations[-1])
+    } else if (annotations[1] == "+") {
+      annotations <- annotations[-1]
+      # remove from default items to be replaced
+      if (any(grepl("^title.*", annotations))) {
+        annotations.default <- annotations.default[!grepl("^title.*", annotations.default)]
+      }
+      if (any(grepl("^peak.*", annotations))) {
+        annotations.default <- annotations.default[!grepl("^peak.*", annotations.default)]
+      }
+      if (any(grepl("^valley.*$", annotations))) {
+        annotations.default <- annotations.default[!grepl("^valley.*", annotations.default)]
+      }
+      if (any(grepl("^boxes$|^segments$", annotations))) {
+        annotations.default <- annotations.default[!grepl("^boxes$|^segments$", annotations.default)]
+      }
+      # merge default with addition
+      z <- union(annotations.default, annotations)
+    } else if (annotations[1] == "=") {
+      # replace
+      z <- annotations[-1]
+      # handle character(0), using "" is a kludge but produces intuitive behaviour
+      if (length(z) == 0L) {
+        z <- ""
+      }
+    } else {
+      z <- annotations
+    }
+    annotations.default <- z
   }
-  if (is.null(annotations)) {
-    z <- annotations.default
-  } else if (annotations[1] == "-") {
-    z <- setdiff(annotations.default, annotations[-1])
-  } else if (annotations[1] == "+") {
-    z <- union(annotations.default, annotations[-1])
-  } else if (annotations[1] == "=") {
-    z <- annotations[-1]
-  } else {
-    z <- annotations
+
+  unique(z) # remove duplicates for tidyness
+}
+
+# photobiology.plot.annotations -----------------------------------------------------
+
+#' @title Set defaults for autoplot annotations
+#'
+#' @description Set R options used when plotting spectra. Option
+#'   "photobiology.plot.annotations" is used as default argument to formal
+#'   parameter \code{annotations} and option "photobiology.plot.bands" is used
+#'   as default argument to formal parameter \code{w.band} in all the
+#'   \code{autoplot()} methods exported from package 'ggspectra'. These
+#'   convenience functions makes it easier to edit these two option which are
+#'   stored as a vector of characters strings and a list of waveband objects,
+#'   respectively.
+#'
+#' @details Vectors of character strings passed as argument to
+#'   \code{annotations} are parsed so that if the first member string is
+#'   \code{"+"}, the remaining members are added to the current default for
+#'   annotations; if it is \code{"-"} the remaining members are removed from the
+#'   current default for annotations; and if it is \code{"="} the remaining
+#'   members become the new default. If the first member is none of these three
+#'   strings, the whole vector becomes the new default. If \code{annotations} is
+#'   \code{NULL} the annotations are reset to the package defaults. When
+#'   removing annotations \code{"title*"}, \code{"peaks*"} and \code{"valleys*"}
+#'   will remove any variation of these annotations. The string \code{""} means
+#'   no annotations while \code{"reserve.space"} means no annotations but expand
+#'   y scale to reserve space for annotations. These two values take precedence
+#'   over any other values in the character vector. The order of the names of
+#'   annotations has no meaning: the vector is interpreted as a set except for
+#'   the three possible "operators" at position 1.
+#'
+#' @param annotations character vector Annotations to add or remove from
+#'   defaults used by the \code{autoplot()} methods defined in this package..
+#'
+#' @note The syntax used and behaviour are the same as for the
+#'   \code{annotations} parameter of the \code{autoplot()} methods for spectra,
+#'   but instead of affecting a single plot, \code{set_annotations_default()}
+#'   changes the default used for subsequent calls to \code{autoplot()}.
+#'
+#' @return Previous value of option "photobiology.plot.annotations" returned
+#'   invisibly.
+#'
+#' @family autoplot methods
+#'
+#' @export
+#'
+set_annotations_default <- function(annotations = NULL) {
+  if (!is.null(annotations)) {
+    annotations.default <-
+      getOption("photobiology.plot.annotations",
+                default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
+    annotations <- decode_annotations(annotations = annotations,
+                                      annotations.default = annotations.default)
   }
-  if ("boxes" %in% z && "segments" %in% z) {
-    z <- setdiff(z, "boxes")
+  options(photobiology.plot.annotations = annotations)
+}
+
+#' @rdname set_annotations_default
+#'
+#' @param w.band a single waveband object or a list of waveband objects.
+#'
+#' @export
+#'
+set_w.band_default <- function(w.band = NULL) {
+  if (!is.null(w.band)) {
+    # validation to avoid delayed errors
+    if (photobiology::is.waveband(w.band)) {
+      w.band <- list(w.band) # optimization: avoid repeating this step
+    }
+    if (!all(sapply(w.band, is.waveband))) {
+      warning("Bad 'w.band' argument, default not changed.")
+      return(getOption("photobiology.plot.bands"))
+    }
   }
-  if ("peaks" %in% z && "peak.labels" %in% z) {
-    z <- setdiff(z, "peaks")
-  }
-  if ("valleys" %in% z && "valley.labels" %in% z) {
-    z <- setdiff(z, "valleys")
-  }
-  z
+  options(photobiology.plot.bands = w.band)
 }

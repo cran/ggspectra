@@ -243,15 +243,19 @@ ggplot(sun.spct) + geom_line() +
   scale_color_identity()
 
 ## ---- eval=good_label_repel----------------------------------------------
-#  ggplot(sun.spct) + geom_line() +
-#    stat_peaks(shape = 21, span = 25, size = 2) +
-#    stat_label_peaks(geom = "label_repel", span = 41,
-#                     size = 3.5, nudge_y = 0.075, segment.colour = "black") +
-#    stat_valleys(shape = 21, span = 25, size = 2) +
-#    stat_label_valleys(geom = "label_repel", span = 51,
-#                       size = 3.5, nudge_y = -0.075, segment.colour = "black") +
-#    scale_fill_identity() + scale_color_identity() +
-#    expand_limits(y = c(-0.08, 0.9))
+ggplot(sun.spct) + geom_line() + 
+  stat_peaks(shape = 21, span = 25, size = 2) + 
+  stat_label_peaks(geom = "label_repel", span = 41,
+                   segment.color = "black",
+                   size = 3, vjust = 1, nudge_y = 0.1,
+                   direction = "y") + 
+  stat_valleys(shape = 21, span = 25, size = 2) + 
+  stat_label_valleys(geom = "label_repel", span = 51, 
+                     segment.color = "black",
+                     size = 3, vjust = 0, nudge_y = -0.1,
+                     direction = "y") +
+  scale_fill_identity() + scale_color_identity() +
+  expand_limits(y = c(-0.08, 0.9))
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
@@ -266,19 +270,20 @@ ggplot(sun.spct) + geom_line() +
   stat_peaks(span = NULL, geom = "hline", linetype = "dotted", color = "red")
 
 ## ---- eval=good_label_repel----------------------------------------------
-#  ggplot(sun.spct) + geom_line() +
-#    stat_label_peaks(span = 31, geom = "label_repel",
-#               label.fmt = "y = %1.2f", segment.colour = "red",
-#               min.segment.length = unit(0.05, "lines"),
-#               nudge_y = 0.1) +
-#    expand_limits(y = 1) +
-#    scale_fill_identity() + scale_color_identity()
+ggplot(sun.spct) + geom_line() + 
+  stat_label_peaks(aes(label = stat(y.label)), 
+                   span = 31, geom = "label_repel", size = 3,
+                   label.fmt = "y = %1.2f", segment.colour = "red",
+                   min.segment.length = unit(0.05, "lines"),
+                   nudge_y = 0.1) +
+  expand_limits(y = 1) +
+  scale_fill_identity() + scale_color_identity()
 
 ## ------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(span = NULL, color = "red") +
   stat_peaks(span = NULL, geom = "text", vjust = -0.5, color = "red", 
-             aes(label = paste(..y.label.., "at", ..x.label.. , "nm"))) +
+             aes(label = paste(stat(y.label), "at", stat(x.label), "nm"))) +
   expand_limits(y = c(NA, 0.9))
 
 ## ------------------------------------------------------------------------
@@ -292,11 +297,11 @@ ggplot(sun.spct) + geom_line() +
 
 ## ------------------------------------------------------------------------
 ggplot(two_suns.spct) + aes(color = spct.idx) +
-  geom_line() + ylim(NA, 1.8) +
+  geom_line() + ylim(NA, 0.9) +
   stat_peaks(span = NULL, color = "black") +
   stat_peaks(span = NULL, geom = "text", vjust = -0.5, size = 3, 
              color = "black", 
-             aes(label = paste(..y.label.., "at", ..x.label.. , "nm"))) +
+             aes(label = paste(stat(y.label), "at", stat(x.label), "nm"))) +
   facet_grid(spct.idx~.)
 
 ## ------------------------------------------------------------------------
@@ -626,19 +631,21 @@ ggplot(data.frame(w.length = 100:400), aes(w.length)) +
   stat_wb_label(w.band = UV_bands("ISO"), ypos.fixed = 2, size = 3) +
   stat_wl_strip(w.band = UV_bands("CIE"), ymax = 4, ymin = 6, color = "white") +
   stat_wb_label(w.band = UV_bands("CIE"), ypos.fixed = 5, size = 3) +
-  stat_wl_strip(w.band = UV_bands("none"), ymax = 7, ymin = 9, color = "white") +
-  stat_wb_label(w.band = UV_bands("none"), ypos.fixed = 8, size = 3) +  
-  stat_wl_strip(w.band = UV_bands("medical"), ymax = 10, ymin = 12, color = "white") +
-  stat_wb_label(w.band = UV_bands("medical"), ypos.fixed = 11, size = 3) +
+  stat_wl_strip(w.band = UV_bands("plants"), ymax = 7, ymin = 9, color = "white") +
+  stat_wb_label(w.band = UV_bands("plants"), ypos.fixed = 8, size = 3) +  
+  stat_wl_strip(w.band = UV_bands("none"), ymax = 10, ymin = 12, color = "white") +
+  stat_wb_label(w.band = UV_bands("none"), ypos.fixed = 11, size = 3) +
+  stat_wl_strip(w.band = UV_bands("medical"), ymax = 13, ymin = 15, color = "white") +
+  stat_wb_label(w.band = UV_bands("medical"), ypos.fixed = 14, size = 3) +  
 
   scale_fill_identity() + 
   scale_color_identity() + 
-  scale_y_continuous(labels = c("ISO", "CIE", "none", "medical"), 
-                     breaks = c(2,5,8,11),
-                     limits = c(0, 13),
-                     name = "Standard",
+  scale_y_continuous(labels = c("ISO", "CIE", "plants", "none", "medical"), 
+                     breaks = c(2,5,8,11,14),
+                     limits = c(0, 16),
+                     name = "Definition",
                      sec.axis = dup_axis(labels = 
-                      c("use", "use", "avoid!", "avoid!"), name = "Recommendation")) +
+                      c("use", "use", "use?", "avoid!", "avoid!"), name = "Recommendation")) +
   scale_x_continuous(breaks = c(seq(from = 100, to = 400, by = 50), 280, 315),
                      limits = c(100, 400),
                      sec.axis = 

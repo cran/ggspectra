@@ -60,6 +60,10 @@ generic_spect object with new \code{x} values plus other computed
 \description{
 \code{stat_wl_strip} computes color definitions according to human vision.
 }
+\note{
+This stat uses a panel function and ignores grouping as it is meant to
+  be used for annotations.
+}
 \section{Computed variables}{
 
 \describe{

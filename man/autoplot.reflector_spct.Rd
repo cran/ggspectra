@@ -94,7 +94,8 @@ Other autoplot methods: \code{\link{autoplot.calibration_spct}},
   \code{\link{autoplot.raw_spct}},
   \code{\link{autoplot.response_spct}},
   \code{\link{autoplot.source_spct}},
-  \code{\link{autoplot.waveband}}
+  \code{\link{autoplot.waveband}},
+  \code{\link{set_annotations_default}}
 }
 \concept{autoplot methods}
 \keyword{hplot}

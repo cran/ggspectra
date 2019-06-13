@@ -58,6 +58,10 @@ trimmed or discarded.
 suitable default aesthetics for "text" and "label"
 geoms displaying "boundaries" and "names" of wavebands.
 }
+\note{
+This stat uses a panel function and ignores grouping as it is meant to
+  be used for annotations.
+}
 \section{Computed variables}{
 
 \describe{

@@ -42,6 +42,10 @@ autoplot(sun.spct,
 
 ## ------------------------------------------------------------------------
 autoplot(sun.spct, 
+     annotations = c("+", "title:none:what:where"))
+
+## ------------------------------------------------------------------------
+autoplot(sun.spct, 
      annotations = c("+", "boundaries"))
 
 ## ------------------------------------------------------------------------
@@ -59,7 +63,7 @@ autoplot(sun.spct, annotations = c("-", "summaries", "peaks"))
 autoplot(sun.spct, annotations = c("+", "valleys"), span = 41)
 
 ## ---- eval=good_label_repel----------------------------------------------
-#  autoplot(sun.spct, annotations = c("+", "peak.labels", "valley.labels"), span = 71)
+autoplot(sun.spct, annotations = c("+", "peak.labels", "valley.labels"), span = 51)
 
 ## ------------------------------------------------------------------------
 autoplot(sun.spct, annotations = "")
@@ -120,9 +124,9 @@ autoplot(yellow_gel.spct, pc.out = TRUE, annotations = c("-", "peaks"))
 ## ------------------------------------------------------------------------
 autoplot(yellow_gel.spct, plot.qty = "absorbance", annotations = c("-", "peaks"))
 
-## ------------------------------------------------------------------------
-yellow_gel.spct$Rfr <- 1 - max(yellow_gel.spct$Tfr)
-autoplot(yellow_gel.spct, plot.qty = "absorptance", annotations = c("-", "peaks"))
+## ---- eval=FALSE, echo=FALSE---------------------------------------------
+#  yellow_gel.spct$Rfr <- 1 - max(yellow_gel.spct$Tfr)
+#  autoplot(yellow_gel.spct, plot.qty = "absorptance", annotations = c("-", "peaks"))
 
 ## ------------------------------------------------------------------------
 autoplot(sun.spct) + geom_spct(fill = color_of(sun.spct)) + 

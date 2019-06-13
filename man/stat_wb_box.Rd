@@ -58,8 +58,9 @@ slightly above the peak of the spectrum. Sets suitable default aesthetics for
 "rect" geom.
 }
 \note{
-The value returned as default value for \code{y} is based on the
-  y-range of spectral values for the whole data set.
+This stat uses a panel function and ignores grouping as it is meant to
+  be used for annotations.The value returned as default value for \code{y} is
+  based on the y-range of spectral values for the whole data set.
 }
 \section{Computed variables}{
 

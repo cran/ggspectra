@@ -7,7 +7,8 @@
 decode_annotations(annotations, annotations.default = "colour.guide")
 }
 \arguments{
-\item{annotations, annotations.default}{character vector}
+\item{annotations, annotations.default}{character vector or a list of
+character vectors.}
 }
 \description{
 Allow users to add and subract from default annotations in addition
