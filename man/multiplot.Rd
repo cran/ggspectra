@@ -4,10 +4,19 @@
 \alias{multiplot}
 \title{Multiple plot function}
 \usage{
-multiplot(..., plotlist = NULL, ncol = 1, cols = ncol,
-  layout = NULL, title = "", title.position = "left",
-  title.fontsize = 12, title.fontfamily = "sans",
-  title.fontface = "bold", title.colour = "black")
+multiplot(
+  ...,
+  plotlist = NULL,
+  ncol = 1,
+  cols = ncol,
+  layout = NULL,
+  title = "",
+  title.position = "left",
+  title.fontsize = 12,
+  title.fontfamily = "sans",
+  title.fontface = "bold",
+  title.colour = "black"
+)
 }
 \arguments{
 \item{...}{one or more ggplot objects.}
@@ -56,5 +65,4 @@ multiplot(plot(sun.spct), plot(yellow_gel.spct), ncol = 1,
 }
 \references{
 \url{http://www.cookbook-r.com/}
-  \url{http://www.guru-gis.net/multiplot-function-for-ggplot/}
 }

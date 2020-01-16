@@ -4,13 +4,26 @@
 \alias{autoplot.cps_spct}
 \title{Create a complete ggplot for detector-counts per second spectra.}
 \usage{
-\method{autoplot}{cps_spct}(object, ...,
-  w.band = getOption("photobiology.plot.bands", default = list(UVC(),
-  UVB(), UVA(), PAR())), range = NULL, unit.out = "cps",
-  pc.out = FALSE, label.qty = "mean", span = NULL,
-  annotations = NULL, time.format = "", tz = "UTC", norm = NULL,
-  text.size = 2.5, idfactor = NULL, ylim = c(NA, NA),
-  object.label = deparse(substitute(object)), na.rm = TRUE)
+\method{autoplot}{cps_spct}(
+  object,
+  ...,
+  w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(),
+    PAR())),
+  range = NULL,
+  unit.out = "cps",
+  pc.out = FALSE,
+  label.qty = "mean",
+  span = NULL,
+  annotations = NULL,
+  time.format = "",
+  tz = "UTC",
+  norm = NULL,
+  text.size = 2.5,
+  idfactor = NULL,
+  ylim = c(NA, NA),
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
+)
 }
 \arguments{
 \item{object}{a cps_spct object.}
@@ -69,14 +82,15 @@ Note that scales are expanded so as to make space for the annotations.
   The object returned is a ggplot objects, and can be further manipulated.
 }
 \seealso{
-Other autoplot methods: \code{\link{autoplot.calibration_spct}},
-  \code{\link{autoplot.filter_spct}},
-  \code{\link{autoplot.object_spct}},
-  \code{\link{autoplot.raw_spct}},
-  \code{\link{autoplot.reflector_spct}},
-  \code{\link{autoplot.response_spct}},
-  \code{\link{autoplot.source_spct}},
-  \code{\link{autoplot.waveband}},
-  \code{\link{set_annotations_default}}
+Other autoplot methods: 
+\code{\link{autoplot.calibration_spct}()},
+\code{\link{autoplot.filter_spct}()},
+\code{\link{autoplot.object_spct}()},
+\code{\link{autoplot.raw_spct}()},
+\code{\link{autoplot.reflector_spct}()},
+\code{\link{autoplot.response_spct}()},
+\code{\link{autoplot.source_spct}()},
+\code{\link{autoplot.waveband}()},
+\code{\link{set_annotations_default}()}
 }
 \concept{autoplot methods}

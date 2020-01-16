@@ -13,36 +13,58 @@
 \alias{ggplot.generic_mspct}
 \title{Create a new ggplot plot from spectral data.}
 \usage{
-\method{ggplot}{source_spct}(data, mapping = NULL, ..., range = NULL,
-  unit.out = getOption("photobiology.radiation.unit", default =
-  "energy"), environment = parent.frame())
+\method{ggplot}{source_spct}(
+  data,
+  mapping = NULL,
+  ...,
+  range = NULL,
+  unit.out = getOption("photobiology.radiation.unit", default = "energy"),
+  environment = parent.frame()
+)
 
-\method{ggplot}{response_spct}(data, mapping = NULL, ..., range = NULL,
-  unit.out = getOption("photobiology.radiation.unit", default =
-  "energy"), environment = parent.frame())
+\method{ggplot}{response_spct}(
+  data,
+  mapping = NULL,
+  ...,
+  range = NULL,
+  unit.out = getOption("photobiology.radiation.unit", default = "energy"),
+  environment = parent.frame()
+)
 
-\method{ggplot}{filter_spct}(data, mapping = NULL, ..., range = NULL,
-  plot.qty = getOption("photobiology.filter.qty", default =
-  "transmittance"), environment = parent.frame())
+\method{ggplot}{filter_spct}(
+  data,
+  mapping = NULL,
+  ...,
+  range = NULL,
+  plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
+  environment = parent.frame()
+)
 
-\method{ggplot}{reflector_spct}(data, mapping = NULL, ...,
-  range = NULL, plot.qty = NULL, environment = parent.frame())
+\method{ggplot}{reflector_spct}(
+  data,
+  mapping = NULL,
+  ...,
+  range = NULL,
+  plot.qty = NULL,
+  environment = parent.frame()
+)
 
-\method{ggplot}{cps_spct}(data, mapping = NULL, ..., range = NULL,
-  environment = parent.frame())
+\method{ggplot}{cps_spct}(data, mapping = NULL, ..., range = NULL, environment = parent.frame())
 
-\method{ggplot}{calibration_spct}(data, mapping = NULL, ...,
-  range = NULL, environment = parent.frame())
+\method{ggplot}{calibration_spct}(data, mapping = NULL, ..., range = NULL, environment = parent.frame())
 
-\method{ggplot}{raw_spct}(data, mapping = NULL, ..., range = NULL,
-  environment = parent.frame())
+\method{ggplot}{raw_spct}(data, mapping = NULL, ..., range = NULL, environment = parent.frame())
 
-\method{ggplot}{object_spct}(data, mapping = NULL, ..., range = NULL,
+\method{ggplot}{object_spct}(
+  data,
+  mapping = NULL,
+  ...,
+  range = NULL,
   plot.qty = getOption("photobiology.object.qty", default = "all"),
-  environment = parent.frame())
+  environment = parent.frame()
+)
 
-\method{ggplot}{generic_mspct}(data, mapping = NULL, ..., range = NULL,
-  environment = parent.frame())
+\method{ggplot}{generic_mspct}(data, mapping = NULL, ..., range = NULL, environment = parent.frame())
 }
 \arguments{
 \item{data}{Default spectrum dataset to use for plot. If not a spectrum, the

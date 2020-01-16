@@ -4,8 +4,20 @@
 \alias{Afr_plot}
 \title{Create a complete ggplot for a filter spectrum.}
 \usage{
-Afr_plot(spct, w.band, range, pc.out, label.qty, span, annotations,
-  text.size, idfactor, ylim, na.rm, ...)
+Afr_plot(
+  spct,
+  w.band,
+  range,
+  pc.out,
+  label.qty,
+  span,
+  annotations,
+  text.size,
+  idfactor,
+  ylim,
+  na.rm,
+  ...
+)
 }
 \arguments{
 \item{spct}{a filter_spct object.}

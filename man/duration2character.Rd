@@ -11,8 +11,6 @@ duration2character(time.unit)
 }
 \arguments{
 \item{time.unit}{lubridate::duration object or character}
-
-\item{time.unit}{lubridate::duration object or character}
 }
 \description{
 Convert lubridate duration objects to a string if possible

@@ -5,11 +5,15 @@
 \alias{Rfr_total_label}
 \title{Reflectance axis labels}
 \usage{
-Rfr_specular_label(unit.exponent = 0,
-  format = getOption("photobiology.math", default = "R.expression"))
+Rfr_specular_label(
+  unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 
-Rfr_total_label(unit.exponent = 0,
-  format = getOption("photobiology.math", default = "R.expression"))
+Rfr_total_label(
+  unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

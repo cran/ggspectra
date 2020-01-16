@@ -4,8 +4,21 @@
 \alias{raw_plot}
 \title{Create a complete ggplot for raw detector-counts spectra.}
 \usage{
-raw_plot(spct, w.band, range, pc.out, label.qty, span, annotations, norm,
-  text.size, idfactor, ylim, na.rm, ...)
+raw_plot(
+  spct,
+  w.band,
+  range,
+  pc.out,
+  label.qty,
+  span,
+  annotations,
+  norm,
+  text.size,
+  idfactor,
+  ylim,
+  na.rm,
+  ...
+)
 }
 \arguments{
 \item{spct}{a raw_spct object.}

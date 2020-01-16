@@ -4,9 +4,16 @@
 \alias{geom_spct}
 \title{Spectral data plots.}
 \usage{
-geom_spct(mapping = NULL, data = NULL, stat = "identity",
-  position = "identity", na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE, ...)
+geom_spct(
+  mapping = NULL,
+  data = NULL,
+  stat = "identity",
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -45,7 +52,7 @@ the range is fixed to 0, but stacking is not enabled.
 }
 \details{
 An spectrum plot is the analog of a line plot (see \code{\link[ggplot2]{geom_path}}),
-and can be used to show y varies over the range of x. The difference is that
+and can be used to show how y varies over the range of x. The difference is that
 the area under the line is filled.
 }
 \section{Aesthetics}{

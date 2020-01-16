@@ -4,10 +4,19 @@
 \alias{stat_wl_summary}
 \title{Average area under curve for regions.}
 \usage{
-stat_wl_summary(mapping = NULL, data = NULL, geom = "text",
-  range = NULL, integral.fun = integrate_xy, label.fmt = "\%.3g",
-  position = "identity", na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE, ...)
+stat_wl_summary(
+  mapping = NULL,
+  data = NULL,
+  geom = "text",
+  range = NULL,
+  integral.fun = integrate_xy,
+  label.fmt = "\%.3g",
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -99,16 +108,22 @@ ggplot(sun.spct) + geom_line() +
 
 }
 \seealso{
-Other stats functions: \code{\link{stat_color}},
-  \code{\link{stat_find_qtys}},
-  \code{\link{stat_find_wls}},
-  \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
-  \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
-  \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_hbar}}, \code{\link{stat_wb_irrad}},
-  \code{\link{stat_wb_label}}, \code{\link{stat_wb_mean}},
-  \code{\link{stat_wb_relative}},
-  \code{\link{stat_wb_sirrad}},
-  \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}}
+Other stats functions: 
+\code{\link{stat_color}()},
+\code{\link{stat_find_qtys}()},
+\code{\link{stat_find_wls}()},
+\code{\link{stat_label_peaks}()},
+\code{\link{stat_peaks}()},
+\code{\link{stat_wb_box}()},
+\code{\link{stat_wb_column}()},
+\code{\link{stat_wb_contribution}()},
+\code{\link{stat_wb_hbar}()},
+\code{\link{stat_wb_irrad}()},
+\code{\link{stat_wb_label}()},
+\code{\link{stat_wb_mean}()},
+\code{\link{stat_wb_relative}()},
+\code{\link{stat_wb_sirrad}()},
+\code{\link{stat_wb_total}()},
+\code{\link{stat_wl_strip}()}
 }
 \concept{stats functions}

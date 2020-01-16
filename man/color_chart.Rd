@@ -4,9 +4,14 @@
 \alias{color_chart}
 \title{Create a color checker chart}
 \usage{
-color_chart(colors = grDevices::colors(), ncol = NULL,
-  use.names = NULL, text.size = 2, text.color = NULL,
-  grid.color = "white")
+color_chart(
+  colors = grDevices::colors(),
+  ncol = NULL,
+  use.names = NULL,
+  text.size = 2,
+  text.color = NULL,
+  grid.color = "white"
+)
 }
 \arguments{
 \item{colors}{character A vector of color definitions.}

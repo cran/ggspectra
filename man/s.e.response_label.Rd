@@ -5,11 +5,15 @@
 \alias{s.q.response_label}
 \title{spectral response axis labels}
 \usage{
-s.e.response_label(unit.exponent = 0,
-  format = getOption("photobiology.math", default = "R.expression"))
+s.e.response_label(
+  unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 
-s.q.response_label(unit.exponent = -6,
-  format = getOption("photobiology.math", default = "R.expression"))
+s.q.response_label(
+  unit.exponent = -6,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

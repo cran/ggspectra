@@ -10,8 +10,10 @@
 \alias{nearest_SI_exponent}
 \title{SI unit prefixes}
 \usage{
-exponent2prefix(exponent,
-  char.set = getOption("photobiology.fancy.chars", default = "utf8"))
+exponent2prefix(
+  exponent,
+  char.set = getOption("photobiology.fancy.chars", default = "utf8")
+)
 
 exponent2factor(exponent = 0, if.zero.exponent = "1")
 
@@ -19,8 +21,10 @@ exponent2prefix_name(exponent)
 
 prefix_name2exponent(name)
 
-prefix2exponent(prefix, char.set = getOption("photobiology.fancy.chars",
-  default = "utf8"))
+prefix2exponent(
+  prefix,
+  char.set = getOption("photobiology.fancy.chars", default = "utf8")
+)
 
 has_SI_prefix(exponent)
 

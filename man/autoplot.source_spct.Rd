@@ -5,17 +5,26 @@
 \alias{autoplot.source_mspct}
 \title{Create a complete ggplot for a light-source spectrum.}
 \usage{
-\method{autoplot}{source_spct}(object, ...,
-  w.band = getOption("photobiology.plot.bands", default = list(UVC(),
-  UVB(), UVA(), PAR())), range = NULL,
-  unit.out = getOption("photobiology.radiation.unit", default =
-  "energy"), label.qty = NULL, span = NULL, annotations = NULL,
-  time.format = "", tz = "UTC", text.size = 2.5, idfactor = NULL,
-  ylim = c(NA, NA), object.label = deparse(substitute(object)),
-  na.rm = TRUE)
+\method{autoplot}{source_spct}(
+  object,
+  ...,
+  w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(),
+    PAR())),
+  range = NULL,
+  unit.out = getOption("photobiology.radiation.unit", default = "energy"),
+  label.qty = NULL,
+  span = NULL,
+  annotations = NULL,
+  time.format = "",
+  tz = "UTC",
+  text.size = 2.5,
+  idfactor = NULL,
+  ylim = c(NA, NA),
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
+)
 
-\method{autoplot}{source_mspct}(object, ..., range = NULL,
-  plot.data = "as.is")
+\method{autoplot}{source_mspct}(object, ..., range = NULL, plot.data = "as.is")
 }
 \arguments{
 \item{object}{a source_spct or a source_mspct object.}
@@ -82,15 +91,16 @@ autoplot(sun.spct, unit.out = "photon")
 
 }
 \seealso{
-Other autoplot methods: \code{\link{autoplot.calibration_spct}},
-  \code{\link{autoplot.cps_spct}},
-  \code{\link{autoplot.filter_spct}},
-  \code{\link{autoplot.object_spct}},
-  \code{\link{autoplot.raw_spct}},
-  \code{\link{autoplot.reflector_spct}},
-  \code{\link{autoplot.response_spct}},
-  \code{\link{autoplot.waveband}},
-  \code{\link{set_annotations_default}}
+Other autoplot methods: 
+\code{\link{autoplot.calibration_spct}()},
+\code{\link{autoplot.cps_spct}()},
+\code{\link{autoplot.filter_spct}()},
+\code{\link{autoplot.object_spct}()},
+\code{\link{autoplot.raw_spct}()},
+\code{\link{autoplot.reflector_spct}()},
+\code{\link{autoplot.response_spct}()},
+\code{\link{autoplot.waveband}()},
+\code{\link{set_annotations_default}()}
 }
 \concept{autoplot methods}
 \keyword{hplot}

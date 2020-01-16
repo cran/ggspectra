@@ -4,8 +4,10 @@
 \alias{counts_label}
 \title{Raw-counts axis labels}
 \usage{
-counts_label(unit.exponent = 3, format = getOption("photobiology.math",
-  default = "R.expression"))
+counts_label(
+  unit.exponent = 3,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

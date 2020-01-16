@@ -6,14 +6,20 @@
 \alias{w_frequency_label}
 \title{Wave- axis labels}
 \usage{
-w_length_label(unit.exponent = -9,
-  format = getOption("photobiology.math", default = "R.expression"))
+w_length_label(
+  unit.exponent = -9,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 
-w_number_label(unit.exponent = 0,
-  format = getOption("photobiology.math", default = "R.expression"))
+w_number_label(
+  unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 
-w_frequency_label(unit.exponent = 9,
-  format = getOption("photobiology.math", default = "R.expression"))
+w_frequency_label(
+  unit.exponent = 9,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

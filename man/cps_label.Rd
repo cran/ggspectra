@@ -4,8 +4,10 @@
 \alias{cps_label}
 \title{Counts-per-second axis labels}
 \usage{
-cps_label(unit.exponent = 0, format = getOption("photobiology.math",
-  default = "R.expression"))
+cps_label(
+  unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

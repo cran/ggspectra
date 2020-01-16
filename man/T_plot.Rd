@@ -4,8 +4,20 @@
 \alias{T_plot}
 \title{Create a complete ggplot for a filter spectrum.}
 \usage{
-T_plot(spct, w.band, range, pc.out, label.qty, span, annotations,
-  text.size, idfactor, na.rm, ylim, ...)
+T_plot(
+  spct,
+  w.band,
+  range,
+  pc.out,
+  label.qty,
+  span,
+  annotations,
+  text.size,
+  idfactor,
+  na.rm,
+  ylim,
+  ...
+)
 }
 \arguments{
 \item{spct}{a filter_spct object}

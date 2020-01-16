@@ -4,8 +4,21 @@
 \alias{cal_plot}
 \title{Create a complete ggplot for an irradiation calibration spectrum.}
 \usage{
-cal_plot(spct, w.band, range, pc.out, label.qty, span, annotations, norm,
-  text.size, idfactor, ylim, na.rm, ...)
+cal_plot(
+  spct,
+  w.band,
+  range,
+  pc.out,
+  label.qty,
+  span,
+  annotations,
+  norm,
+  text.size,
+  idfactor,
+  ylim,
+  na.rm,
+  ...
+)
 }
 \arguments{
 \item{spct}{a calibration_spct object}

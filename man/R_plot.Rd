@@ -4,8 +4,20 @@
 \alias{R_plot}
 \title{Create a complete ggplot for a reflector spectrum.}
 \usage{
-R_plot(spct, w.band, range, pc.out, label.qty, span, annotations,
-  text.size, idfactor, ylim, na.rm, ...)
+R_plot(
+  spct,
+  w.band,
+  range,
+  pc.out,
+  label.qty,
+  span,
+  annotations,
+  text.size,
+  idfactor,
+  ylim,
+  na.rm,
+  ...
+)
 }
 \arguments{
 \item{spct}{a filter_spct object}

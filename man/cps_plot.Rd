@@ -4,8 +4,21 @@
 \alias{cps_plot}
 \title{Create a complete ggplot for detector-counts per second spectra.}
 \usage{
-cps_plot(spct, w.band, range, pc.out, label.qty, span, annotations, norm,
-  text.size, idfactor, ylim, na.rm, ...)
+cps_plot(
+  spct,
+  w.band,
+  range,
+  pc.out,
+  label.qty,
+  span,
+  annotations,
+  norm,
+  text.size,
+  idfactor,
+  ylim,
+  na.rm,
+  ...
+)
 }
 \arguments{
 \item{spct}{a cps_spct object}

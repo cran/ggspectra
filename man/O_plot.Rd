@@ -4,8 +4,20 @@
 \alias{O_plot}
 \title{Create a complete ggplot for a object spectrum.}
 \usage{
-O_plot(spct, w.band, range, pc.out, label.qty, span, annotations, stacked,
-  text.size, na.rm, ylim, ...)
+O_plot(
+  spct,
+  w.band,
+  range,
+  pc.out,
+  label.qty,
+  span,
+  annotations,
+  stacked,
+  text.size,
+  na.rm,
+  ylim,
+  ...
+)
 }
 \arguments{
 \item{spct}{an object_spct object.}

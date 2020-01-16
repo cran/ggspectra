@@ -6,23 +6,62 @@
 \alias{stat_wb_q_irrad}
 \title{Integrate irradiance for wavebands.}
 \usage{
-stat_wb_irrad(mapping = NULL, data = NULL, geom = "text",
-  w.band = NULL, time.unit, unit.in, label.qty = "total",
-  label.mult = 1, label.fmt = "\%.3g", ypos.mult = 1.07,
-  ypos.fixed = NULL, position = "identity", na.rm = FALSE,
-  show.legend = NA, inherit.aes = TRUE, ...)
+stat_wb_irrad(
+  mapping = NULL,
+  data = NULL,
+  geom = "text",
+  w.band = NULL,
+  time.unit,
+  unit.in,
+  label.qty = "total",
+  label.mult = 1,
+  label.fmt = "\%.3g",
+  ypos.mult = 1.07,
+  ypos.fixed = NULL,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
 
-stat_wb_e_irrad(mapping = NULL, data = NULL, geom = "text",
-  w.band = NULL, time.unit = "second", unit.in = "energy",
-  label.qty = "total", label.mult = 1, label.fmt = "\%.3g",
-  ypos.mult = 1.07, ypos.fixed = NULL, position = "identity",
-  na.rm = FALSE, show.legend = NA, inherit.aes = TRUE, ...)
+stat_wb_e_irrad(
+  mapping = NULL,
+  data = NULL,
+  geom = "text",
+  w.band = NULL,
+  time.unit = "second",
+  unit.in = "energy",
+  label.qty = "total",
+  label.mult = 1,
+  label.fmt = "\%.3g",
+  ypos.mult = 1.07,
+  ypos.fixed = NULL,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
 
-stat_wb_q_irrad(mapping = NULL, data = NULL, geom = "text",
-  w.band = NULL, time.unit = "second", unit.in = "photon",
-  label.qty = "total", label.mult = 1, label.fmt = "\%.3g",
-  ypos.mult = 1.07, ypos.fixed = NULL, position = "identity",
-  na.rm = FALSE, show.legend = NA, inherit.aes = TRUE, ...)
+stat_wb_q_irrad(
+  mapping = NULL,
+  data = NULL,
+  geom = "text",
+  w.band = NULL,
+  time.unit = "second",
+  unit.in = "photon",
+  label.qty = "total",
+  label.mult = 1,
+  label.fmt = "\%.3g",
+  ypos.mult = 1.07,
+  ypos.fixed = NULL,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -151,17 +190,22 @@ ggplot(sun.spct) +
 
 }
 \seealso{
-Other stats functions: \code{\link{stat_color}},
-  \code{\link{stat_find_qtys}},
-  \code{\link{stat_find_wls}},
-  \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
-  \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
-  \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_hbar}}, \code{\link{stat_wb_label}},
-  \code{\link{stat_wb_mean}},
-  \code{\link{stat_wb_relative}},
-  \code{\link{stat_wb_sirrad}},
-  \code{\link{stat_wb_total}}, \code{\link{stat_wl_strip}},
-  \code{\link{stat_wl_summary}}
+Other stats functions: 
+\code{\link{stat_color}()},
+\code{\link{stat_find_qtys}()},
+\code{\link{stat_find_wls}()},
+\code{\link{stat_label_peaks}()},
+\code{\link{stat_peaks}()},
+\code{\link{stat_wb_box}()},
+\code{\link{stat_wb_column}()},
+\code{\link{stat_wb_contribution}()},
+\code{\link{stat_wb_hbar}()},
+\code{\link{stat_wb_label}()},
+\code{\link{stat_wb_mean}()},
+\code{\link{stat_wb_relative}()},
+\code{\link{stat_wb_sirrad}()},
+\code{\link{stat_wb_total}()},
+\code{\link{stat_wl_strip}()},
+\code{\link{stat_wl_summary}()}
 }
 \concept{stats functions}

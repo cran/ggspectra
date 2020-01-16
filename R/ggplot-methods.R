@@ -83,19 +83,24 @@ ggplot.source_spct <-
       data <- trim_wl(data, range = range, use.hinges = TRUE, fill = NULL)
     }
     if (is.null(mapping)) {
-    if (unit.out == "energy") {
-      data <- q2e(data)
-      mapping <- aes_(~w.length, ~s.e.irrad)
-    } else if (unit.out %in% c("photon", "quantum")) {
-      data <- e2q(data)
-      mapping <- aes_(~w.length, ~s.q.irrad)
-    } else {
-      stop("Invalid 'unit.out' argument value: '", unit.out, "'")
+      if (unit.out == "energy") {
+        data <- q2e(data)
+        mapping <- aes_(~w.length, ~s.e.irrad)
+      } else if (unit.out %in% c("photon", "quantum")) {
+        data <- e2q(data)
+        mapping <- aes_(~w.length, ~s.q.irrad)
+      } else {
+        stop("Invalid 'unit.out' argument value: '", unit.out, "'")
+      }
     }
-  }
-  rmDerivedSpct(data)
-  ggplot(data = data, mapping = mapping, ...,
-                    environment = environment)
+    # roundabout way of retaining the derived classes without calling any
+    # private (not exported) method or function from 'ggplot2'
+    data.class <- class(data)
+    rmDerivedSpct(data)
+    p <- ggplot2::ggplot(data = data, mapping = mapping, ...,
+                         environment = environment)
+    class(p[["data"]]) <- data.class
+    p
   }
 
 #' @rdname ggplot
@@ -120,9 +125,14 @@ ggplot.response_spct <-
         stop("Invalid 'unit.out' argument value: '", unit.out, "'")
       }
     }
+    # roundabout way of retaining the derived classes without calling any
+    # private (not exported) method or function from 'ggplot2'
+    data.class <- class(data)
     rmDerivedSpct(data)
-    ggplot(data = data, mapping = mapping, ...,
-           environment = environment)
+    p <- ggplot2::ggplot(data = data, mapping = mapping, ...,
+                         environment = environment)
+    class(p[["data"]]) <- data.class
+    p
   }
 
 #' @rdname ggplot
@@ -142,22 +152,27 @@ ggplot.filter_spct <-
       data <- trim_wl(data, range = range, use.hinges = TRUE, fill = NULL)
     }
     if (is.null(mapping)) {
-    if (plot.qty == "transmittance") {
-      data <- A2T(data)
-      mapping <- aes_(~w.length, ~Tfr)
-    } else if (plot.qty == "absorptance") {
-      data <- T2Afr(data)
-      mapping <- aes_(~w.length, ~Afr)
-    } else if (plot.qty == "absorbance") {
-      data <- T2A(data)
-      mapping <- aes_(~w.length, ~A)
-    } else {
-      stop("Invalid 'plot.qty' argument value: '", plot.qty, "'")
+      if (plot.qty == "transmittance") {
+        data <- A2T(data)
+        mapping <- aes_(~w.length, ~Tfr)
+      } else if (plot.qty == "absorptance") {
+        data <- T2Afr(data)
+        mapping <- aes_(~w.length, ~Afr)
+      } else if (plot.qty == "absorbance") {
+        data <- T2A(data)
+        mapping <- aes_(~w.length, ~A)
+      } else {
+        stop("Invalid 'plot.qty' argument value: '", plot.qty, "'")
+      }
     }
-  }
-  rmDerivedSpct(data)
-  ggplot(data = data, mapping = mapping, ...,
-         environment = environment)
+    # roundabout way of retaining the derived classes without calling any
+    # private (not exported) method or function from 'ggplot2'
+    data.class <- class(data)
+    rmDerivedSpct(data)
+    p <- ggplot2::ggplot(data = data, mapping = mapping, ...,
+                         environment = environment)
+    class(p[["data"]]) <- data.class
+    p
   }
 
 #' @rdname ggplot
@@ -176,9 +191,14 @@ ggplot.reflector_spct <-
     if (is.null(mapping)) {
       mapping <- aes_(~w.length, ~Rfr)
     }
+    # roundabout way of retaining the derived classes without calling any
+    # private (not exported) method or function from 'ggplot2'
+    data.class <- class(data)
     rmDerivedSpct(data)
-    ggplot(data = data, mapping = mapping, ...,
-           environment = environment)
+    p <- ggplot2::ggplot(data = data, mapping = mapping, ...,
+                         environment = environment)
+    class(p[["data"]]) <- data.class
+    p
   }
 
 #' @rdname ggplot
@@ -198,9 +218,14 @@ ggplot.cps_spct <-
         mapping <- aes_(~w.length, ~cps_1)
       }
     }
+    # roundabout way of retaining the derived classes without calling any
+    # private (not exported) method or function from 'ggplot2'
+    data.class <- class(data)
     rmDerivedSpct(data)
-    ggplot(data = data, mapping = mapping, ...,
-           environment = environment)
+    p <- ggplot2::ggplot(data = data, mapping = mapping, ...,
+                         environment = environment)
+    class(p[["data"]]) <- data.class
+    p
   }
 
 #' @rdname ggplot
@@ -220,9 +245,14 @@ ggplot.calibration_spct <-
         mapping <- aes_(~w.length, ~irrad.mult_1)
       }
     }
+    # roundabout way of retaining the derived classes without calling any
+    # private (not exported) method or function from 'ggplot2'
+    data.class <- class(data)
     rmDerivedSpct(data)
-    ggplot(data = data, mapping = mapping, ...,
-           environment = environment)
+    p <- ggplot2::ggplot(data = data, mapping = mapping, ...,
+                         environment = environment)
+    class(p[["data"]]) <- data.class
+    p
   }
 
 #' @rdname ggplot
@@ -242,9 +272,14 @@ ggplot.raw_spct <-
         mapping <- aes_(~w.length, ~counts_1)
       }
     }
+    # roundabout way of retaining the derived classes without calling any
+    # private (not exported) method or function from 'ggplot2'
+    data.class <- class(data)
     rmDerivedSpct(data)
-    ggplot(data = data, mapping = mapping, ...,
-           environment = environment)
+    p <- ggplot2::ggplot(data = data, mapping = mapping, ...,
+                         environment = environment)
+    class(p[["data"]]) <- data.class
+    p
   }
 
 #' @rdname ggplot
@@ -279,10 +314,14 @@ ggplot.object_spct <-
     if (is.null(mapping)) {
       mapping <- aes_(~w.length, ~value)
     }
-    # convert to a tibble so that dispatch goes to ggplot2::ggplot.data.frame()
+    # roundabout way of retaining the derived classes without calling any
+    # private (not exported) method or function from 'ggplot2'
+    data.class <- class(molten.data)
     rmDerivedSpct(molten.data)
-    ggplot(data = molten.data, mapping = mapping, ...,
-           environment = environment)
+    p <- ggplot2::ggplot(data = molten.data, mapping = mapping, ...,
+                         environment = environment)
+    class(p[["data"]]) <- data.class
+    p
   }
 
 # collections of spectra --------------------------------------------------

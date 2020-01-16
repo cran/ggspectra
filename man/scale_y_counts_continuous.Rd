@@ -5,13 +5,19 @@
 \alias{scale_y_counts_tg_continuous}
 \title{Raw-counts y-scale}
 \usage{
-scale_y_counts_continuous(unit.exponent = 3,
+scale_y_counts_continuous(
+  unit.exponent = 3,
   name = counts_label(unit.exponent = unit.exponent),
-  labels = SI_pl_format(exponent = unit.exponent), ...)
+  labels = SI_pl_format(exponent = unit.exponent),
+  ...
+)
 
-scale_y_counts_tg_continuous(unit.exponent = 3,
+scale_y_counts_tg_continuous(
+  unit.exponent = 3,
   name = counts_label(unit.exponent = 0),
-  labels = SI_tg_format(exponent = unit.exponent), ...)
+  labels = SI_tg_format(exponent = unit.exponent),
+  ...
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

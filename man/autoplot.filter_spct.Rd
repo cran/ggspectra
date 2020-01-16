@@ -5,17 +5,27 @@
 \alias{autoplot.filter_mspct}
 \title{Create a complete ggplot for a filter spectrum.}
 \usage{
-\method{autoplot}{filter_spct}(object, ...,
-  w.band = getOption("photobiology.plot.bands", default = list(UVC(),
-  UVB(), UVA(), PAR())), range = NULL,
-  plot.qty = getOption("photobiology.filter.qty", default =
-  "transmittance"), pc.out = FALSE, label.qty = NULL, span = NULL,
-  annotations = NULL, time.format = "", tz = "UTC",
-  text.size = 2.5, idfactor = NULL, ylim = c(NA, NA),
-  object.label = deparse(substitute(object)), na.rm = TRUE)
+\method{autoplot}{filter_spct}(
+  object,
+  ...,
+  w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(),
+    PAR())),
+  range = NULL,
+  plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
+  pc.out = FALSE,
+  label.qty = NULL,
+  span = NULL,
+  annotations = NULL,
+  time.format = "",
+  tz = "UTC",
+  text.size = 2.5,
+  idfactor = NULL,
+  ylim = c(NA, NA),
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
+)
 
-\method{autoplot}{filter_mspct}(object, ..., range = NULL,
-  plot.data = "as.is")
+\method{autoplot}{filter_mspct}(object, ..., range = NULL, plot.data = "as.is")
 }
 \arguments{
 \item{object}{a filter_spct object or a filter_mspct object.}
@@ -92,15 +102,16 @@ autoplot(yellow_gel.spct, pc.out = TRUE)
 
 }
 \seealso{
-Other autoplot methods: \code{\link{autoplot.calibration_spct}},
-  \code{\link{autoplot.cps_spct}},
-  \code{\link{autoplot.object_spct}},
-  \code{\link{autoplot.raw_spct}},
-  \code{\link{autoplot.reflector_spct}},
-  \code{\link{autoplot.response_spct}},
-  \code{\link{autoplot.source_spct}},
-  \code{\link{autoplot.waveband}},
-  \code{\link{set_annotations_default}}
+Other autoplot methods: 
+\code{\link{autoplot.calibration_spct}()},
+\code{\link{autoplot.cps_spct}()},
+\code{\link{autoplot.object_spct}()},
+\code{\link{autoplot.raw_spct}()},
+\code{\link{autoplot.reflector_spct}()},
+\code{\link{autoplot.response_spct}()},
+\code{\link{autoplot.source_spct}()},
+\code{\link{autoplot.waveband}()},
+\code{\link{set_annotations_default}()}
 }
 \concept{autoplot methods}
 \keyword{hplot}

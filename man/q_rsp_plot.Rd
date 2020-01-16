@@ -4,8 +4,21 @@
 \alias{q_rsp_plot}
 \title{Create a complete ggplot for response spectra.}
 \usage{
-q_rsp_plot(spct, w.band, range, pc.out, label.qty, span, annotations, norm,
-  text.size, idfactor, ylim, na.rm, ...)
+q_rsp_plot(
+  spct,
+  w.band,
+  range,
+  pc.out,
+  label.qty,
+  span,
+  annotations,
+  norm,
+  text.size,
+  idfactor,
+  ylim,
+  na.rm,
+  ...
+)
 }
 \arguments{
 \item{spct}{a response_spct object.}

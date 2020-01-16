@@ -5,17 +5,27 @@
 \alias{autoplot.reflector_mspct}
 \title{Create a complete ggplot for a reflector spectrum.}
 \usage{
-\method{autoplot}{reflector_spct}(object, ...,
-  w.band = getOption("photobiology.plot.bands", default = list(UVC(),
-  UVB(), UVA(), PAR())), range = NULL,
-  plot.qty = getOption("photobiology.reflector.qty", default =
-  "reflectance"), pc.out = FALSE, label.qty = NULL, span = NULL,
-  annotations = NULL, time.format = "", tz = "UTC",
-  text.size = 2.5, idfactor = NULL, ylim = c(NA, NA),
-  object.label = deparse(substitute(object)), na.rm = TRUE)
+\method{autoplot}{reflector_spct}(
+  object,
+  ...,
+  w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(),
+    PAR())),
+  range = NULL,
+  plot.qty = getOption("photobiology.reflector.qty", default = "reflectance"),
+  pc.out = FALSE,
+  label.qty = NULL,
+  span = NULL,
+  annotations = NULL,
+  time.format = "",
+  tz = "UTC",
+  text.size = 2.5,
+  idfactor = NULL,
+  ylim = c(NA, NA),
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
+)
 
-\method{autoplot}{reflector_mspct}(object, ..., range = NULL,
-  plot.data = "as.is")
+\method{autoplot}{reflector_mspct}(object, ..., range = NULL, plot.data = "as.is")
 }
 \arguments{
 \item{object}{a reflector_spct object or a reflector_mspct object.}
@@ -87,15 +97,16 @@ autoplot(Ler_leaf_rflt.spct)
 
 }
 \seealso{
-Other autoplot methods: \code{\link{autoplot.calibration_spct}},
-  \code{\link{autoplot.cps_spct}},
-  \code{\link{autoplot.filter_spct}},
-  \code{\link{autoplot.object_spct}},
-  \code{\link{autoplot.raw_spct}},
-  \code{\link{autoplot.response_spct}},
-  \code{\link{autoplot.source_spct}},
-  \code{\link{autoplot.waveband}},
-  \code{\link{set_annotations_default}}
+Other autoplot methods: 
+\code{\link{autoplot.calibration_spct}()},
+\code{\link{autoplot.cps_spct}()},
+\code{\link{autoplot.filter_spct}()},
+\code{\link{autoplot.object_spct}()},
+\code{\link{autoplot.raw_spct}()},
+\code{\link{autoplot.response_spct}()},
+\code{\link{autoplot.source_spct}()},
+\code{\link{autoplot.waveband}()},
+\code{\link{set_annotations_default}()}
 }
 \concept{autoplot methods}
 \keyword{hplot}

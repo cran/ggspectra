@@ -5,14 +5,34 @@
 \alias{wl_guide}
 \title{Calculate colours from wavelength.}
 \usage{
-stat_wl_strip(mapping = NULL, data = NULL, geom = "rect",
-  type = "CMF", w.band = NULL, length.out = 150,
-  position = "identity", na.rm = TRUE, show.legend = FALSE,
-  inherit.aes = TRUE, ...)
+stat_wl_strip(
+  mapping = NULL,
+  data = NULL,
+  geom = "rect",
+  type = "CMF",
+  w.band = NULL,
+  length.out = 150,
+  position = "identity",
+  na.rm = TRUE,
+  show.legend = FALSE,
+  inherit.aes = TRUE,
+  ...
+)
 
-wl_guide(mapping = NULL, data = NULL, type = "CMF", w.band = NULL,
-  length.out = 150, ymin = -Inf, ymax = Inf, position = "identity",
-  na.rm = FALSE, show.legend = FALSE, inherit.aes = TRUE, ...)
+wl_guide(
+  mapping = NULL,
+  data = NULL,
+  type = "CMF",
+  w.band = NULL,
+  length.out = 150,
+  ymin = -Inf,
+  ymax = Inf,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = FALSE,
+  inherit.aes = TRUE,
+  ...
+)
 }
 \arguments{
 \item{mapping}{The aesthetic mapping, usually constructed with
@@ -110,17 +130,22 @@ ggplot(sun.spct) + wl_guide(alpha = 0.33, color = NA) + geom_line()
 \seealso{
 \code{\link[photobiology]{color_of}}, which is used internally.
 
-Other stats functions: \code{\link{stat_color}},
-  \code{\link{stat_find_qtys}},
-  \code{\link{stat_find_wls}},
-  \code{\link{stat_label_peaks}}, \code{\link{stat_peaks}},
-  \code{\link{stat_wb_box}}, \code{\link{stat_wb_column}},
-  \code{\link{stat_wb_contribution}},
-  \code{\link{stat_wb_hbar}}, \code{\link{stat_wb_irrad}},
-  \code{\link{stat_wb_label}}, \code{\link{stat_wb_mean}},
-  \code{\link{stat_wb_relative}},
-  \code{\link{stat_wb_sirrad}},
-  \code{\link{stat_wb_total}},
-  \code{\link{stat_wl_summary}}
+Other stats functions: 
+\code{\link{stat_color}()},
+\code{\link{stat_find_qtys}()},
+\code{\link{stat_find_wls}()},
+\code{\link{stat_label_peaks}()},
+\code{\link{stat_peaks}()},
+\code{\link{stat_wb_box}()},
+\code{\link{stat_wb_column}()},
+\code{\link{stat_wb_contribution}()},
+\code{\link{stat_wb_hbar}()},
+\code{\link{stat_wb_irrad}()},
+\code{\link{stat_wb_label}()},
+\code{\link{stat_wb_mean}()},
+\code{\link{stat_wb_relative}()},
+\code{\link{stat_wb_sirrad}()},
+\code{\link{stat_wb_total}()},
+\code{\link{stat_wl_summary}()}
 }
 \concept{stats functions}

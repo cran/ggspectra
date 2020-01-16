@@ -5,13 +5,19 @@
 \alias{scale_y_Rfr_total_continuous}
 \title{Reflectance y-scale}
 \usage{
-scale_y_Rfr_specular_continuous(unit.exponent = 0,
+scale_y_Rfr_specular_continuous(
+  unit.exponent = 0,
   name = Rfr_specular_label(unit.exponent = unit.exponent),
-  labels = SI_pl_format(exponent = unit.exponent), ...)
+  labels = SI_pl_format(exponent = unit.exponent),
+  ...
+)
 
-scale_y_Rfr_total_continuous(unit.exponent = 0,
+scale_y_Rfr_total_continuous(
+  unit.exponent = 0,
   name = Rfr_total_label(unit.exponent = unit.exponent),
-  labels = SI_pl_format(exponent = unit.exponent), ...)
+  labels = SI_pl_format(exponent = unit.exponent),
+  ...
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

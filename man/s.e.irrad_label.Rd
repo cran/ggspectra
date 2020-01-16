@@ -5,11 +5,15 @@
 \alias{s.q.irrad_label}
 \title{spectral irradiance axis labels}
 \usage{
-s.e.irrad_label(unit.exponent = 0,
-  format = getOption("photobiology.math", default = "R.expression"))
+s.e.irrad_label(
+  unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 
-s.q.irrad_label(unit.exponent = -6,
-  format = getOption("photobiology.math", default = "R.expression"))
+s.q.irrad_label(
+  unit.exponent = -6,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

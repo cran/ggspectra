@@ -4,9 +4,12 @@
 \alias{scale_y_cps_continuous}
 \title{Counts-per-second  y-scale}
 \usage{
-scale_y_cps_continuous(unit.exponent = 0,
+scale_y_cps_continuous(
+  unit.exponent = 0,
   name = cps_label(unit.exponent = unit.exponent),
-  labels = SI_pl_format(exponent = unit.exponent), ...)
+  labels = SI_pl_format(exponent = unit.exponent),
+  ...
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

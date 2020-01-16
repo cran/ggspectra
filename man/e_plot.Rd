@@ -4,8 +4,19 @@
 \alias{e_plot}
 \title{Create a complete ggplot for light-source spectra.}
 \usage{
-e_plot(spct, w.band, range, label.qty, span, annotations, text.size,
-  idfactor, ylim, na.rm, ...)
+e_plot(
+  spct,
+  w.band,
+  range,
+  label.qty,
+  span,
+  annotations,
+  text.size,
+  idfactor,
+  ylim,
+  na.rm,
+  ...
+)
 }
 \arguments{
 \item{spct}{a source_spct object.}

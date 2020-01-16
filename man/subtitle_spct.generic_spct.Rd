@@ -4,8 +4,12 @@
 \alias{subtitle_spct.generic_spct}
 \title{Build a plot subtitle from object metadata (deprecated!)}
 \usage{
-subtitle_spct.generic_spct(x, default.when = character(0),
-  default.where = character(0), ...)
+subtitle_spct.generic_spct(
+  x,
+  default.when = character(0),
+  default.where = character(0),
+  ...
+)
 }
 \arguments{
 \item{x}{An R object.}

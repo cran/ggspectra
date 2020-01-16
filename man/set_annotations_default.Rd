@@ -53,14 +53,15 @@ The syntax used and behaviour are the same as for the
   changes the default used for subsequent calls to \code{autoplot()}.
 }
 \seealso{
-Other autoplot methods: \code{\link{autoplot.calibration_spct}},
-  \code{\link{autoplot.cps_spct}},
-  \code{\link{autoplot.filter_spct}},
-  \code{\link{autoplot.object_spct}},
-  \code{\link{autoplot.raw_spct}},
-  \code{\link{autoplot.reflector_spct}},
-  \code{\link{autoplot.response_spct}},
-  \code{\link{autoplot.source_spct}},
-  \code{\link{autoplot.waveband}}
+Other autoplot methods: 
+\code{\link{autoplot.calibration_spct}()},
+\code{\link{autoplot.cps_spct}()},
+\code{\link{autoplot.filter_spct}()},
+\code{\link{autoplot.object_spct}()},
+\code{\link{autoplot.raw_spct}()},
+\code{\link{autoplot.reflector_spct}()},
+\code{\link{autoplot.response_spct}()},
+\code{\link{autoplot.source_spct}()},
+\code{\link{autoplot.waveband}()}
 }
 \concept{autoplot methods}

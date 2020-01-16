@@ -97,6 +97,7 @@ Function `autotitle()` adds a title, subtitle and/or a caption to a plot. The di
 
 ```{r}
 library(ggplot2)
+library(dplyr)
 library(scales)
 library(photobiology)
 library(photobiologyWavebands)
@@ -349,7 +350,7 @@ ggplot(sun.spct, unit.out = "photon") +
                                labels = SI_tg_format(exponent = -6))
 ```
 
-Transformation objects for '**scales**', or user defined, can be also passed as arguments. We replace zeros to avoid a warnings from the `log10()` call, and as the scale `limits`
+Transformation objects from package '**scales**', or user defined, can be also passed as arguments. We replace zeros to avoid a warnings from the `log10()` call, and as the scale `limits`
 discards some observations, we use `na.rm = TRUE` to silence this additional warning.
 
 ```{r}

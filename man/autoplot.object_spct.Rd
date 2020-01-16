@@ -5,13 +5,26 @@
 \alias{autoplot.object_mspct}
 \title{Create a complete ggplot for a object spectrum.}
 \usage{
-\method{autoplot}{object_spct}(object, ...,
-  w.band = getOption("photobiology.plot.bands", default = list(UVC(),
-  UVB(), UVA(), PAR())), range = NULL, plot.qty = "all",
-  pc.out = FALSE, label.qty = NULL, span = 61, annotations = NULL,
-  time.format = "", tz = "UTC", stacked = TRUE, text.size = 2.5,
-  idfactor = NULL, ylim = c(NA, NA),
-  object.label = deparse(substitute(object)), na.rm = TRUE)
+\method{autoplot}{object_spct}(
+  object,
+  ...,
+  w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(),
+    PAR())),
+  range = NULL,
+  plot.qty = "all",
+  pc.out = FALSE,
+  label.qty = NULL,
+  span = 61,
+  annotations = NULL,
+  time.format = "",
+  tz = "UTC",
+  stacked = TRUE,
+  text.size = 2.5,
+  idfactor = NULL,
+  ylim = c(NA, NA),
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
+)
 
 \method{autoplot}{object_mspct}(object, ..., range = NULL)
 }
@@ -83,15 +96,16 @@ autoplot(Ler_leaf.spct)
 
 }
 \seealso{
-Other autoplot methods: \code{\link{autoplot.calibration_spct}},
-  \code{\link{autoplot.cps_spct}},
-  \code{\link{autoplot.filter_spct}},
-  \code{\link{autoplot.raw_spct}},
-  \code{\link{autoplot.reflector_spct}},
-  \code{\link{autoplot.response_spct}},
-  \code{\link{autoplot.source_spct}},
-  \code{\link{autoplot.waveband}},
-  \code{\link{set_annotations_default}}
+Other autoplot methods: 
+\code{\link{autoplot.calibration_spct}()},
+\code{\link{autoplot.cps_spct}()},
+\code{\link{autoplot.filter_spct}()},
+\code{\link{autoplot.raw_spct}()},
+\code{\link{autoplot.reflector_spct}()},
+\code{\link{autoplot.response_spct}()},
+\code{\link{autoplot.source_spct}()},
+\code{\link{autoplot.waveband}()},
+\code{\link{set_annotations_default}()}
 }
 \concept{autoplot methods}
 \keyword{hplot}

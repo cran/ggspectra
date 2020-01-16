@@ -5,11 +5,15 @@
 \alias{A_total_label}
 \title{Absorbance axis labels}
 \usage{
-A_internal_label(unit.exponent = 0,
-  format = getOption("photobiology.math", default = "R.expression"))
+A_internal_label(
+  unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 
-A_total_label(unit.exponent = 0,
-  format = getOption("photobiology.math", default = "R.expression"))
+A_total_label(
+  unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

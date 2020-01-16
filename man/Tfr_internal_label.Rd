@@ -5,11 +5,15 @@
 \alias{Tfr_total_label}
 \title{Transmittance axis labels}
 \usage{
-Tfr_internal_label(unit.exponent = 0,
-  format = getOption("photobiology.math", default = "R.expression"))
+Tfr_internal_label(
+  unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 
-Tfr_total_label(unit.exponent = 0,
-  format = getOption("photobiology.math", default = "R.expression"))
+Tfr_total_label(
+  unit.exponent = 0,
+  format = getOption("photobiology.math", default = "R.expression")
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

@@ -1,5 +1,6 @@
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 library(ggplot2)
+library(dplyr)
 library(scales)
 library(photobiology)
 library(photobiologyWavebands)
@@ -10,149 +11,149 @@ good_label_repel <- packageVersion('ggrepel') != "0.8.0" #||
 #  packageVersion('ggplot2') >= "3.1.0"
 
 
-## ---- include=FALSE, echo=FALSE------------------------------------------
+## ---- include=FALSE, echo=FALSE-----------------------------------------------
 library(knitr)
 opts_chunk$set(fig.align = 'center', 
                fig.show = 'hold', fig.width = 7, fig.height = 4,
                cache = FALSE)
 options(warnPartialMatchArgs = FALSE)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct / 2))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 two_suns.spct <- rbindspct(two_suns.mspct)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 theme_set(theme_bw())
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(two_suns.spct) + aes(color = spct.idx) + geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(two_suns.spct, aes(w.length, s.e.irrad, color = spct.idx)) + geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct, unit.out = "photon") + geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 photon_as_default()
 ggplot(sun.spct) + geom_line()
 ggplot(sun.spct, unit.out = "energy") + geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 unset_user_defaults()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(yellow_gel.spct) + geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(yellow_gel.spct, plot.qty = "absorbance") + geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 Afr_as_default()
 ggplot(yellow_gel.spct) + geom_line()
 ggplot(polyester.spct) + geom_line()
 unset_user_defaults()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(two_suns.mspct) + 
   aes(linetype = spct.idx) +
   wl_guide(ymax = -0.05) +
   geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(two_suns.mspct) + 
   wl_guide(ymax = -0.05) +
   geom_spct() +
   geom_line() +
   facet_wrap(~spct.idx, ncol = 1L)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(two_suns.mspct) + 
   wl_guide(ymax = -0.05) +
   geom_spct() +
   geom_line() +
   facet_wrap(~spct.idx, ncol = 1L, scales = "free_y")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() +
   scale_x_wl_continuous()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() +
   scale_x_wl_continuous(sec.axis = sec_axis_w_number())
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() +
   scale_x_wl_continuous(sec.axis = sec_axis_w_frequency())
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() +
   scale_x_wl_continuous(sec.axis = sec_axis_w_frequency(15))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() +
   scale_x_wl_continuous(sec.axis = sec_axis_w_frequency(14))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 nearest_SI_exponent(14)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(white_led.raw_spct) + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_counts_continuous()
   
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(white_led.raw_spct) + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_counts_tg_continuous()
   
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(white_led.cps_spct) + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_counts_continuous()
   
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_s.e.irrad_continuous()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct, unit.out = "photon") + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_s.q.irrad_continuous()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() +
   scale_x_wl_continuous(-6) +
   scale_y_s.e.irrad_continuous(-3)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct, unit.out = "photon") + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_s.q.irrad_continuous(unit.exponent = 0,
                                labels = scientific_format())
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 library(scales)
 ggplot(sun.spct, unit.out = "photon") + 
   geom_line() +
@@ -160,7 +161,7 @@ ggplot(sun.spct, unit.out = "photon") +
   scale_y_s.q.irrad_continuous(unit.exponent = 0,
                                labels = SI_tg_format(exponent = -6))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 temp.spct <- clean(sun.spct, range.s.data = c(1e-20, Inf), fill = 1e-20)
 ggplot(temp.spct, unit.out = "photon") + 
   geom_line(na.rm = TRUE) +
@@ -170,71 +171,71 @@ ggplot(temp.spct, unit.out = "photon") +
                                labels = trans_format("log10", math_format()),
                                limits = c(1e-12, NA))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(ccd.spct, unit.out = "photon") + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_s.q.response_continuous()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(ccd.spct, unit.out = "photon") + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_s.q.response_continuous(trans = "log10",
                                   labels = trans_format("log10", math_format()))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(yellow_gel.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_Tfr_total_continuous()
   
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(yellow_gel.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_Tfr_total_continuous(labels = percent)
   
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(yellow_gel.spct, plot.qty = "absorbance") + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_A_total_continuous()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(green_leaf.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_Rfr_total_continuous()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + stat_peaks(color = "red")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct, unit.out = "photon") + geom_line() + stat_peaks(color = "red")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + stat_valleys(color = "blue")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(yellow_gel.spct) + geom_line() + stat_find_wls(color = "darkgreen")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(shape = 21, color = "black") + scale_fill_identity()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(span = 21, shape = 4, color = "red", size = 2) +
   stat_peaks(span = 21, color = "red", geom = "rug", sides = "b")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(span = 21, geom = "text", color = "red", vjust = "bottom") 
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(shape = 21, span = 25, size = 2) + 
   scale_fill_identity() +
@@ -242,7 +243,7 @@ ggplot(sun.spct) + geom_line() +
              geom = "label", span = 25, vjust = "bottom", size = 3) + 
   scale_color_identity()
 
-## ---- eval=good_label_repel----------------------------------------------
+## ---- eval=good_label_repel---------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(shape = 21, span = 25, size = 2) + 
   stat_label_peaks(geom = "label_repel", span = 41,
@@ -257,19 +258,19 @@ ggplot(sun.spct) + geom_line() +
   scale_fill_identity() + scale_color_identity() +
   expand_limits(y = c(-0.08, 0.9))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(shape = 21, span = 25, size = 2) + scale_fill_identity() +
   stat_label_peaks(geom = "label", span = 25, size = 3, na.rm = TRUE) +
   scale_color_identity() +
   expand_limits(y = c(NA, 0.9))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(span = NULL, geom = "vline", linetype = "dotted", color = "red") +
   stat_peaks(span = NULL, geom = "hline", linetype = "dotted", color = "red")
 
-## ---- eval=good_label_repel----------------------------------------------
+## ---- eval=good_label_repel---------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_label_peaks(aes(label = stat(y.label)), 
                    span = 31, geom = "label_repel", size = 3,
@@ -279,14 +280,14 @@ ggplot(sun.spct) + geom_line() +
   expand_limits(y = 1) +
   scale_fill_identity() + scale_color_identity()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(span = NULL, color = "red") +
   stat_peaks(span = NULL, geom = "text", vjust = -0.5, color = "red", 
              aes(label = paste(stat(y.label), "at", stat(x.label), "nm"))) +
   expand_limits(y = c(NA, 0.9))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(span = 21, geom = "point", colour = "red") +
   stat_valleys(span = 21, geom = "point", colour = "blue") +
@@ -295,7 +296,7 @@ ggplot(sun.spct) + geom_line() +
   stat_valleys(span = 51, geom = "text", colour = "blue", 
                vjust = 1.2, label.fmt = "%3.0f nm")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(two_suns.spct) + aes(color = spct.idx) +
   geom_line() + ylim(NA, 0.9) +
   stat_peaks(span = NULL, color = "black") +
@@ -304,17 +305,17 @@ ggplot(two_suns.spct) + aes(color = spct.idx) +
              aes(label = paste(stat(y.label), "at", stat(x.label), "nm"))) +
   facet_grid(spct.idx~.)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   stat_color() + scale_color_identity()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   geom_line() +
   stat_color(shape = 21, color = "black") + 
   scale_fill_identity()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   stat_color(geom = "bar") + 
   geom_point(shape = 21, color = "black", stroke = 1.2, fill = "white") +
@@ -322,67 +323,67 @@ ggplot(sun.spct) +
   scale_color_identity() + 
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(two_suns.spct) + aes(shape = spct.idx) +
   stat_color() + scale_color_identity() +
   geom_line() + 
   facet_grid(spct.idx~., scales = "free_y")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_wb_box(w.band = VIS_bands(), color = "white") +
   scale_fill_identity()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + stat_wb_column(w.band = VIS_bands()) + geom_line() +
   scale_fill_identity()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_wb_hbar(w.band = VIS_bands(), size = 1.2) +
   scale_color_identity()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_wb_box(w.band = PAR(), color = "white", ypos.fixed = 0.85) +
   stat_wb_label(w.band = PAR(), ypos.fixed = 0.85) +
   scale_fill_identity() + scale_color_identity()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + stat_wl_summary()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   stat_wl_summary(range = c(300,350), geom = "rect") +
   geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   geom_line() + 
   stat_wl_summary(geom = "hline", color = "red") +
   stat_wl_summary(label.fmt = "Mean = %.3g", color = "red", vjust = -0.3)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wl_summary(range = c(400,500), geom = "rect", alpha = 0.2, fill = color_of(450)) +
   stat_wl_summary(range = c(400,500), label.fmt = "Mean = %.3g", vjust = -0.3, geom = "text") + 
   geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(two_suns.spct) + aes(color = spct.idx) +
   geom_line() + 
   stat_wl_summary(geom = "hline") +
   stat_wl_summary(label.fmt = "Mean = %.3g", vjust = 1.2, show.legend = FALSE) +
   facet_grid(spct.idx~.)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(two_suns.spct) + aes(color = spct.idx) +
   geom_line() + 
   stat_wl_summary(geom = "hline") +
   stat_wl_summary(label.fmt = "Mean = %.3g", vjust = 1.2, show.legend = FALSE) +
   facet_grid(spct.idx~., scales = "free_y")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   geom_line() + 
   stat_wb_hbar(w.band = PAR(), size = 1.3) +
@@ -391,7 +392,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wb_hbar(w.band = c(400,500), size = 1.2) +
   stat_wb_mean(aes(color = ..wb.color..),
@@ -401,7 +402,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   geom_line() + 
   stat_wb_hbar(w.band = list(Blue(), Red()), size = 1.2) +
@@ -412,7 +413,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wb_box(w.band = PAR()) +
   stat_wb_total(w.band = PAR()) +
@@ -421,7 +422,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wb_box(w.band = c(400,500)) +
   stat_wb_total(w.band = c(400,500)) +
@@ -430,7 +431,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct * yellow_gel.spct) +
   stat_wb_box(w.band = Plant_bands(), color = "white", ypos.fixed = 0.7) +
   stat_wb_column(w.band = Plant_bands(), color = "white", alpha = 0.5) +
@@ -440,7 +441,7 @@ ggplot(sun.spct * yellow_gel.spct) +
   scale_fill_identity() + scale_color_identity() +
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wb_box(w.band = PAR()) +
   stat_wb_irrad(w.band = PAR(), unit.in = "energy", time.unit = "second") +
@@ -449,7 +450,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct, unit.out = "photon") +
   stat_wb_box(w.band = PAR()) +
   stat_wb_irrad(w.band = PAR(),
@@ -460,7 +461,7 @@ ggplot(sun.spct, unit.out = "photon") +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wb_box(w.band = PAR()) +
   stat_wb_e_irrad(w.band = PAR()) +
@@ -469,7 +470,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wb_box(w.band = CIE()) +
   stat_wb_e_irrad(w.band = CIE()) +
@@ -478,7 +479,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.daily.spct) +
   stat_wb_box(w.band = CIE()) +
   stat_wb_e_irrad(w.band = CIE(), time.unit = "day", label.mult = 1e-3) +
@@ -487,7 +488,7 @@ ggplot(sun.daily.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct, unit.out = "photon") +
   stat_wb_box(w.band = VIS_bands(), color = "black") +
   stat_wb_column(w.band = VIS_bands(), color = NA, alpha = 0.5) +
@@ -497,7 +498,7 @@ ggplot(sun.spct, unit.out = "photon") +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   geom_line() + 
   stat_wb_hbar(w.band = PAR(), size = 1.4) +
@@ -507,7 +508,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct, unit.out = "photon") +
   stat_wb_column(w.band = PAR(), alpha = 0.8) +
   stat_wb_q_sirrad(w.band = PAR(), 
@@ -525,7 +526,7 @@ ggplot(sun.spct, unit.out = "photon") +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wb_box(w.band = waveband(CIE()), ypos.fixed = 0.85) +
   stat_wb_e_sirrad(w.band = CIE(), ypos.fixed = 0.85) +
@@ -534,7 +535,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.daily.spct) +
   stat_wb_box(w.band = waveband(CIE()), ypos.fixed = 34e3) +
   stat_wb_e_sirrad(w.band = CIE(),
@@ -546,7 +547,7 @@ ggplot(sun.daily.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 my.bands <- split_bands(c(300,800), length.out = 10)
 ggplot(sun.spct, unit.out = "photon") +
   stat_wb_hbar(w.band = my.bands, size = 1.4) +
@@ -557,7 +558,7 @@ ggplot(sun.spct, unit.out = "photon") +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wb_column(w.band = VIS_bands(), alpha = 0.5) +
   stat_wb_e_irrad(w.band = VIS_bands(), angle = 90,
@@ -568,7 +569,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct, unit.out = "photon") +
   stat_wb_column(w.band = VIS_bands(), alpha = 0.5) +
   stat_wb_q_irrad(w.band = VIS_bands(), angle = 90, 
@@ -579,7 +580,7 @@ ggplot(sun.spct, unit.out = "photon") +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 my.bands <- split_bands(c(300,800), length.out = 10)
 ggplot(sun.spct) +
   stat_wb_column(w.band = my.bands, alpha = 0.5) +
@@ -590,7 +591,7 @@ ggplot(sun.spct) +
   scale_fill_identity() +  
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(data.frame(w.length = 300:800), aes(w.length)) +
   stat_wl_strip(w.band = VIS_bands(), ymax = Inf, ymin = -Inf) +
   stat_wb_label(w.band = VIS_bands(), angle = 90) +
@@ -602,7 +603,7 @@ ggplot(data.frame(w.length = 300:800), aes(w.length)) +
   theme_minimal()
 
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(data.frame(w.length = 300:1100), aes(w.length)) +
   stat_wl_strip(w.band = RBV_bands(), ymax = 1, ymin = 3) +
   stat_wb_label(w.band = RBV_bands(), ypos.fixed = 2, angle = 90, vjust = 0.3, size = 3) +
@@ -625,7 +626,7 @@ ggplot(data.frame(w.length = 300:1100), aes(w.length)) +
   labs(x = "Wavelength (nm)", title = "Landsat imagers: VIS and NIR bands") +
   theme_classic()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(data.frame(w.length = 100:400), aes(w.length)) +
   stat_wl_strip(w.band = UV_bands("ISO"), ymax = 1, ymin = 3, color = "white") +
   stat_wb_label(w.band = UV_bands("ISO"), ypos.fixed = 2, size = 3) +
@@ -655,40 +656,40 @@ ggplot(data.frame(w.length = 100:400), aes(w.length)) +
        subtitle = "According to ISO standard, CIE recommendations, and non-standard use") +
   theme_classic()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 my.data <- data.frame(x = 300:800)
 ggplot(my.data, aes(x)) + stat_wl_strip(ymin = -1, ymax = 1, color = NA) +
     scale_fill_identity()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   geom_line() +
   stat_wl_strip(ymin = -Inf, ymax = -0.025) + 
   scale_fill_identity() +
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   geom_line() + 
   stat_wl_strip(w.band = VIS_bands(), ymin = -Inf, ymax = -0.025) + 
   scale_fill_identity() +
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wl_strip(w.band = VIS_bands(), ymin = -Inf, ymax = Inf, alpha = 0.4) + 
   scale_fill_identity() +
   geom_line() +
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
   stat_wl_strip(alpha = 0.4, ymin = -Inf, ymax = Inf) + 
   scale_fill_identity() +
   geom_line() +
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct, unit.out = "photon") +
   stat_wl_strip(alpha = 0.4, ymin = -Inf, ymax = Inf) + 
   stat_wb_box(w.band = PAR()) +
@@ -698,33 +699,33 @@ ggplot(sun.spct, unit.out = "photon") +
   scale_fill_identity() + scale_color_identity() +
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_spct()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_spct(fill = color_of(sun.spct))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct * yellow_gel.spct) + 
   geom_spct(fill = color_of(sun.spct * yellow_gel.spct))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   wl_guide(alpha = 0.4) +
   geom_line()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   wl_guide(ymax = -0.025) +
   geom_line() 
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   wl_guide() +
   geom_spct(alpha = 0.75, colour = "white", size = 1) 
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   wl_guide() +
   geom_line(size = 2, colour = "white") +
@@ -732,13 +733,13 @@ ggplot(sun.spct) +
   geom_hline(yintercept = 0, colour = "grey92") +
   theme_bw()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 color_chart(colors())
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 color_chart(grep("blue", colors(), value = TRUE), ncol = 5, text.size = 4)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
  color_chart(w_length2rgb(570:689, color.name = as.character(570:689)), 
             use.names = TRUE, text.size = 4) +
   ggtitle("Reddish colors", subtitle = "Labels: wavelength (nm)")

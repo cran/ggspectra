@@ -5,15 +5,23 @@
 \alias{ggtitle_spct}
 \title{Add title, subtitle and caption to a spectral plot}
 \usage{
-autotitle(object, object.label = deparse(substitute(object)),
-  annotations = "title", time.format = "",
+autotitle(
+  object,
+  object.label = deparse(substitute(object)),
+  annotations = "title",
+  time.format = "",
   tz = lubridate::tz(getWhenMeasured(object)),
-  default.title = "title:objt")
+  default.title = "title:objt"
+)
 
-ggtitle_spct(object, object.label = deparse(substitute(object)),
-  annotations = "title", time.format = "",
+ggtitle_spct(
+  object,
+  object.label = deparse(substitute(object)),
+  annotations = "title",
+  time.format = "",
   tz = lubridate::tz(getWhenMeasured(object)),
-  default.title = "title:objt")
+  default.title = "title:objt"
+)
 }
 \arguments{
 \item{object}{generic_spct The spectral object plotted.}

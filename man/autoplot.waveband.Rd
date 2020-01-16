@@ -4,12 +4,22 @@
 \alias{autoplot.waveband}
 \title{Create a complete ggplot for a waveband descriptor.}
 \usage{
-\method{autoplot}{waveband}(object, ..., w.length = NULL,
-  range = c(280, 800), fill = 0, span = NULL,
+\method{autoplot}{waveband}(
+  object,
+  ...,
+  w.length = NULL,
+  range = c(280, 800),
+  fill = 0,
+  span = NULL,
   unit.in = getOption("photobiology.radiation.unit", default = "energy"),
-  annotations = NULL, wb.trim = TRUE, norm = NULL, text.size = 2.5,
-  ylim = c(NA, NA), object.label = deparse(substitute(object)),
-  na.rm = TRUE)
+  annotations = NULL,
+  wb.trim = TRUE,
+  norm = NULL,
+  text.size = 2.5,
+  ylim = c(NA, NA),
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
+)
 }
 \arguments{
 \item{object}{a waveband object.}
@@ -76,15 +86,16 @@ autoplot(waveband(c(400, 500)))
 
 }
 \seealso{
-Other autoplot methods: \code{\link{autoplot.calibration_spct}},
-  \code{\link{autoplot.cps_spct}},
-  \code{\link{autoplot.filter_spct}},
-  \code{\link{autoplot.object_spct}},
-  \code{\link{autoplot.raw_spct}},
-  \code{\link{autoplot.reflector_spct}},
-  \code{\link{autoplot.response_spct}},
-  \code{\link{autoplot.source_spct}},
-  \code{\link{set_annotations_default}}
+Other autoplot methods: 
+\code{\link{autoplot.calibration_spct}()},
+\code{\link{autoplot.cps_spct}()},
+\code{\link{autoplot.filter_spct}()},
+\code{\link{autoplot.object_spct}()},
+\code{\link{autoplot.raw_spct}()},
+\code{\link{autoplot.reflector_spct}()},
+\code{\link{autoplot.response_spct}()},
+\code{\link{autoplot.source_spct}()},
+\code{\link{set_annotations_default}()}
 }
 \concept{autoplot methods}
 \keyword{hplot}

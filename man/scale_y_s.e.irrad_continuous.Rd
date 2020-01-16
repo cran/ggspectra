@@ -7,21 +7,33 @@
 \alias{scale_y_s.e.irrad_log10}
 \title{Spectral irradiance y-scale}
 \usage{
-scale_y_s.e.irrad_continuous(unit.exponent = 0,
-  name = s.e.irrad_label(unit.exponent), labels = SI_pl_format(exponent
-  = unit.exponent), ...)
+scale_y_s.e.irrad_continuous(
+  unit.exponent = 0,
+  name = s.e.irrad_label(unit.exponent),
+  labels = SI_pl_format(exponent = unit.exponent),
+  ...
+)
 
-scale_y_s.q.irrad_continuous(unit.exponent = -6,
+scale_y_s.q.irrad_continuous(
+  unit.exponent = -6,
   name = s.q.irrad_label(unit.exponent = unit.exponent),
-  labels = SI_pl_format(exponent = unit.exponent), ...)
+  labels = SI_pl_format(exponent = unit.exponent),
+  ...
+)
 
-scale_y_s.q.irrad_log10(unit.exponent = -6,
+scale_y_s.q.irrad_log10(
+  unit.exponent = -6,
   name = s.q.irrad_label(unit.exponent = unit.exponent),
-  labels = SI_pl_format(exponent = unit.exponent), ...)
+  labels = SI_pl_format(exponent = unit.exponent),
+  ...
+)
 
-scale_y_s.e.irrad_log10(unit.exponent = 0,
-  name = s.e.irrad_label(unit.exponent), labels = SI_pl_format(exponent
-  = unit.exponent), ...)
+scale_y_s.e.irrad_log10(
+  unit.exponent = 0,
+  name = s.e.irrad_label(unit.exponent),
+  labels = SI_pl_format(exponent = unit.exponent),
+  ...
+)
 }
 \arguments{
 \item{unit.exponent}{integer}

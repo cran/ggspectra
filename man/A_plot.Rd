@@ -4,8 +4,19 @@
 \alias{A_plot}
 \title{Create a complete ggplot for a filter spectrum.}
 \usage{
-A_plot(spct, w.band, range, label.qty, span, annotations, text.size,
-  idfactor, na.rm, ylim, ...)
+A_plot(
+  spct,
+  w.band,
+  range,
+  label.qty,
+  span,
+  annotations,
+  text.size,
+  idfactor,
+  na.rm,
+  ylim,
+  ...
+)
 }
 \arguments{
 \item{spct}{a filter_spct object}

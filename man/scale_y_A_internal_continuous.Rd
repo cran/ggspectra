@@ -5,13 +5,19 @@
 \alias{scale_y_A_total_continuous}
 \title{Absorbance y-scale}
 \usage{
-scale_y_A_internal_continuous(unit.exponent = 0,
+scale_y_A_internal_continuous(
+  unit.exponent = 0,
   name = A_internal_label(unit.exponent = unit.exponent),
-  labels = SI_pl_format(exponent = unit.exponent), ...)
+  labels = SI_pl_format(exponent = unit.exponent),
+  ...
+)
 
-scale_y_A_total_continuous(unit.exponent = 0,
+scale_y_A_total_continuous(
+  unit.exponent = 0,
   name = A_total_label(unit.exponent = unit.exponent),
-  labels = SI_pl_format(exponent = unit.exponent), ...)
+  labels = SI_pl_format(exponent = unit.exponent),
+  ...
+)
 }
 \arguments{
 \item{unit.exponent}{integer}
