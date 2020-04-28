@@ -9,9 +9,9 @@ stat_wl_strip(
   mapping = NULL,
   data = NULL,
   geom = "rect",
-  type = "CMF",
   w.band = NULL,
   length.out = 150,
+  chroma.type = "CMF",
   position = "identity",
   na.rm = TRUE,
   show.legend = FALSE,
@@ -22,7 +22,7 @@ stat_wl_strip(
 wl_guide(
   mapping = NULL,
   data = NULL,
-  type = "CMF",
+  chroma.type = "CMF",
   w.band = NULL,
   length.out = 150,
   ymin = -Inf,
@@ -44,13 +44,13 @@ the plot defaults.}
 
 \item{geom}{The geometric object to use display the data}
 
-\item{type}{character one of "CMF" (color matching function) or "CC"
-(color coordinates).}
-
 \item{w.band}{waveband object or a list of such objects or NULL.}
 
 \item{length.out}{The number of steps to use to simulate a continuous
 range of colours when w.band == NULL.}
+
+\item{chroma.type}{character one of "CMF" (color matching function) or "CC"
+(color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
 \item{position}{The position adjustment to use for overlapping points
 on this layer}
@@ -136,6 +136,7 @@ Other stats functions:
 \code{\link{stat_find_wls}()},
 \code{\link{stat_label_peaks}()},
 \code{\link{stat_peaks}()},
+\code{\link{stat_spikes}()},
 \code{\link{stat_wb_box}()},
 \code{\link{stat_wb_column}()},
 \code{\link{stat_wb_contribution}()},

@@ -15,8 +15,15 @@
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
@@ -37,8 +44,10 @@ e_plot <- function(spct,
                    range,
                    label.qty,
                    span,
+                   wls.target,
                    annotations,
                    text.size,
+                   chroma.type,
                    idfactor,
                    ylim,
                    na.rm,
@@ -175,8 +184,10 @@ e_plot <- function(spct,
                             annotations = annotations,
                             label.qty = label.qty,
                             span = span,
+                            wls.target = wls.target,
                             summary.label = irrad.label,
                             text.size = text.size,
+                            chroma.type = chroma.type,
                             na.rm = TRUE)
 
   if (is_effective(spct)) {
@@ -236,8 +247,15 @@ e_plot <- function(spct,
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector
 #' @param text.size numeric size of text in the plot decorations.
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
@@ -258,8 +276,10 @@ q_plot <- function(spct,
                    range,
                    label.qty,
                    span,
+                   wls.target,
                    annotations,
                    text.size,
+                   chroma.type,
                    idfactor,
                    ylim,
                    na.rm,
@@ -386,6 +406,7 @@ q_plot <- function(spct,
   } else if (label.qty %in% c("mean", "average")) {
     label.qty <- "sirrad"
   }
+
   plot <- plot + decoration(w.band = w.band,
                             unit.out = "photon",
                             time.unit = getTimeUnit(spct),
@@ -396,8 +417,10 @@ q_plot <- function(spct,
                             annotations = annotations,
                             label.qty = label.qty,
                             span = span,
+                            wls.target = wls.target,
                             summary.label = irrad.label,
                             text.size = text.size,
+                            chroma.type = chroma.type,
                             na.rm = TRUE)
 
   if (is_effective(spct)) {
@@ -462,11 +485,18 @@ q_plot <- function(spct,
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector.
 #' @param time.format character Format as accepted by
 #'   \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
@@ -497,10 +527,12 @@ autoplot.source_spct <-
            unit.out=getOption("photobiology.radiation.unit", default = "energy"),
            label.qty = NULL,
            span = NULL,
+           wls.target = "HM",
            annotations = NULL,
            time.format = "",
            tz = "UTC",
            text.size = 2.5,
+           chroma.type = "CMF",
            idfactor = NULL,
            ylim = c(NA, NA),
            object.label = deparse(substitute(object)),
@@ -531,8 +563,10 @@ autoplot.source_spct <-
       out.ggplot <- q_plot(spct = object, w.band = w.band, range = range,
                            label.qty = label.qty,
                            span = span,
+                           wls.target = wls.target,
                            annotations = annotations,
                            text.size = text.size,
+                           chroma.type = chroma.type,
                            idfactor = idfactor,
                            ylim = ylim,
                            na.rm = na.rm,
@@ -541,8 +575,10 @@ autoplot.source_spct <-
       out.ggplot <- e_plot(spct = object, w.band = w.band, range = range,
                            label.qty = label.qty,
                            span = span,
+                           wls.target = wls.target,
                            annotations = annotations,
                            text.size = text.size,
+                           chroma.type = chroma.type,
                            idfactor = idfactor,
                            ylim = ylim,
                            na.rm = na.rm,
@@ -567,10 +603,23 @@ autoplot.source_spct <-
 #' @export
 #'
 autoplot.source_mspct <-
-  function(object, ..., range = NULL, plot.data = "as.is") {
+  function(object,
+           ...,
+           range = NULL,
+           unit.out = getOption("photobiology.radiation.unit",
+                                default = "energy"),
+           plot.data = "as.is") {
     # We trim the spectra to avoid unnecesary computaions later
     if (!is.null(range)) {
       object <- trim_wl(object, range = range, use.hinges = TRUE, fill = NULL)
+    }
+    # conversion before binding and summaries
+    if (unit.out == "energy") {
+      data <- q2e(object, action = "replace")
+    } else if (unit.out %in% c("photon", "quantum")) {
+      data <- e2q(object, action = "replace")
+    } else {
+      stop("Invalid 'unit.out' argument value: '", unit.out, "'")
     }
     # we convert the collection of spectra into a single spectrum object
     # containing a summary spectrum or multiple spectra in long form.

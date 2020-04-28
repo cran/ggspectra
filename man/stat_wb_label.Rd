@@ -9,6 +9,7 @@ stat_wb_label(
   data = NULL,
   geom = "text",
   w.band = NULL,
+  chroma.type = "CMF",
   label.fmt = "\%s",
   ypos.fixed = 0,
   position = "identity",
@@ -30,6 +31,9 @@ the plot defaults.}
 
 \item{w.band}{a waveband object or a list of waveband objects or numeric
 vector of at least length two.}
+
+\item{chroma.type}{character one of "CMF" (color matching function) or "CC"
+(color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
 \item{label.fmt}{character string giving a format definition for formating
 the name of the waveband.
@@ -129,6 +133,7 @@ Other stats functions:
 \code{\link{stat_find_wls}()},
 \code{\link{stat_label_peaks}()},
 \code{\link{stat_peaks}()},
+\code{\link{stat_spikes}()},
 \code{\link{stat_wb_box}()},
 \code{\link{stat_wb_column}()},
 \code{\link{stat_wb_contribution}()},

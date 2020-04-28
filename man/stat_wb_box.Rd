@@ -9,6 +9,7 @@ stat_wb_box(
   data = NULL,
   geom = "rect",
   w.band = NULL,
+  chroma.type = "CMF",
   ypos.mult = 1.07,
   ypos.fixed = NULL,
   position = "identity",
@@ -30,6 +31,9 @@ the plot defaults.}
 
 \item{w.band}{a waveband object or a list of waveband objects or numeric
 vector of at least length two.}
+
+\item{chroma.type}{character one of "CMF" (color matching function) or "CC"
+(color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
 \item{ypos.mult}{numeric Multiplier constant used to scale returned
 \code{y} values.}
@@ -130,6 +134,7 @@ Other stats functions:
 \code{\link{stat_find_wls}()},
 \code{\link{stat_label_peaks}()},
 \code{\link{stat_peaks}()},
+\code{\link{stat_spikes}()},
 \code{\link{stat_wb_column}()},
 \code{\link{stat_wb_contribution}()},
 \code{\link{stat_wb_hbar}()},

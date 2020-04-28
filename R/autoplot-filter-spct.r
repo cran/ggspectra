@@ -13,8 +13,15 @@
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
@@ -36,8 +43,10 @@ Afr_plot <- function(spct,
                      pc.out,
                      label.qty,
                      span,
+                     wls.target,
                      annotations,
                      text.size,
+                     chroma.type,
                      idfactor,
                      ylim,
                      na.rm,
@@ -48,68 +57,26 @@ Afr_plot <- function(spct,
   if (is.null(ylim) || !is.numeric(ylim)) {
     ylim <- rep(NA_real_, 2L)
   }
+  force(spct)
+  spct <- any2Afr(spct, action = "add")
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
   }
-  A2T(spct, byref = TRUE)
-  Tfr.type <- getTfrType(spct)
-  if (!is.null(w.band)) {
+   if (!is.null(w.band)) {
     w.band <- trim_wl(w.band, range = range(spct))
   }
-  setGenericSpct(spct, multiple.wl = getMultipleWl(spct)) # so that we can assign variable Afr
-  if (! "Afr" %in% names(spct)) {
-    if (Tfr.type == "internal" &&
-        "Rfr" %in% names(spct)) {
-      spct$Afr <- (1 - spct[["Rfr"]]) * (1 - spct[["Tfr"]])
-      Afr.type <- "total"
-    } else if (Tfr.type == "internal" &&
-      !("Rfr" %in% names(spct))) {
-      spct$Afr <- 1 - spct[["Tfr"]]
-      Afr.type <- "internal"
-    } else if (Tfr.type == "total" &&
-               "Rfr" %in% names(spct)) {
-      spct$Afr <- 1 - spct[["Tfr"]] - spct[["Rfr"]]
-      Afr.type <- "total"
-    } else {
-      warning("Absorptance data unavailable")
-      return(ggplot())
-    }
-  } else {
-    Afr.type <- Tfr.type
-  }
-  if (!length(Afr.type)) {
-    Afr.type <- "unknown"
-  }
+#  setGenericSpct(spct, multiple.wl = getMultipleWl(spct)) # so that we can assign variable Afr
+
   if (!pc.out) {
     scale.factor <- 1
-    if (Afr.type == "internal") {
-      s.Afr.label <- expression(Internal~~spectral~~absorptance~~italic(A)[int](lambda)~~(fraction))
-      Afr.label.total  <- "atop(italic(A)[int], (fraction))"
-      Afr.label.avg  <- "atop(bar(italic(A)[int](lambda)), (fraction))"
-    } else if (Afr.type == "total") {
-      s.Afr.label <- expression(Total~~spectral~~absorptance~~italic(A)[tot](lambda)~~(fraction))
-      Afr.label.total  <- "atop(italic(A)[tot], (total))"
-      Afr.label.avg  <- "atop(bar(italic(A)[tot](lambda)), (fraction))"
-    }  else {
-      s.Afr.label <- expression(Spectral~~absorptance~~italic(A)(lambda)~~(fraction))
-      Afr.label.total  <- "atop(italic(A), (total))"
-      Afr.label.avg  <- "atop(bar(italic(A)(lambda)), (fraction))"
-    }
+    s.Afr.label <- expression(Spectral~~absorptance~~italic(A)(lambda)~~(fraction))
+    Afr.label.total  <- "atop(italic(A), (fraction))"
+    Afr.label.avg  <- "atop(bar(italic(A)(lambda)), (fraction))"
   } else if (pc.out) {
     scale.factor <- 100
-    if (Afr.type == "internal") {
-      s.Afr.label <- expression(Internal~~spectral~~absorptance~~italic(A)[int](lambda)~~(percent))
-      Afr.label.total  <- "atop(italic(A)[int], (total %*% 100))"
-      Afr.label.avg  <- "atop(bar(italic(A)[int](lambda)), (percent))"
-    } else if (Afr.type == "total") {
-      s.Afr.label <- expression(Total~~spectral~~absorptance~~italic(A)[tot](lambda)~~(percent))
-      Afr.label.total  <- "atop(italic(A)[tot], (total %*% 100))"
-      Afr.label.avg  <- "atop(bar(italic(A)[tot](lambda)), (percent))"
-    }  else {
-      s.Afr.label <- expression(Spectral~~absorptance~~italic(A)(lambda)~~(percent))
-      Afr.label.total  <- "atop(italic(A), (total  %*% 100))"
-      Afr.label.avg  <- "atop(bar(italic(A)(lambda)), (percent))"
-    }
+    s.Afr.label <- expression(Spectral~~absorptance~~italic(A)(lambda)~~(percent))
+    Afr.label.total  <- "atop(italic(A), (total %*% 100))"
+    Afr.label.avg  <- "atop(bar(italic(A)(lambda)), (percent))"
   }
   if (label.qty == "total") {
     Afr.label <- Afr.label.total
@@ -179,8 +146,10 @@ Afr_plot <- function(spct,
                             annotations = annotations,
                             label.qty = label.qty,
                             span = span,
+                            wls.target = wls.target,
                             summary.label = Afr.label,
                             text.size = text.size,
+                            chroma.type = chroma.type,
                             na.rm = TRUE)
 
   if (!is.null(annotations) &&
@@ -222,8 +191,15 @@ Afr_plot <- function(spct,
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
@@ -245,8 +221,10 @@ T_plot <- function(spct,
                    pc.out,
                    label.qty,
                    span,
+                   wls.target,
                    annotations,
                    text.size,
+                   chroma.type,
                    idfactor,
                    na.rm,
                    ylim,
@@ -257,10 +235,11 @@ T_plot <- function(spct,
   if (is.null(ylim) || !is.numeric(ylim)) {
     ylim <- rep(NA_real_, 2L)
   }
+  force(spct)
+  spct <- any2T(spct, action = "replace")
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
   }
-  A2T(spct, byref = TRUE)
   Tfr.type <- getTfrType(spct)
   if (!is.null(w.band)) {
     w.band <- trim_wl(w.band, range = range(spct))
@@ -367,8 +346,10 @@ T_plot <- function(spct,
                             annotations = annotations,
                             label.qty = label.qty,
                             span = span,
+                            wls.target = wls.target,
                             summary.label = Tfr.label,
                             text.size = text.size,
+                            chroma.type = chroma.type,
                             na.rm = TRUE)
 
   if (!is.null(annotations) &&
@@ -408,8 +389,15 @@ T_plot <- function(spct,
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
@@ -430,8 +418,10 @@ A_plot <- function(spct,
                    range,
                    label.qty,
                    span,
+                   wls.target,
                    annotations,
                    text.size,
+                   chroma.type,
                    idfactor,
                    na.rm,
                    ylim,
@@ -442,10 +432,10 @@ A_plot <- function(spct,
   if (is.null(ylim) || !is.numeric(ylim)) {
     ylim <- rep(NA_real_, 2L)
   }
+  spct <- any2A(spct, action = "replace")
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
   }
-  T2A(spct, action = "replace", byref = TRUE)
   if (!is.null(w.band)) {
     w.band <- trim_wl(w.band, range = range(spct))
   }
@@ -453,19 +443,10 @@ A_plot <- function(spct,
   if (!length(Tfr.type)) {
     Tfr.type <- "unknown"
   }
-  if (Tfr.type == "internal") {
-    s.A.label <- expression(Internal~~spectral~~absorbance~~A[int](lambda)~~(AU))
-    A.label.total  <- "atop(A[int], (AU %*% nm))"
-    A.label.avg  <- "atop(bar(A[int](lambda)), (AU))"
-  } else if (Tfr.type == "total") {
-    s.A.label <- expression(Total~~spectral~~absorbance~~A[tot](lambda)~~(AU))
-    A.label.total  <- "atop(A[tot], (AU %*% nm))"
-    A.label.avg  <- "atop(bar(A[tot](lambda)), (AU))"
-  }  else {
-    s.A.label <- expression(Spectral~~absorbance~~A(lambda)~~(AU))
-    A.label.total  <- "atop(A, (AU %*% nm))"
-    A.label.avg  <- "atop(bar(A(lambda)), (AU))"
-  }
+  s.A.label <- expression(Spectral~~absorbance~~A(lambda)~~(AU))
+  A.label.total  <- "atop(A, (AU %*% nm))"
+  A.label.avg  <- "atop(bar(A(lambda)), (AU))"
+
   if (label.qty == "total") {
     A.label <- A.label.total
   } else if (label.qty %in% c("average", "mean")) {
@@ -531,8 +512,10 @@ A_plot <- function(spct,
                             annotations = annotations,
                             label.qty = label.qty,
                             span = span,
+                            wls.target = wls.target,
                             summary.label = A.label,
                             text.size = text.size,
+                            chroma.type = chroma.type,
                             na.rm = TRUE)
 
   if (!is.null(annotations) &&
@@ -566,8 +549,15 @@ A_plot <- function(spct,
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
@@ -589,8 +579,10 @@ R_plot <- function(spct,
                    pc.out,
                    label.qty,
                    span,
+                   wls.target,
                    annotations,
                    text.size,
+                   chroma.type,
                    idfactor,
                    ylim,
                    na.rm,
@@ -600,6 +592,11 @@ R_plot <- function(spct,
   }
   if (is.null(ylim) || !is.numeric(ylim)) {
     ylim <- rep(NA_real_, 2L)
+  }
+  # delete other columns to optimize object size and code performance
+  extra.columns <- intersect(colnames(spct), c("Tfr", "Afr", "A"))
+  for (c in extra.columns) {
+    spct[[c]] <- NULL
   }
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
@@ -709,8 +706,10 @@ R_plot <- function(spct,
                             annotations = annotations,
                             label.qty = label.qty,
                             span = span,
+                            wls.target = wls.target,
                             summary.label = Rfr.label,
                             text.size = text.size,
+                            chroma.type = chroma.type,
                             na.rm = TRUE)
 
   if (!is.null(annotations) &&
@@ -750,9 +749,16 @@ R_plot <- function(spct,
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector.
 #' @param stacked logical.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param na.rm logical.
 #' @param ylim numeric y axis limits,
 #' @param ... currently ignored.
@@ -767,9 +773,11 @@ O_plot <- function(spct,
                    pc.out,
                    label.qty,
                    span,
+                   wls.target,
                    annotations,
                    stacked,
                    text.size,
+                   chroma.type,
                    na.rm,
                    ylim,
                    ...) {
@@ -806,10 +814,11 @@ O_plot <- function(spct,
   if (Rfr.type != "total") {
     warning("Only 'total' reflectance can be meaningfully plotted in a combined plot")
   }
-  if (Tfr.type != "total") {
-    warning("Only 'total' transmittance can be meaningfully plotted in a combined plot")
+  if (Tfr.type == "internal") {
+#    warning("Internal transmittance converted to total transmittance")
+    spct <- convertTfrType(spct, Tfr.type = "total")
   }
-  s.Rfr.label <- expression(atop(Spectral~~reflectance~R(lambda)~~spectral~~absorptance~~A(lambda), and~~spectral~~transmittance~T(lambda)))
+  s.Rfr.label <- expression(atop(Spectral~~reflectance~R(lambda)~~absorptance~~A(lambda), and~~transmittance~T(lambda)))
   spct[["Afr"]] <- 1.0 - spct[["Tfr"]] - spct[["Rfr"]]
   if (any((spct[["Afr"]]) < -0.01)) {
     message("Bad data or fluorescence.")
@@ -839,8 +848,11 @@ O_plot <- function(spct,
 
   }
 
+  # Once molten it will not pass checks as object_spct
+  spct.tb <- spct
+  rmDerivedSpct(spct.tb)
   molten.spct <-
-    tidyr::gather_(data = dplyr::select(spct, c("w.length", "Tfr", "Afr", "Rfr")),
+    tidyr::gather_(data = spct.tb[ , c("w.length", "Tfr", "Afr", "Rfr")],
                    key_col = "variable", value_col = "value", gather_cols = c("Tfr", "Afr", "Rfr"))
   stack.levels <- c("Tfr", "Afr", "Rfr")
   if (utils::compareVersion(
@@ -850,8 +862,10 @@ O_plot <- function(spct,
   }
   molten.spct[["variable"]] <-
     factor(molten.spct[["variable"]], levels = stack.levels)
-  setGenericSpct(molten.spct, multiple.wl = 3L * getMultipleWl(spct))
+#  setGenericSpct(molten.spct, multiple.wl = 3L * getMultipleWl(spct))
+
   plot <- ggplot(molten.spct, aes_(~w.length, ~value), na.rm = na.rm)
+  attributes(plot$data) <- c(attributes(plot$data), get_attributes(spct))
   if (stacked) {
     plot <- plot + geom_area(aes_(alpha = ~variable), fill = "black", colour = NA)
     plot <- plot + scale_alpha_manual(values = c(Tfr = 0.4,
@@ -891,8 +905,10 @@ O_plot <- function(spct,
                             annotations = annotations,
                             label.qty = label.qty,
                             span = span,
+                            wls.target = wls.target,
                             summary.label = "",
                             text.size = text.size,
+                            chroma.type = chroma.type,
                             na.rm = TRUE)
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "colour.guide", "reserve.space"), annotations)) > 0L) {
@@ -942,10 +958,17 @@ O_plot <- function(spct,
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector.
 #' @param time.format character Format as accepted by \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param text.size numeric size of text in the plot decorations.
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
@@ -979,10 +1002,12 @@ autoplot.filter_spct <-
            pc.out = FALSE,
            label.qty = NULL,
            span = NULL,
+           wls.target = "HM",
            annotations = NULL,
            time.format = "",
            tz = "UTC",
            text.size = 2.5,
+           chroma.type = "CMF",
            idfactor = NULL,
            ylim = c(NA, NA),
            object.label = deparse(substitute(object)),
@@ -1016,8 +1041,10 @@ autoplot.filter_spct <-
                            pc.out = pc.out,
                            label.qty = label.qty,
                            span = span,
+                           wls.target = wls.target,
                            annotations = annotations,
                            text.size = text.size,
+                           chroma.type = chroma.type,
                            idfactor = idfactor,
                            ylim = ylim,
                            na.rm = na.rm,
@@ -1028,8 +1055,10 @@ autoplot.filter_spct <-
                            range = range,
                            label.qty = label.qty,
                            span = span,
+                           wls.target = wls.target,
                            annotations = annotations,
                            text.size = text.size,
+                           chroma.type = chroma.type,
                            idfactor = idfactor,
                            ylim = ylim,
                            na.rm = na.rm,
@@ -1041,8 +1070,10 @@ autoplot.filter_spct <-
                              pc.out = pc.out,
                              label.qty = label.qty,
                              span = span,
+                             wls.target = wls.target,
                              annotations = annotations,
                              text.size = text.size,
+                             chroma.type = chroma.type,
                              idfactor = idfactor,
                              ylim = ylim,
                              na.rm = na.rm,
@@ -1067,10 +1098,24 @@ autoplot.filter_spct <-
 #' @export
 #'
 autoplot.filter_mspct <-
-  function(object, ..., range = NULL, plot.data = "as.is") {
+  function(object,
+           ...,
+           range = NULL,
+           plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
+           plot.data = "as.is") {
     # We trim the spectra to avoid unnecesary computaions later
     if (!is.null(range)) {
       object <- trim_wl(object, range = range, use.hinges = TRUE, fill = NULL)
+    }
+    # conversion before binding or summaries
+    if (plot.qty == "transmittance") {
+      data <- any2T(object, action = "replace")
+    } else if (plot.qty == "absorptance") {
+      data <- any2Afr(object, action = "replace")
+    } else if (plot.qty == "absorbance") {
+      data <- any2A(object, action = "replace")
+    } else {
+      stop("Invalid 'plot.qty' argument value: '", plot.qty, "'")
     }
     # we convert the collection of spectra into a single spectrum object
     # containing a summary spectrum or multiple spectra in long form.
@@ -1079,7 +1124,7 @@ autoplot.filter_mspct <-
                 median = photobiology::s_median(object),
                 as.is = photobiology::rbindspct(object)
     )
-    autoplot(object = z, range = NULL, ...)
+    autoplot(object = z, range = NULL, plot.qty = plot.qty, ...)
   }
 
 #' Create a complete ggplot for a reflector spectrum.
@@ -1107,10 +1152,17 @@ autoplot.filter_mspct <-
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector.
 #' @param time.format character Format as accepted by
 #'   \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param text.size numeric size of text in the plot decorations.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
@@ -1144,10 +1196,12 @@ autoplot.reflector_spct <-
            pc.out = FALSE,
            label.qty = NULL,
            span = NULL,
+           wls.target = "HM",
            annotations = NULL,
            time.format = "",
            tz = "UTC",
            text.size = 2.5,
+           chroma.type = "CMF",
            idfactor = NULL,
            ylim = c(NA, NA),
            object.label = deparse(substitute(object)),
@@ -1180,8 +1234,10 @@ autoplot.reflector_spct <-
                            pc.out = pc.out,
                            label.qty = label.qty,
                            span = span,
+                           wls.target = wls.target,
                            annotations = annotations,
                            text.size = text.size,
+                           chroma.type = chroma.type,
                            idfactor = idfactor,
                            ylim = ylim,
                            na.rm = na.rm,
@@ -1206,7 +1262,11 @@ autoplot.reflector_spct <-
 #' @export
 #'
 autoplot.reflector_mspct <-
-  function(object, ..., range = NULL, plot.data = "as.is") {
+  function(object,
+           ...,
+           range = NULL,
+           plot.qty = getOption("photobiology.reflector.qty", default = "reflectance"),
+           plot.data = "as.is") {
     # We trim the spectra to avoid unnecesary computaions later
     if (!is.null(range)) {
       object <- trim_wl(object, range = range, use.hinges = TRUE, fill = NULL)
@@ -1218,7 +1278,7 @@ autoplot.reflector_mspct <-
                 median = photobiology::s_median(object),
                 as.is = photobiology::rbindspct(object)
     )
-    autoplot(object = z, range = NULL, ...)
+    autoplot(object = z, range = NULL, plot.qty = plot.qty, ...)
   }
 
 #' Create a complete ggplot for a object spectrum.
@@ -1247,10 +1307,17 @@ autoplot.reflector_mspct <-
 #' @param span a peak is defined as an element in a sequence which is greater
 #'   than all other elements within a window of width span centered at that
 #'   element.
+#' @param wls.target numeric vector indicating the spectral quantity values for
+#'   which wavelengths are to be searched and interpolated if need. The
+#'   \code{character} strings "half.maximum" and "half.range" are also accepted
+#'   as arguments. A list with \code{numeric} and/or \code{character} values is
+#'   also accepted.
 #' @param annotations a character vector
 #' @param time.format character Format as accepted by \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
 #' @param stacked logical
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param text.size numeric size of text in the plot decorations.
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
@@ -1276,7 +1343,8 @@ autoplot.reflector_mspct <-
 #' @family autoplot methods
 #'
 autoplot.object_spct <-
-  function(object, ...,
+  function(object,
+           ...,
            w.band = getOption("photobiology.plot.bands",
                               default = list(UVC(), UVB(), UVA(), PAR())),
            range = NULL,
@@ -1284,11 +1352,13 @@ autoplot.object_spct <-
            pc.out = FALSE,
            label.qty = NULL,
            span = 61,
+           wls.target = "HM",
            annotations = NULL,
            time.format = "",
            tz = "UTC",
            stacked = TRUE,
            text.size = 2.5,
+           chroma.type = "CMF",
            idfactor = NULL,
            ylim = c(NA, NA),
            object.label = deparse(substitute(object)),
@@ -1321,9 +1391,11 @@ autoplot.object_spct <-
                          pc.out = pc.out,
                          label.qty = label.qty,
                          span = span,
+                         wls.target = wls.target,
                          annotations = annotations,
                          stacked = stacked,
                          text.size = text.size,
+                         chroma.type = chroma.type,
                          ylim = ylim,
                          na.rm = na.rm,
                          ...)
@@ -1335,8 +1407,10 @@ autoplot.object_spct <-
                            pc.out = pc.out,
                            label.qty = label.qty,
                            span = span,
+                           wls.target = wls.target,
                            annotations = annotations,
                            text.size = text.size,
+                           chroma.type = chroma.type,
                            idfactor = idfactor,
                            ylim = ylim,
                            na.rm = na.rm,
@@ -1348,8 +1422,10 @@ autoplot.object_spct <-
                            range = range,
                            label.qty = label.qty,
                            span = span,
+                           wls.target = wls.target,
                            annotations = annotations,
                            text.size = text.size,
+                           chroma.type = chroma.type,
                            idfactor = idfactor,
                            ylim = ylim,
                            na.rm = na.rm,
@@ -1362,8 +1438,10 @@ autoplot.object_spct <-
                              pc.out = pc.out,
                              label.qty = label.qty,
                              span = span,
+                             wls.target = wls.target,
                              annotations = annotations,
                              text.size = text.size,
+                             chroma.type = chroma.type,
                              idfactor = idfactor,
                              ylim = ylim,
                              na.rm = na.rm,
@@ -1376,8 +1454,10 @@ autoplot.object_spct <-
                            pc.out = pc.out,
                            label.qty = label.qty,
                            span = span,
+                           wls.target = wls.target,
                            annotations = annotations,
                            text.size = text.size,
+                           chroma.type = chroma.type,
                            idfactor = idfactor,
                            ylim = ylim,
                            na.rm = na.rm,

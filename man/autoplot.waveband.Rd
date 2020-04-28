@@ -11,6 +11,7 @@
   range = c(280, 800),
   fill = 0,
   span = NULL,
+  wls.target = "HM",
   unit.in = getOption("photobiology.radiation.unit", default = "energy"),
   annotations = NULL,
   wb.trim = TRUE,
@@ -37,6 +38,12 @@ range.}
 \item{span}{a peak is defined as an element in a sequence which is greater
 than all other elements within a window of width span centered at that
 element.}
+
+\item{wls.target}{numeric vector indicating the spectral quantity values for
+which wavelengths are to be searched and interpolated if need. The
+\code{character} strings "half.maximum" and "half.range" are also accepted
+as arguments. A list with \code{numeric} and/or \code{character} values is
+also accepted.}
 
 \item{unit.in}{the type of unit we assume as reference "energy" or "photon"
 based.}

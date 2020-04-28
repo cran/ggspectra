@@ -10,8 +10,10 @@ q_plot(
   range,
   label.qty,
   span,
+  wls.target,
   annotations,
   text.size,
+  chroma.type,
   idfactor,
   ylim,
   na.rm,
@@ -33,9 +35,18 @@ for labels, one of "mean", "total", "contribution", and "relative".}
 than all other elements within a window of width span centered at that
 element.}
 
+\item{wls.target}{numeric vector indicating the spectral quantity values for
+which wavelengths are to be searched and interpolated if need. The
+\code{character} strings "half.maximum" and "half.range" are also accepted
+as arguments. A list with \code{numeric} and/or \code{character} values is
+also accepted.}
+
 \item{annotations}{a character vector}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{chroma.type}{character one of "CMF" (color matching function) or "CC"
+(color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
 \item{idfactor}{character Name of an index column in data holding a
 \code{factor} with each spectrum in a long-form multispectrum object

@@ -8,10 +8,14 @@
 #' @param ymax,ymin,xmax,xmin numeric
 #' @param annotations character vector
 #' @param span numeric
+#' @param strict logical
+#' @param wls.target numeric or character vector
 #' @param label.qty character
 #' @param summary.label character
 #' @param text.size numeric
 #' @param label.color color definition or name
+#' @param chroma.type character one of "CMF" (color matching function) or "CC"
+#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param pos.shift numeric
 #' @param na.rm logical
 #'
@@ -28,6 +32,8 @@ decoration <- function(w.band,
                        x.min,
                        annotations,
                        span = NULL,
+                       strict = is.null(span),
+                       wls.target = "HM",
                        label.qty,
                        label.mult = 1,
                        summary.label,
@@ -35,6 +41,7 @@ decoration <- function(w.band,
                        time.unit = NULL,
                        text.size = 2.5,
                        label.color = NULL,
+                       chroma.type = "CMF",
                        pos.shift = 0,
                        na.rm = TRUE) {
   if (grepl(".pc", label.qty, fixed = TRUE)) {
@@ -57,83 +64,159 @@ decoration <- function(w.band,
                             na.rm = na.rm)
   z <- list()
   if ("peaks" %in% annotations) {
-    z <- c(z, stat_peaks(span = span, label.fmt = "%.4g",
-                         ignore_threshold = 0.02, color = "red",
-                         geom = "text", vjust = -0.5, size = text.size,
-                         na.rm = na.rm),
-           stat_peaks(color = "red",
+    z <- c(z,
+           stat_peaks(span = span,
+                      ignore_threshold = 0.02,
+                      strict = strict,
+                      chroma.type = chroma.type,
+                      label.fmt = "%.4g",
+                      color = "red",
+                      geom = "text",
+                      vjust = -0.5,
+                      size = text.size,
+                      na.rm = na.rm),
+           stat_peaks(chroma.type = chroma.type,
+                      color = "red",
                       span = span,
-                      shape = 16,
-                      ignore_threshold = 0.02))
+                      ignore_threshold = 0.02,
+                      strict = strict,
+                      shape = 16))
   }
   if ("peak.labels" %in% annotations) {
-    z <- c(z, stat_label_peaks(aes_(color = ~..BW.color..),
-                         span = span, label.fmt = "%.4g",
-                         ignore_threshold = 0.02,
+    z <- c(z,
+           stat_label_peaks(aes_(color = ~..BW.color..),
+                            span = span,
+                            ignore_threshold = 0.02,
+                            strict = strict,
+                            chroma.type = chroma.type,
+                            label.fmt = "%.4g",
+                            geom = "label_repel",
+                            segment.colour = "red",
+                            min.segment.length = unit(0.02, "lines"),
+                            size = text.size,
+                            box.padding = unit(0.02, "lines"),
+                            direction = "y",
+                            nudge_y = 0,
+                            na.rm = na.rm),
+           stat_peaks(chroma.type = chroma.type,
+                      color = "red",
+                      span = span,
+                      ignore_threshold = 0.02,
+                      strict = strict,
+                      shape = 16))
+  }
+  if ("valleys" %in% annotations) {
+    z <- c(z,
+           stat_valleys(span = span,
+                        ignore_threshold = 0.02,
+                        strict = strict,
+                        chroma.type = chroma.type,
+                        label.fmt = "%.4g",
+                        color = "blue",
+                        geom = "text",
+                        vjust = +1.2,
+                        size = text.size,
+                        na.rm = na.rm),
+           stat_valleys(span = span,
+                        ignore_threshold = 0.02,
+                        strict = strict,
+                        chroma.type = chroma.type,
+                        color = "blue",
+                        shape = 16))
+  }
+  if ("valley.labels" %in% annotations) {
+    z <- c(z,
+           stat_label_valleys(aes_(color = ~..BW.color..),
+                              span = span,
+                              ignore_threshold = -0.02,
+                              strict = strict,
+                              chroma.type = chroma.type,
+                              label.fmt = "%.4g",
+                              geom = "label_repel",
+                              segment.colour = "blue",
+                              min.segment.length = unit(0.02, "lines"),
+                              size = text.size,
+                              box.padding = unit(0.02, "lines"),
+                              direction = "y",
+                              nudge_y = 0,
+                              na.rm = na.rm),
+           stat_valleys(span = span,
+                        ignore_threshold = -0.02,
+                        strict = strict,
+                        chroma.type = chroma.type,
+                        color = "blue",
+                        shape = 16))
+  }
+  if ("wls" %in% annotations) {
+    z <- c(z,
+           stat_find_wls(target = wls.target,
+                         interpolate = TRUE,
+                         chroma.type = chroma.type,
+                         color = "black",
+                         geom = "text",
+                         hjust = 1.3,
+                         size = text.size,
+                         na.rm = na.rm),
+           stat_find_wls(target = wls.target,
+                         interpolate = TRUE,
+                         chroma.type = chroma.type,
+                         color = "black",
+                         shape = 16))
+  }
+  if ("wls.labels" %in% annotations) {
+    z <- c(z,
+           stat_find_wls(aes_(color = ~..BW.color..),
+                         target = wls.target,
+                         interpolate = TRUE,
+                         chroma.type = chroma.type,
+                         label.fmt = "%.4g",
                          geom = "label_repel",
-                         segment.colour = "red",
+                         segment.colour = "black",
                          min.segment.length = unit(0.02, "lines"),
                          size = text.size,
                          box.padding = unit(0.02, "lines"),
-                         direction = "y",
-                         vjust = 1,
+                         direction = "x",
+                         nudge_x = 10,
                          na.rm = na.rm),
-           stat_peaks(color = "red",
-                      span = span,
-                      shape = 16,
-                      ignore_threshold = 0.02))
-  }
-  if ("valleys" %in% annotations) {
-    z <- c(z, stat_valleys(span = span, label.fmt = "%.4g",
-                           ignore_threshold = 0.02, color = "blue",
-                           geom = "text", vjust = +1.2, size = text.size,
-                           na.rm = na.rm),
-           stat_valleys(color = "blue",
-                        span = span,
-                        shape = 16,
-                        ignore_threshold = 0.02))
-  }
-  if ("valley.labels" %in% annotations) {
-    z <- c(z, stat_label_valleys(span = span, label.fmt = "%.4g",
-                                 ignore_threshold = 0.02,
-                                 geom = "label_repel",
-                                 segment.colour = "blue",
-                                 min.segment.length = unit(0.02, "lines"),
-                                 size = text.size,
-                                 box.padding = unit(0.02, "lines"),
-                                 direction = "y",
-                                 vjust = 0,
-                                 na.rm = na.rm),
-           stat_valleys(color = "blue",
-                        span = span,
-                        shape = 16,
-                        ignore_threshold = 0.02))
+           stat_find_wls(target = wls.target,
+                         interpolate = TRUE,
+                         chroma.type = chroma.type,
+                         color = "black",
+                         shape = 16))
   }
   if ("colour.guide" %in% annotations) {
-    z <- c(z, stat_wl_strip(ymax = y.max * 1.26, ymin = y.max * 1.22,
-                            na.rm = na.rm, color = NA))
+    z <- c(z,
+           stat_wl_strip(chroma.type = chroma.type,
+                         ymax = y.max * 1.26,
+                         ymin = y.max * 1.22,
+                         na.rm = na.rm,
+                         color = NA))
   }
   if ("boxes" %in% annotations) {
-    z <- c(z, stat_wl_strip(w.band = w.band,
-                            ymax = y.max * 1.20,
-                            ymin = y.max * 1.08,
-                            color = "white",
-                            linetype = "solid",
-                            na.rm = na.rm
-    ))
+    z <- c(z,
+           stat_wl_strip(w.band = w.band,
+                         chroma.type = chroma.type,
+                         ymax = y.max * 1.20,
+                         ymin = y.max * 1.08,
+                         color = "white",
+                         linetype = "solid",
+                         na.rm = na.rm
+           ))
   } else {
     label.color <- if (is.null(label.color)) {
       label.color <- "black"
     }
   }
   if ("segments" %in% annotations) {
-    z <- c(z, stat_wl_strip(w.band = w.band,
-                            ymax = y.max * 1.10,
-                            ymin = y.max * 1.07,
-                            color = "white",
-                            linetype = "solid",
-                            na.rm = na.rm
-    ))
+    z <- c(z,
+           stat_wl_strip(w.band = w.band,
+                         chroma.type = chroma.type,
+                         ymax = y.max * 1.10,
+                         ymin = y.max * 1.07,
+                         color = "white",
+                         linetype = "solid",
+                         na.rm = na.rm
+           ))
     label.color <- "black"
     pos.shift <- 0.01
   }
@@ -151,32 +234,37 @@ decoration <- function(w.band,
     if ("summaries" %in% annotations) {
       if (label.qty %in% c("irrad", "sirrad")) {
         if (is.null(label.color)) {
-          z <- c(z, stat_wb_summary(geom = "text",
-                                    unit.in = unit.out,
-                                    time.unit = time.unit,
-                                    w.band = w.band,
-                                    label.mult = label.mult,
-                                    ypos.fixed = y.max * 1.143 + pos.shift,
-                                    mapping = mapping,
-                                    size = text.size,
-                                    na.rm = na.rm))
+          z <- c(z,
+                 stat_wb_summary(geom = "text",
+                                 unit.in = unit.out,
+                                 time.unit = time.unit,
+                                 w.band = w.band,
+                                 label.mult = label.mult,
+                                 chroma.type = chroma.type,
+                                 ypos.fixed = y.max * 1.143 + pos.shift,
+                                 mapping = mapping,
+                                 size = text.size,
+                                 na.rm = na.rm))
         } else {
-          z <- c(z, stat_wb_summary(geom = "text",
-                                    unit.in = unit.out,
-                                    time.unit = time.unit,
-                                    w.band = w.band,
-                                    label.mult = label.mult,
-                                    ypos.fixed = y.max * 1.143 + pos.shift,
-                                    color = label.color,
-                                    mapping = mapping,
-                                    size = text.size,
-                                    na.rm = na.rm))
+          z <- c(z,
+                 stat_wb_summary(geom = "text",
+                                 unit.in = unit.out,
+                                 time.unit = time.unit,
+                                 w.band = w.band,
+                                 label.mult = label.mult,
+                                 chroma.type = chroma.type,
+                                 ypos.fixed = y.max * 1.143 + pos.shift,
+                                 color = label.color,
+                                 mapping = mapping,
+                                 size = text.size,
+                                 na.rm = na.rm))
         }
       } else {
         if (is.null(label.color)) {
           z <- c(z, stat_wb_summary(geom = "text",
                                     w.band = w.band,
                                     label.mult = label.mult,
+                                    chroma.type = chroma.type,
                                     ypos.fixed = y.max * 1.143 + pos.shift,
                                     mapping = mapping,
                                     size = text.size,
@@ -185,6 +273,7 @@ decoration <- function(w.band,
           z <- c(z, stat_wb_summary(geom = "text",
                                     w.band = w.band,
                                     label.mult = label.mult,
+                                    chroma.type = chroma.type,
                                     ypos.fixed = y.max * 1.143 + pos.shift,
                                     color = label.color,
                                     mapping = mapping,
@@ -200,17 +289,21 @@ decoration <- function(w.band,
                       na.rm = na.rm))
     } else {
       if (is.null(label.color)) {
-        z <- c(z, stat_wb_label(mapping = aes_(color = ~..BW.color..),
-                                w.band = w.band,
-                                ypos.fixed = y.max * (1.143 + pos.shift),
-                                size = text.size,
-                                na.rm = na.rm))
+        z <- c(z,
+               stat_wb_label(mapping = aes_(color = ~..BW.color..),
+                             w.band = w.band,
+                             chroma.type = chroma.type,
+                             ypos.fixed = y.max * (1.143 + pos.shift),
+                             size = text.size,
+                             na.rm = na.rm))
       } else {
-        z <- c(z, stat_wb_label(w.band = w.band,
-                                ypos.fixed = y.max * (1.143 + pos.shift),
-                                color = label.color,
-                                size = text.size,
-                                na.rm = na.rm))
+        z <- c(z,
+               stat_wb_label(w.band = w.band,
+                             ypos.fixed = y.max * (1.143 + pos.shift),
+                             color = label.color,
+                             chroma.type = chroma.type,
+                             size = text.size,
+                             na.rm = na.rm))
       }
 
     }
@@ -247,7 +340,7 @@ decode_annotations <- function(annotations,
     if ("color.guide" %in% annotations.default) {
       annotations.default <- c(setdiff(annotations.default, "color.guide"), "colour.guide")
     }
-    if (length(annotations) == 0L) { # we can receive character(0) from preceeding iteration
+    if (length(annotations) == 0L) { # we can receive character(0) from preceding iteration
       z <- annotations.default
     } else if ("" %in% annotations) {
       # no annotations and do not not expand y scale
@@ -256,7 +349,7 @@ decode_annotations <- function(annotations,
       # no annotations but expand y scale to accomodate them
       z <- "reserve.space"
     } else if (annotations[1] == "-") {
-      # remove any member of a "family" of annotations if '*' wildcard is present
+      # remove any member of a "family" of annotations if '*' wild card is present
       if (any(grepl("^title[*]$", annotations))) {
         annotations.default <- annotations.default[!grepl("^title.*", annotations.default)]
       }
@@ -265,6 +358,9 @@ decode_annotations <- function(annotations,
       }
       if (any(grepl("^valleys[*]$", annotations))) {
         annotations.default <- annotations.default[!grepl("^valley.*", annotations.default)]
+      }
+      if (any(grepl("^wls[*]$", annotations))) {
+        annotations.default <- annotations.default[!grepl("^wls.*", annotations.default)]
       }
       # remove exact matches
       z <- setdiff(annotations.default, annotations[-1])
@@ -279,6 +375,9 @@ decode_annotations <- function(annotations,
       }
       if (any(grepl("^valley.*$", annotations))) {
         annotations.default <- annotations.default[!grepl("^valley.*", annotations.default)]
+      }
+      if (any(grepl("^wls.*$", annotations))) {
+        annotations.default <- annotations.default[!grepl("^wls.*", annotations.default)]
       }
       if (any(grepl("^boxes$|^segments$", annotations))) {
         annotations.default <- annotations.default[!grepl("^boxes$|^segments$", annotations.default)]
@@ -298,7 +397,7 @@ decode_annotations <- function(annotations,
     annotations.default <- z
   }
 
-  unique(z) # remove duplicates for tidyness
+  unique(z) # remove duplicates for tidiness
 }
 
 # photobiology.plot.annotations -----------------------------------------------------

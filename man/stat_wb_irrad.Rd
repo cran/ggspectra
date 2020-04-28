@@ -15,6 +15,7 @@ stat_wb_irrad(
   unit.in,
   label.qty = "total",
   label.mult = 1,
+  chroma.type = "CMF",
   label.fmt = "\%.3g",
   ypos.mult = 1.07,
   ypos.fixed = NULL,
@@ -34,6 +35,7 @@ stat_wb_e_irrad(
   unit.in = "energy",
   label.qty = "total",
   label.mult = 1,
+  chroma.type = "CMF",
   label.fmt = "\%.3g",
   ypos.mult = 1.07,
   ypos.fixed = NULL,
@@ -53,6 +55,7 @@ stat_wb_q_irrad(
   unit.in = "photon",
   label.qty = "total",
   label.mult = 1,
+  chroma.type = "CMF",
   label.fmt = "\%.3g",
   ypos.mult = 1.07,
   ypos.fixed = NULL,
@@ -84,6 +87,9 @@ vector of at least length two.}
 
 \item{label.mult}{numeric Scaling factor applied to y-integral values before
 conversion into character strings.}
+
+\item{chroma.type}{character one of "CMF" (color matching function) or "CC"
+(color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
 \item{label.fmt}{character string giving a format definition for converting
 y-integral values into character strings by means of function
@@ -196,6 +202,7 @@ Other stats functions:
 \code{\link{stat_find_wls}()},
 \code{\link{stat_label_peaks}()},
 \code{\link{stat_peaks}()},
+\code{\link{stat_spikes}()},
 \code{\link{stat_wb_box}()},
 \code{\link{stat_wb_column}()},
 \code{\link{stat_wb_contribution}()},

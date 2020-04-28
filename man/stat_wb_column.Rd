@@ -10,6 +10,7 @@ stat_wb_column(
   geom = "rect",
   w.band = NULL,
   integral.fun = integrate_xy,
+  chroma.type = "CMF",
   position = "identity",
   na.rm = FALSE,
   show.legend = NA,
@@ -31,6 +32,9 @@ the plot defaults.}
 vector of at least length two.}
 
 \item{integral.fun}{function on $x$ and $y$.}
+
+\item{chroma.type}{character one of "CMF" (color matching function) or "CC"
+(color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
 \item{position}{The position adjustment to use for overlapping points on this
 layer}
@@ -129,6 +133,7 @@ Other stats functions:
 \code{\link{stat_find_wls}()},
 \code{\link{stat_label_peaks}()},
 \code{\link{stat_peaks}()},
+\code{\link{stat_spikes}()},
 \code{\link{stat_wb_box}()},
 \code{\link{stat_wb_contribution}()},
 \code{\link{stat_wb_hbar}()},

@@ -306,8 +306,26 @@ ggplot(two_suns.spct) + aes(color = spct.idx) +
   facet_grid(spct.idx~.)
 
 ## -----------------------------------------------------------------------------
+ggplot(white_led.raw_spct, aes(w.length, counts_3)) + 
+  geom_line() + 
+  stat_spikes(color = "red", z.threshold = 8, max.spike.width = 7)
+
+## -----------------------------------------------------------------------------
+ggplot(despike(white_led.raw_spct, z.threshold = 8, max.spike.width = 7), 
+       aes(w.length, counts_3)) + 
+  geom_line()
+
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   stat_color() + scale_color_identity()
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + 
+  stat_color(chroma.type = "CC") + scale_color_identity()
+
+## -----------------------------------------------------------------------------
+ggplot(clip_wl(sun.spct)) + 
+  stat_color(chroma.type = beesxyzCMF.spct) + scale_color_identity()
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) +
@@ -318,6 +336,16 @@ ggplot(sun.spct) +
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   stat_color(geom = "bar") + 
+  geom_line(color = "black") +
+  geom_point(shape = 21, color = "black", stroke = 1.2, fill = "white") +
+  scale_fill_identity() + 
+  scale_color_identity() + 
+  theme_bw()
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + 
+  stat_color(geom = "bar", chroma.type = beesxyzCMF.spct) + 
+  geom_line(color = "black") +
   geom_point(shape = 21, color = "black", stroke = 1.2, fill = "white") +
   scale_fill_identity() + 
   scale_color_identity() + 

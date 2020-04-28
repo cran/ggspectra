@@ -11,6 +11,7 @@ cps_plot(
   pc.out,
   label.qty,
   span,
+  wls.target,
   annotations,
   norm,
   text.size,
@@ -36,6 +37,12 @@ for labels, one of "mean", "total", "contribution", and "relative".}
 \item{span}{a peak is defined as an element in a sequence which is greater
 than all other elements within a window of width span centered at that
 element.}
+
+\item{wls.target}{numeric vector indicating the spectral quantity values for
+which wavelengths are to be searched and interpolated if need. The
+\code{character} strings "half.maximum" and "half.range" are also accepted
+as arguments. A list with \code{numeric} and/or \code{character} values is
+also accepted.}
 
 \item{annotations}{a character vector}
 

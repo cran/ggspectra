@@ -11,6 +11,8 @@
 \alias{ggplot.raw_spct}
 \alias{ggplot.object_spct}
 \alias{ggplot.generic_mspct}
+\alias{ggplot.filter_mspct}
+\alias{ggplot.source_mspct}
 \title{Create a new ggplot plot from spectral data.}
 \usage{
 \method{ggplot}{source_spct}(
@@ -65,11 +67,29 @@
 )
 
 \method{ggplot}{generic_mspct}(data, mapping = NULL, ..., range = NULL, environment = parent.frame())
+
+\method{ggplot}{filter_mspct}(
+  data,
+  mapping = NULL,
+  ...,
+  range = NULL,
+  plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
+  environment = parent.frame()
+)
+
+\method{ggplot}{source_mspct}(
+  data,
+  mapping = NULL,
+  ...,
+  range = NULL,
+  unit.out = getOption("photobiology.radiation.unit", default = "energy"),
+  environment = parent.frame()
+)
 }
 \arguments{
 \item{data}{Default spectrum dataset to use for plot. If not a spectrum, the
 methods used will be those defined in package \code{ggplot2}. See
-\code{\link[ggplot2]{ggplot}}. If not specified, must be suppled in each
+\code{\link[ggplot2]{ggplot}}. If not specified, must be supplied in each
 layer added to the plot.}
 
 \item{mapping}{Default list of aesthetic mappings to use for plot. If not
@@ -78,7 +98,7 @@ specified, in the case of spectral objects, a default mapping will be used.}
 \item{...}{Other arguments passed on to methods.}
 
 \item{range}{an R object on which range() returns a vector of length 2, with
-min annd max wavelengths (nm).}
+min and max wavelengths (nm).}
 
 \item{unit.out}{character string indicating type of units to use for
 plotting spectral irradiance or spectral response, \code{"photon"} or
@@ -88,10 +108,10 @@ plotting spectral irradiance or spectral response, \code{"photon"} or
 found in the data, ggplot will look for it in this environment. It defaults
 to using the environment in which \code{ggplot()} is called.}
 
-\item{plot.qty}{character string one of \code{"transmittance"} or
-\code{"absorbance"} for \code{filter_spct}, and one of
-\code{"transmittance"}, \code{"reflectance"} or \code{"all"} for
-\code{object_spct}.}
+\item{plot.qty}{character string One of \code{"transmittance"},
+\code{"absorptance"} or \code{"absorbance"} for \code{filter_spct} objects,
+and in addition to these \code{"reflectance"}, \code{"all"} or
+\code{"as.is"} for \code{object_spct} objects.}
 }
 \description{
 \code{ggplot()} initializes a ggplot object. It can be used to declare the
@@ -128,14 +148,27 @@ mappings for different geoms.
 }
 \note{
 Current implementation does not merge the default mapping with user
-supplied mapping. If user supplies a mapping, it is used as is, and
-variables should be present in the spectral object. In contrast, when
-using the default mapping, unit conversion is done on the fly when needed.
-To add to the default mapping, \code{aes()} can be used by itself to compose
-the ggplot.
+  supplied mapping. If user supplies a mapping, it is used as is, and
+  variables should be present in the spectral object. In contrast, when using
+  the default mapping, unit or quantity conversions are done on the fly when
+  needed. To add to the default mapping, \code{aes()} can be used by itself
+  to compose the ggplot. In all cases, except when an \code{object_spct} is
+  converted into long form, the data member of the returned plot object
+  retains its class and attributes.
 
 plot.qty is ignored for reflectors.
 }
+\section{Object spectra}{
+ In the case of class object_spct, the arguments
+  \code{"all"} and \code{"as.is"} if passed to \code{plot.qty}, indicate in
+  the first case that the data are to be converted into long form, to allow
+  stacking, while in the second case \code{data} is copied unchanged to the
+  plot object. \code{"reflectance"} passed to \code{plot.qty} converts
+  \code{data} into a \code{replector_spct} object and \code{"absorbance"},
+  \code{"absorptance"} and \code{"reflectance"}, convert \code{data} into a
+  \code{filter_spct}.
+}
+
 \section{Collections of spectra}{
  The method for collections of spectra
   accepts arguments for the same parameters as the corresponding methods for

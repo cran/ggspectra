@@ -12,6 +12,8 @@ decoration(
   x.min,
   annotations,
   span = NULL,
+  strict = is.null(span),
+  wls.target = "HM",
   label.qty,
   label.mult = 1,
   summary.label,
@@ -19,6 +21,7 @@ decoration(
   time.unit = NULL,
   text.size = 2.5,
   label.color = NULL,
+  chroma.type = "CMF",
   pos.shift = 0,
   na.rm = TRUE
 )
@@ -30,6 +33,10 @@ decoration(
 
 \item{span}{numeric}
 
+\item{strict}{logical}
+
+\item{wls.target}{numeric or character vector}
+
 \item{label.qty}{character}
 
 \item{summary.label}{character}
@@ -37,6 +44,9 @@ decoration(
 \item{text.size}{numeric}
 
 \item{label.color}{color definition or name}
+
+\item{chroma.type}{character one of "CMF" (color matching function) or "CC"
+(color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
 \item{pos.shift}{numeric}
 

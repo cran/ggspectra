@@ -15,17 +15,25 @@
   pc.out = FALSE,
   label.qty = NULL,
   span = NULL,
+  wls.target = "HM",
   annotations = NULL,
   time.format = "",
   tz = "UTC",
   text.size = 2.5,
+  chroma.type = "CMF",
   idfactor = NULL,
   ylim = c(NA, NA),
   object.label = deparse(substitute(object)),
   na.rm = TRUE
 )
 
-\method{autoplot}{reflector_mspct}(object, ..., range = NULL, plot.data = "as.is")
+\method{autoplot}{reflector_mspct}(
+  object,
+  ...,
+  range = NULL,
+  plot.qty = getOption("photobiology.reflector.qty", default = "reflectance"),
+  plot.data = "as.is"
+)
 }
 \arguments{
 \item{object}{a reflector_spct object or a reflector_mspct object.}
@@ -49,6 +57,12 @@ for labels, one of "mean", "total", "contribution", and "relative".}
 than all other elements within a window of width span centered at that
 element.}
 
+\item{wls.target}{numeric vector indicating the spectral quantity values for
+which wavelengths are to be searched and interpolated if need. The
+\code{character} strings "half.maximum" and "half.range" are also accepted
+as arguments. A list with \code{numeric} and/or \code{character} values is
+also accepted.}
+
 \item{annotations}{a character vector.}
 
 \item{time.format}{character Format as accepted by
@@ -57,6 +71,9 @@ element.}
 \item{tz}{character Time zone to use for title and/or subtitle.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
+
+\item{chroma.type}{character one of "CMF" (color matching function) or "CC"
+(color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
 \item{idfactor}{character Name of an index column in data holding a
 \code{factor} with each spectrum in a long-form multispectrum object

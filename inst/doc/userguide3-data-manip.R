@@ -71,11 +71,14 @@ ggplot(sun.spct) +
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() + 
-  stat_peaks(colour = "green", span = NULL) +
+  stat_peaks(size = 3, span = NULL) +
+  stat_peaks(geom = "vline", linetype = "dotted", span = NULL) +
   geom_line(data = . %>% smooth_spct(method = "supsmu"), 
             colour = "red", size = 1.2) +
   stat_peaks(data = . %>% smooth_spct(method = "supsmu"),
-             colour = "green", span = NULL)
+             size = 3, span = NULL) +
+  stat_peaks(data = . %>% smooth_spct(method = "supsmu"),
+             geom = "vline", linetype = "dotted", span = NULL)
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
@@ -85,17 +88,14 @@ ggplot(sun.spct) +
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() + 
-  geom_point(data = . %>% 
-              trim_wl(range = PAR()) %>% tag(),
+  geom_point(data = . %>% trim_wl(range = VIS()) %>% tag(),
             mapping = aes(color = wl.color),
             shape = "circle", size = 1.3) +
   scale_color_identity()
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
-  geom_area(data = . %>% 
-              trim_wl(range = VIS()) %>% 
-              tag(w.band = VIS_bands()),
+  geom_area(data = . %>% trim_wl(range = VIS()) %>% tag(w.band = VIS_bands()),
             mapping = aes(fill = wb.color)) +
   geom_line() + 
   scale_fill_identity()

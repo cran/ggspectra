@@ -12,6 +12,7 @@ stat_label_peaks(
   span = 5,
   ignore_threshold = 0,
   strict = TRUE,
+  chroma.type = "CMF",
   label.fmt = "\%.3g",
   x.label.fmt = label.fmt,
   y.label.fmt = label.fmt,
@@ -30,6 +31,7 @@ stat_label_valleys(
   span = 5,
   ignore_threshold = 0,
   strict = TRUE,
+  chroma.type = "CMF",
   label.fmt = "\%.3g",
   x.label.fmt = label.fmt,
   y.label.fmt = label.fmt,
@@ -61,6 +63,9 @@ threshold below which peaks will be ignored.}
 
 \item{strict}{logical flag: if TRUE, an element must be strictly greater than
 all other values in its window to be considered a peak. Default: FALSE.}
+
+\item{chroma.type}{character one of "CMF" (color matching function) or "CC"
+(color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
 \item{label.fmt}{character  string giving a format definition for converting
 values into character strings by means of function \code{\link{sprintf}}.}
@@ -190,6 +195,7 @@ Other stats functions:
 \code{\link{stat_find_qtys}()},
 \code{\link{stat_find_wls}()},
 \code{\link{stat_peaks}()},
+\code{\link{stat_spikes}()},
 \code{\link{stat_wb_box}()},
 \code{\link{stat_wb_column}()},
 \code{\link{stat_wb_contribution}()},

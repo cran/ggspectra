@@ -10,6 +10,7 @@ stat_find_qtys(
   geom = "point",
   target = "half.maximum",
   interpolate = TRUE,
+  chroma.type = "CMF",
   label.fmt = "\%.3g",
   x.label.fmt = label.fmt,
   y.label.fmt = label.fmt,
@@ -30,15 +31,16 @@ the plot defaults.}
 
 \item{geom}{The geometric object to use display the data}
 
-\item{target}{numeric vector indicating the spectral quantity values for
-which wavelengths are to be searched and interpolated if need. The
-\code{character} strings "half.maximum" and "half.range" are also accepted
-as arguments. A list with \code{numeric} and/or \code{character} values is
-also accepted.}
+\item{target}{numeric value indicating the spectral quantity value for which
+wavelengths are to be searched and interpolated if need. The character
+string "half.maximum" is also accepted as argument.}
 
-\item{interpolate}{logical Indicating whether the nearest wavelength value in
-\code{x} should be returned or a value calculated by linear interpolation
-between wavelength values stradling the target.}
+\item{interpolate}{logical Indicating whether the nearest wavelength value
+in \code{x} should be returned or a value calculated by linear
+interpolation between wavelength values straddling the target.}
+
+\item{chroma.type}{character one of "CMF" (color matching function) or "CC"
+(color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
 \item{label.fmt}{character  string giving a format definition for converting
 values into character strings by means of function \code{\link{sprintf}}.}
@@ -138,6 +140,7 @@ Other stats functions:
 \code{\link{stat_find_wls}()},
 \code{\link{stat_label_peaks}()},
 \code{\link{stat_peaks}()},
+\code{\link{stat_spikes}()},
 \code{\link{stat_wb_box}()},
 \code{\link{stat_wb_column}()},
 \code{\link{stat_wb_contribution}()},

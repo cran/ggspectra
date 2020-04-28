@@ -116,13 +116,16 @@ filter_no_yes.spct <-
 autoplot(filter_no_yes.spct)
 
 ## -----------------------------------------------------------------------------
-autoplot(yellow_gel.spct, annotations = c("-", "peaks"))
+autoplot(yellow_gel.spct, 
+         annotations = list(c("-", "peaks"), c("+", "wls")))
 
 ## -----------------------------------------------------------------------------
-autoplot(yellow_gel.spct, pc.out = TRUE, annotations = c("-", "peaks"))
+autoplot(yellow_gel.spct, pc.out = TRUE, 
+         annotations = list(c("-", "peaks"), c("+", "wls")))
 
 ## -----------------------------------------------------------------------------
-autoplot(yellow_gel.spct, plot.qty = "absorbance", annotations = c("-", "peaks"))
+autoplot(yellow_gel.spct, plot.qty = "absorbance", wls.target = 2,
+         annotations = list(c("-", "peaks"), c("+", "wls")))
 
 ## ---- eval=FALSE, echo=FALSE--------------------------------------------------
 #  yellow_gel.spct$Rfr <- 1 - max(yellow_gel.spct$Tfr)
@@ -139,13 +142,18 @@ autoplot(yellow_gel.spct, annotations = c("+", "boundaries"))
 ## -----------------------------------------------------------------------------
 autoplot(white_led.raw_spct, annotations = c("+", "boundaries"))
 
-## -----------------------------------------------------------------------------
-autoplot(dplyr::select(white_led.raw_spct, w.length, counts = counts_1),
-     annotations = c("+", "boundaries"))
+## ---- eval=FALSE--------------------------------------------------------------
+#  autoplot(dplyr::select(white_led.raw_spct, w.length, counts = counts_1),
+#       annotations = c("+", "boundaries"))
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  autoplot(dplyr::select(white_led.raw_spct, w.length, counts_1, counts_3),
+#       annotations = c("+", "boundaries"))
 
 ## -----------------------------------------------------------------------------
-autoplot(dplyr::select(white_led.raw_spct, w.length, counts_1, counts_3),
-     annotations = c("+", "boundaries"))
+autoplot(sun.spct, 
+         chroma.type = beesxyzCMF.spct,
+          annotations = c("=", "color.guide"))
 
 ## -----------------------------------------------------------------------------
 two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct / 2))

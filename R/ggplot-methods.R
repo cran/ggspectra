@@ -33,19 +33,32 @@
 #'
 #' @param data Default spectrum dataset to use for plot. If not a spectrum, the
 #'   methods used will be those defined in package \code{ggplot2}. See
-#'   \code{\link[ggplot2]{ggplot}}. If not specified, must be suppled in each
+#'   \code{\link[ggplot2]{ggplot}}. If not specified, must be supplied in each
 #'   layer added to the plot.
 #' @param mapping Default list of aesthetic mappings to use for plot. If not
 #'   specified, in the case of spectral objects, a default mapping will be used.
 #' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm).
+#'   min and max wavelengths (nm).
 #' @param unit.out character string indicating type of units to use for
 #'   plotting spectral irradiance or spectral response, \code{"photon"} or
 #'   \code{"energy"}.
+#' @param plot.qty character string One of \code{"transmittance"},
+#'   \code{"absorptance"} or \code{"absorbance"} for \code{filter_spct} objects,
+#'   and in addition to these \code{"reflectance"}, \code{"all"} or
+#'   \code{"as.is"} for \code{object_spct} objects.
 #' @param ... Other arguments passed on to methods.
 #' @param environment If a variable defined in the aesthetic mapping is not
 #'   found in the data, ggplot will look for it in this environment. It defaults
 #'   to using the environment in which \code{ggplot()} is called.
+#'
+#' @section Object spectra: In the case of class object_spct, the arguments
+#'   \code{"all"} and \code{"as.is"} if passed to \code{plot.qty}, indicate in
+#'   the first case that the data are to be converted into long form, to allow
+#'   stacking, while in the second case \code{data} is copied unchanged to the
+#'   plot object. \code{"reflectance"} passed to \code{plot.qty} converts
+#'   \code{data} into a \code{replector_spct} object and \code{"absorbance"},
+#'   \code{"absorptance"} and \code{"reflectance"}, convert \code{data} into a
+#'   \code{filter_spct}.
 #'
 #' @section Collections of spectra: The method for collections of spectra
 #'   accepts arguments for the same parameters as the corresponding methods for
@@ -67,11 +80,13 @@
 #' ggplot(Ler_leaf.spct) + aes(linetype = variable) + geom_line()
 #'
 #' @note Current implementation does not merge the default mapping with user
-#' supplied mapping. If user supplies a mapping, it is used as is, and
-#' variables should be present in the spectral object. In contrast, when
-#' using the default mapping, unit conversion is done on the fly when needed.
-#' To add to the default mapping, \code{aes()} can be used by itself to compose
-#' the ggplot.
+#'   supplied mapping. If user supplies a mapping, it is used as is, and
+#'   variables should be present in the spectral object. In contrast, when using
+#'   the default mapping, unit or quantity conversions are done on the fly when
+#'   needed. To add to the default mapping, \code{aes()} can be used by itself
+#'   to compose the ggplot. In all cases, except when an \code{object_spct} is
+#'   converted into long form, the data member of the returned plot object
+#'   retains its class and attributes.
 #'
 #' @name ggplot
 #'
@@ -84,10 +99,10 @@ ggplot.source_spct <-
     }
     if (is.null(mapping)) {
       if (unit.out == "energy") {
-        data <- q2e(data)
+        data <- q2e(data, action = "replace")
         mapping <- aes_(~w.length, ~s.e.irrad)
       } else if (unit.out %in% c("photon", "quantum")) {
-        data <- e2q(data)
+        data <- e2q(data, action = "replace")
         mapping <- aes_(~w.length, ~s.q.irrad)
       } else {
         stop("Invalid 'unit.out' argument value: '", unit.out, "'")
@@ -137,11 +152,6 @@ ggplot.response_spct <-
 
 #' @rdname ggplot
 #'
-#' @param plot.qty character string one of \code{"transmittance"} or
-#'   \code{"absorbance"} for \code{filter_spct}, and one of
-#'   \code{"transmittance"}, \code{"reflectance"} or \code{"all"} for
-#'   \code{object_spct}.
-#'
 #' @export
 #'
 ggplot.filter_spct <-
@@ -153,13 +163,13 @@ ggplot.filter_spct <-
     }
     if (is.null(mapping)) {
       if (plot.qty == "transmittance") {
-        data <- A2T(data)
+        data <- any2T(data, action = "replace")
         mapping <- aes_(~w.length, ~Tfr)
       } else if (plot.qty == "absorptance") {
-        data <- T2Afr(data)
+        data <- any2Afr(data, action = "replace")
         mapping <- aes_(~w.length, ~Afr)
       } else if (plot.qty == "absorbance") {
-        data <- T2A(data)
+        data <- any2A(data, action = "replace")
         mapping <- aes_(~w.length, ~A)
       } else {
         stop("Invalid 'plot.qty' argument value: '", plot.qty, "'")
@@ -297,8 +307,8 @@ ggplot.object_spct <-
     if (plot.qty == "reflectance") {
       return(ggplot(as.reflector_spct(data)))
     } else if (plot.qty %in% c("transmittance", "absorbance", "absorptance")) {
-      return(ggplot(as.filter_spct(data)))
-    } else if (plot.qty != "all") {
+      return(ggplot(as.filter_spct(data), plot.qty = plot.qty))
+    } else if (!plot.qty %in% c("all", "as.is")) {
       stop("Invalid 'plot.qty' argument value: '", plot.qty, "'")
     }
     # compute absorptance
@@ -306,21 +316,32 @@ ggplot.object_spct <-
     if (any((data[["Afr"]]) < -0.01)) {
       message("Bad data or fluorescence.")
     }
-    # melt data into long form
-    molten.data <-
-      tidyr::gather_(data = dplyr::select(data, c("w.length", "Tfr", "Afr", "Rfr")),
-                     key_col = "variable", value_col = "value", gather_cols = c("Tfr", "Afr", "Rfr"))
-    # if not supplied create a mapping
-    if (is.null(mapping)) {
-      mapping <- aes_(~w.length, ~value)
+    if (plot.qty == "as.is") {
+      data.class <- class(data)
+      rmDerivedSpct(data)
+      p <- ggplot2::ggplot(data = data, mapping = mapping, ...,
+                           environment = environment)
+      class(p[["data"]]) <- data.class
+    } else {
+      # Attributes will be lost when melting the tibble
+      data.attributes <- get_attributes(data)
+      # Once molten it will not pass checks as object_spct
+      rmDerivedSpct(data)
+      # melt data into long form
+      molten.data <-
+        tidyr::gather_(data = data[ , c("w.length", "Tfr", "Afr", "Rfr")],
+                       key_col = "variable", value_col = "value", gather_cols = c("Tfr", "Afr", "Rfr"))
+      # if not supplied create a mapping
+      if (is.null(mapping)) {
+        mapping <- aes_(~w.length, ~value)
+      }
+      # roundabout way of retaining the attributes without calling any
+      # private (not exported) method or function from 'ggplot2'
+      rmDerivedSpct(molten.data)
+      p <- ggplot2::ggplot(data = molten.data, mapping = mapping, ...,
+                           environment = environment)
+      attributes(p$data) <- c(attributes(p$data), data.attributes)
     }
-    # roundabout way of retaining the derived classes without calling any
-    # private (not exported) method or function from 'ggplot2'
-    data.class <- class(molten.data)
-    rmDerivedSpct(molten.data)
-    p <- ggplot2::ggplot(data = molten.data, mapping = mapping, ...,
-                         environment = environment)
-    class(p[["data"]]) <- data.class
     p
   }
 
@@ -337,5 +358,71 @@ ggplot.generic_mspct <-
       data <- trim_wl(data, range = range, use.hinges = TRUE, fill = NULL)
     }
     spct <- rbindspct(data)
-    ggplot(data = spct, mapping = mapping, ...)
+    ggplot(data = spct, mapping = mapping, ..., environment = environment)
   }
+
+#' @rdname ggplot
+#'
+#' @export
+#'
+ggplot.filter_mspct <-
+  function(data, mapping = NULL, ..., range = NULL,
+           plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
+           environment = parent.frame()) {
+    if (!is.null(range)) {
+      data <- trim_wl(data, range = range, use.hinges = TRUE, fill = NULL)
+    }
+    # conversion before binding as filter properties can differ
+    if (is.null(mapping)) {
+      if (plot.qty == "transmittance") {
+        data <- any2T(data, action = "replace")
+        mapping <- aes_(~w.length, ~Tfr)
+      } else if (plot.qty == "absorptance") {
+        data <- any2Afr(data, action = "replace")
+        mapping <- aes_(~w.length, ~Afr)
+      } else if (plot.qty == "absorbance") {
+        data <- any2A(data, action = "replace")
+        mapping <- aes_(~w.length, ~A)
+      } else {
+        stop("Invalid 'plot.qty' argument value: '", plot.qty, "'")
+      }
+    }
+    spct <- rbindspct(data)
+    ggplot(data = spct,
+           mapping = mapping,
+           plot.qty = plot.qty,
+           ...,
+           environment = environment)
+  }
+
+#' @rdname ggplot
+#'
+#' @export
+#'
+ggplot.source_mspct <-
+  function(data, mapping = NULL, ..., range = NULL,
+           unit.out = getOption("photobiology.radiation.unit", default = "energy"),
+           environment = parent.frame()) {
+    if (!is.null(range)) {
+      data <- trim_wl(data, range = range, use.hinges = TRUE, fill = NULL)
+    }
+    # conversion before binding, to avoid multiple conversions
+    if (is.null(mapping)) {
+      if (unit.out == "energy") {
+        data <- q2e(data, action = "replace")
+        mapping <- aes_(~w.length, ~s.e.irrad)
+      } else if (unit.out %in% c("photon", "quantum")) {
+        data <- e2q(data, action = "replace")
+        mapping <- aes_(~w.length, ~s.q.irrad)
+      } else {
+        stop("Invalid 'unit.out' argument value: '", unit.out, "'")
+      }
+    }
+    spct <- rbindspct(data)
+    ggplot(data = spct,
+           mapping = mapping,
+           unit.out = unit.out,
+           ...,
+           environment = environment)
+  }
+
