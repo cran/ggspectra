@@ -1,4 +1,4 @@
-## -----------------------------------------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 library(ggplot2)
 library(dplyr)
 library(scales)
@@ -7,9 +7,7 @@ library(photobiologyWavebands)
 library(ggspectra)
 library(ggrepel)
 
-good_label_repel <- packageVersion('ggrepel') != "0.8.0" #||
-#  packageVersion('ggplot2') >= "3.1.0"
-
+good_label_repel <- packageVersion('ggrepel') != "0.8.0"
 
 ## ---- include=FALSE, echo=FALSE-----------------------------------------------
 library(knitr)
@@ -82,6 +80,70 @@ ggplot(two_suns.mspct) +
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.e.irrad_continuous()
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous(unit.exponent = -6) +
+  scale_y_s.e.irrad_continuous(unit.exponent = -3)
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous(unit.exponent = -7)  +
+  scale_y_s.e.irrad_continuous()
+
+## -----------------------------------------------------------------------------
+nearest_SI_exponent(-4)
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous(unit.exponent = nearest_SI_exponent(-4))  +
+  scale_y_s.e.irrad_continuous()
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.e.irrad_continuous(unit.exponent = 0,
+                               labels = SI_tg_format(exponent = -3))
+
+## -----------------------------------------------------------------------------
+temp.spct <- clean(sun.spct, range.s.data = c(1e-20, Inf), fill = 1e-20)
+ggplot(temp.spct) + 
+  geom_line(na.rm = TRUE) +
+  scale_x_wl_continuous() +
+  scale_y_s.e.irrad_continuous(unit.exponent = 0,
+                               trans = "log10",
+                               labels = trans_format("log10", math_format()),
+                               limits = c(1e-6, NA))
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous(label.text = "Longitud de onda,") +
+  scale_y_s.e.irrad_continuous(label.text = "Irradiancia,")
+
+## -----------------------------------------------------------------------------
+norm_sun.spct <- normalize(sun.spct)
+ggplot(norm_sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.e.irrad_continuous(normalized = getNormalized(norm_sun.spct))
+
+## -----------------------------------------------------------------------------
+scaled_sun.spct <- fscale(sun.spct)
+ggplot(scaled_sun.spct) + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_s.e.irrad_continuous(scaled = is_scaled(scaled_sun.spct))
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + 
+  geom_line() +
   scale_x_wl_continuous()
 
 ## -----------------------------------------------------------------------------
@@ -100,33 +162,22 @@ ggplot(sun.spct) +
   scale_x_wl_continuous(sec.axis = sec_axis_w_frequency(15))
 
 ## -----------------------------------------------------------------------------
-ggplot(sun.spct) + 
-  geom_line() +
-  scale_x_wl_continuous(sec.axis = sec_axis_w_frequency(14))
-
-## -----------------------------------------------------------------------------
-nearest_SI_exponent(14)
-
-## -----------------------------------------------------------------------------
 ggplot(white_led.raw_spct) + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_counts_continuous()
-  
 
 ## -----------------------------------------------------------------------------
 ggplot(white_led.raw_spct) + 
   geom_line() +
   scale_x_wl_continuous() +
   scale_y_counts_tg_continuous()
-  
 
 ## -----------------------------------------------------------------------------
 ggplot(white_led.cps_spct) + 
   geom_line() +
   scale_x_wl_continuous() +
-  scale_y_counts_continuous()
-  
+  scale_y_cps_continuous(unit.exponent = 3)
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
@@ -138,77 +189,57 @@ ggplot(sun.spct) +
 ggplot(sun.spct, unit.out = "photon") + 
   geom_line() +
   scale_x_wl_continuous() +
-  scale_y_s.q.irrad_continuous()
+  scale_y_s.e.irrad_log10(unit.exponent = -6)
 
 ## -----------------------------------------------------------------------------
-ggplot(sun.spct) + 
-  geom_line() +
-  scale_x_wl_continuous(-6) +
-  scale_y_s.e.irrad_continuous(-3)
-
-## -----------------------------------------------------------------------------
-ggplot(sun.spct, unit.out = "photon") + 
+ggplot(ccd.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
-  scale_y_s.q.irrad_continuous(unit.exponent = 0,
-                               labels = scientific_format())
+  scale_y_s.e.response_continuous(unit.exponent = 6)
 
 ## -----------------------------------------------------------------------------
-library(scales)
-ggplot(sun.spct, unit.out = "photon") + 
+ggplot(ccd.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
-  scale_y_s.q.irrad_continuous(unit.exponent = 0,
-                               labels = SI_tg_format(exponent = -6))
-
-## -----------------------------------------------------------------------------
-temp.spct <- clean(sun.spct, range.s.data = c(1e-20, Inf), fill = 1e-20)
-ggplot(temp.spct, unit.out = "photon") + 
-  geom_line(na.rm = TRUE) +
-  scale_x_wl_continuous() +
-  scale_y_s.q.irrad_continuous(unit.exponent = 0,
-                               trans = "log10",
-                               labels = trans_format("log10", math_format()),
-                               limits = c(1e-12, NA))
-
-## -----------------------------------------------------------------------------
-ggplot(ccd.spct, unit.out = "photon") + 
-  geom_line() +
-  scale_x_wl_continuous() +
-  scale_y_s.q.response_continuous()
-
-## -----------------------------------------------------------------------------
-ggplot(ccd.spct, unit.out = "photon") + 
-  geom_line() +
-  scale_x_wl_continuous() +
-  scale_y_s.q.response_continuous(trans = "log10",
-                                  labels = trans_format("log10", math_format()))
+  scale_y_s.e.action_continuous(unit.exponent = 6)
 
 ## -----------------------------------------------------------------------------
 ggplot(yellow_gel.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
-  scale_y_Tfr_total_continuous()
-  
+  scale_y_Tfr_continuous(Tfr.type = getTfrType(yellow_gel.spct))
 
 ## -----------------------------------------------------------------------------
 ggplot(yellow_gel.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
-  scale_y_Tfr_total_continuous(labels = percent)
-  
+  scale_y_Tfr_continuous(Tfr.type = getTfrType(yellow_gel.spct),
+                         labels = percent)
 
 ## -----------------------------------------------------------------------------
-ggplot(yellow_gel.spct, plot.qty = "absorbance") + 
+gel_internal.spct <- convertTfrType(yellow_gel.spct, Tfr.type = "internal")
+ggplot(gel_internal.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
-  scale_y_A_total_continuous()
+  scale_y_Tfr_continuous(Tfr.type = getTfrType(gel_internal.spct))
+
+## -----------------------------------------------------------------------------
+ggplot(gel_internal.spct, plot.qty = "absorbance") + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_A_continuous(Tfr.type = getTfrType(gel_internal.spct))
+
+## -----------------------------------------------------------------------------
+ggplot(yellow_gel.spct, plot.qty = "absorptance") + 
+  geom_line() +
+  scale_x_wl_continuous() +
+  scale_y_Afr_continuous()
 
 ## -----------------------------------------------------------------------------
 ggplot(green_leaf.spct) + 
   geom_line() +
   scale_x_wl_continuous() +
-  scale_y_Rfr_total_continuous()
+  scale_y_Rfr_continuous(Rfr.type = getRfrType(green_leaf.spct))
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + stat_peaks(color = "red")

@@ -6,9 +6,10 @@
 \usage{
 scale_x_wl_continuous(
   unit.exponent = -9,
-  name = w_length_label(unit.exponent = unit.exponent),
+  name = w_length_label(unit.exponent = unit.exponent, label.text = label.text),
   breaks = scales::pretty_breaks(n = 7),
   labels = SI_pl_format(exponent = unit.exponent + 9),
+  label.text = axis_labels()[["w.length"]],
   ...
 )
 }
@@ -21,6 +22,8 @@ scale_x_wl_continuous(
 
 \item{labels}{The tick labels or a function to generate them from the tick
 positions.}
+
+\item{label.text}{character Textual portion of the labels.}
 
 \item{...}{other named arguments passed to \code{scale_y_continuous}}
 }
@@ -40,6 +43,10 @@ ggplot(sun.spct) +
 ggplot(sun.spct) +
   geom_line() +
   scale_x_wl_continuous(-6)
+
+ggplot(sun.spct) +
+  geom_line() +
+  scale_x_wl_continuous(sec.axis = sec_axis_w_frequency())
 
 ggplot(sun.spct) +
   geom_line() +

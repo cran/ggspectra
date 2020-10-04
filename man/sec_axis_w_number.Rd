@@ -5,12 +5,14 @@
 \alias{sec_axis_w_frequency}
 \title{Secondary axes for wavelengths}
 \usage{
-sec_axis_w_number(unit.exponent = -6)
+sec_axis_w_number(unit.exponent = -6, label.text = axis_labels()[["w.number"]])
 
-sec_axis_w_frequency(unit.exponent = 12)
+sec_axis_w_frequency(unit.exponent = 12, label.text = axis_labels()[["freq"]])
 }
 \arguments{
 \item{unit.exponent}{integer}
+
+\item{label.text}{character Textual portion of the labels.}
 }
 \description{
 Secondary axes for wavelength data in nanometres. With suitable scaling and

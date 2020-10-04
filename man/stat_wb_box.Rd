@@ -12,6 +12,7 @@ stat_wb_box(
   chroma.type = "CMF",
   ypos.mult = 1.07,
   ypos.fixed = NULL,
+  box.height = 0.06,
   position = "identity",
   na.rm = FALSE,
   show.legend = NA,
@@ -35,11 +36,15 @@ vector of at least length two.}
 \item{chroma.type}{character one of "CMF" (color matching function) or "CC"
 (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.}
 
-\item{ypos.mult}{numeric Multiplier constant used to scale returned
-\code{y} values.}
+\item{ypos.mult}{numeric Multiplier constant used to compute returned
+\code{y} values. This is numerically similar to using npc units, but values
+larger than one expand the plotting area.}
 
 \item{ypos.fixed}{numeric If not \code{NULL} used a constant value returned
 in \code{y}.}
+
+\item{box.height}{numeric The height of the box as a fraction of the range of
+$y$. This is similar to using npc units.}
 
 \item{position}{The position adjustment to use for overlapping points on this
 layer}
@@ -85,6 +90,8 @@ to the data, with default \code{integrate_xy}.
   \item{wb.xmax}{w.band maximum}
   \item{wb.ymin}{data$y minimum}
   \item{wb.ymax}{data$y maximum}
+  \item{ymin}{box bottom}
+  \item{ymax}{box top}
   \item{y}{ypos.fixed or top of data, adjusted by \code{ypos.mult}}
   \item{wb.color}{color of the w.band}
   \item{wb.name}{label of w.band}
@@ -96,10 +103,10 @@ to the data, with default \code{integrate_xy}.
 
 Set by the statistic and available to geoms.
 \describe{
-  \item{xmin}{..wb.xmin..}
-  \item{xmax}{..wb.xmax..}
-  \item{ymin}{..y.. - (..wb.ymax.. - ..wb.ymin..) * 0.03}
-  \item{ymax}{..y.. + (..wb.ymax.. - ..wb.ymin..) * 0.03}
+  \item{xmin}{stat(wb.xmin)}
+  \item{xmax}{stat(wb.xmax)}
+  \item{ymin}{stat(ymin)}
+  \item{ymax}{stat(ymax)}
   \item{fill}{..wb.color..}
 }
 }

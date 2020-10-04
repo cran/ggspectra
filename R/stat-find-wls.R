@@ -140,8 +140,8 @@ StatFindWls <-
                      dplyr::mutate(wls.df,
                                    x.label = sprintf(x.label.fmt, x),
                                    y.label = sprintf(y.label.fmt, y),
-                                   wl.color = photobiology::color_of(x, chroma.type = chroma.type),
-                                   BW.color = black_or_white(photobiology::color_of(x, chroma.type = chroma.type)))
+                                   wl.color = photobiology::fast_color_of_wl(x, chroma.type = chroma.type),
+                                   BW.color = black_or_white(wl.color))
                    },
                    default_aes = ggplot2::aes(label = stat(x.label),
                                               fill = stat(wl.color),
@@ -316,8 +316,8 @@ StatFindQty <-
                          dplyr::mutate(rows.df,
                                        x.label = sprintf(x.label.fmt, x),
                                        y.label = sprintf(y.label.fmt, y),
-                                       wl.color = color_of(x, chroma.type = chroma.type),
-                                       BW.color = black_or_white(color_of(x, chroma.type = chroma.type)))
+                                       wl.color = photobiology::fast_color_of_wl(x, chroma.type = chroma.type),
+                                       BW.color = black_or_white(wl.color))
                      }
                      rows.df
                    },

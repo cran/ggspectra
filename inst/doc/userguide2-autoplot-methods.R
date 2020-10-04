@@ -162,6 +162,9 @@ mixed.mspct <- generic_mspct(list(sun = sun.spct, filter = polyester.spct))
 ## -----------------------------------------------------------------------------
 autoplot(two_suns.mspct)
 
+## -----------------------------------------------------------------------------
+autoplot(two_suns.mspct, facets = 1)
+
 ## ---- fig.width = 7, fig.height = 8-------------------------------------------
 autoplot(two_suns.mspct, idfactor = NA) + 
   facet_wrap(~spct.idx, ncol = 1)

@@ -6,16 +6,26 @@
 \title{Raw-counts y-scale}
 \usage{
 scale_y_counts_continuous(
-  unit.exponent = 3,
-  name = counts_label(unit.exponent = unit.exponent),
+  unit.exponent = ifelse(normalized, 0, 3),
+  name = counts_label(unit.exponent = unit.exponent, format = format, label.text =
+    label.text, scaled = scaled, normalized = round(normalized, 1)),
   labels = SI_pl_format(exponent = unit.exponent),
+  format = getOption("photobiology.math", default = "R.expression"),
+  label.text = axis_labels()[["counts"]],
+  scaled = FALSE,
+  normalized = FALSE,
   ...
 )
 
 scale_y_counts_tg_continuous(
-  unit.exponent = 3,
-  name = counts_label(unit.exponent = 0),
+  unit.exponent = ifelse(normalized, 0, 3),
+  name = counts_label(unit.exponent = 0, format = format, label.text = label.text,
+    scaled = scaled, normalized = round(normalized, 1)),
   labels = SI_tg_format(exponent = unit.exponent),
+  format = getOption("photobiology.math", default = "R.expression"),
+  label.text = axis_labels()[["counts"]],
+  scaled = FALSE,
+  normalized = FALSE,
   ...
 )
 }
@@ -26,14 +36,25 @@ scale_y_counts_tg_continuous(
 
 \item{labels}{The tick labels or a function to generate them.}
 
+\item{format}{character string, "R", "R.expression", "R.character", or
+"LaTeX".}
+
+\item{label.text}{character Textual portion of the labels.}
+
+\item{scaled}{logical If \code{TRUE} relative units are assumed.}
+
+\item{normalized}{logical (\code{FALSE}) or numeric Normalization wavelength
+in manometers (nm).}
+
 \item{...}{other named arguments passed to \code{scale_y_continuous}}
 }
 \description{
 Scale y continuous with defaults suitable for raw detector counts.
 }
 \note{
-This function only alters two default arguments, please, see
-documentation for \code{\link[ggplot2]{scale_continuous}}
+This function only alters default arguments values for \code{name} and
+  \code{labels}, please, see documentation for
+  \code{\link[ggplot2]{scale_continuous}} for other parameters.
 }
 \examples{
 
@@ -44,12 +65,29 @@ ggplot(white_led.raw_spct) +
 
 ggplot(white_led.raw_spct) +
   geom_line() +
-  scale_y_counts_continuous(0) +
+  scale_y_counts_continuous(unit.exponent = 0) +
   scale_x_wl_continuous()
 
 ggplot(white_led.raw_spct) +
   geom_line() +
   scale_y_counts_tg_continuous() +
+  scale_x_wl_continuous()
+
+ggplot(white_led.raw_spct) +
+  geom_line() +
+  scale_y_counts_tg_continuous(unit.exponent = 0) +
+  scale_x_wl_continuous()
+
+norm_led.raw_spct <- normalize(white_led.raw_spct[ , 1:2], norm = "max")
+
+ggplot(norm_led.raw_spct) +
+  geom_line() +
+  scale_y_counts_continuous(normalized = getNormalized(norm_led.raw_spct)) +
+  scale_x_wl_continuous()
+
+ggplot(norm_led.raw_spct) +
+  geom_line() +
+  scale_y_counts_tg_continuous(normalized = getNormalized(norm_led.raw_spct)) +
   scale_x_wl_continuous()
 
 }

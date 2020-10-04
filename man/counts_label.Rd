@@ -6,7 +6,10 @@
 \usage{
 counts_label(
   unit.exponent = 3,
-  format = getOption("photobiology.math", default = "R.expression")
+  format = getOption("photobiology.math", default = "R.expression"),
+  label.text = axis_labels()[["counts"]],
+  scaled = FALSE,
+  normalized = FALSE
 )
 }
 \arguments{
@@ -14,6 +17,13 @@ counts_label(
 
 \item{format}{character string, "R", "R.expresion", "R.character", or
 "LaTeX".}
+
+\item{label.text}{character Textual portion of the labels.}
+
+\item{scaled}{logical If \code{TRUE} relative units are assumed.}
+
+\item{normalized}{logical (\code{FALSE}) or numeric Normalization wavelength
+in manometers (nm).}
 }
 \value{
 a character string or an R expression.

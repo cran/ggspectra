@@ -8,17 +8,20 @@
 \usage{
 w_length_label(
   unit.exponent = -9,
-  format = getOption("photobiology.math", default = "R.expression")
+  format = getOption("photobiology.math", default = "R.expression"),
+  label.text = axis_labels()[["w.length"]]
 )
 
 w_number_label(
   unit.exponent = 0,
-  format = getOption("photobiology.math", default = "R.expression")
+  format = getOption("photobiology.math", default = "R.expression"),
+  label.text = axis_labels()[["w.number"]]
 )
 
 w_frequency_label(
   unit.exponent = 9,
-  format = getOption("photobiology.math", default = "R.expression")
+  format = getOption("photobiology.math", default = "R.expression"),
+  label.text = axis_labels()[["freq"]]
 )
 }
 \arguments{
@@ -26,6 +29,8 @@ w_frequency_label(
 
 \item{format}{character string, "R", "R.expresion", "R.character", or
 "LaTeX".}
+
+\item{label.text}{character Textual portion of the labels.}
 }
 \value{
 a character string or an R expression.

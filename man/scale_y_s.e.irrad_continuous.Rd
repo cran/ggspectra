@@ -3,35 +3,55 @@
 \name{scale_y_s.e.irrad_continuous}
 \alias{scale_y_s.e.irrad_continuous}
 \alias{scale_y_s.q.irrad_continuous}
-\alias{scale_y_s.q.irrad_log10}
 \alias{scale_y_s.e.irrad_log10}
+\alias{scale_y_s.q.irrad_log10}
 \title{Spectral irradiance y-scale}
 \usage{
 scale_y_s.e.irrad_continuous(
   unit.exponent = 0,
-  name = s.e.irrad_label(unit.exponent),
+  name = s.e.irrad_label(unit.exponent = unit.exponent, format = format, label.text =
+    label.text, scaled = scaled, normalized = round(normalized, 1)),
   labels = SI_pl_format(exponent = unit.exponent),
+  format = getOption("photobiology.math", default = "R.expression"),
+  label.text = axis_labels()[["s.e.irrad"]],
+  scaled = FALSE,
+  normalized = FALSE,
   ...
 )
 
 scale_y_s.q.irrad_continuous(
-  unit.exponent = -6,
-  name = s.q.irrad_label(unit.exponent = unit.exponent),
+  unit.exponent = ifelse(normalized, 0, -6),
+  name = s.q.irrad_label(unit.exponent = unit.exponent, format = format, label.text =
+    label.text, scaled = scaled, normalized = round(normalized, 1)),
   labels = SI_pl_format(exponent = unit.exponent),
-  ...
-)
-
-scale_y_s.q.irrad_log10(
-  unit.exponent = -6,
-  name = s.q.irrad_label(unit.exponent = unit.exponent),
-  labels = SI_pl_format(exponent = unit.exponent),
+  format = getOption("photobiology.math", default = "R.expression"),
+  label.text = axis_labels()[["s.q.irrad"]],
+  scaled = FALSE,
+  normalized = FALSE,
   ...
 )
 
 scale_y_s.e.irrad_log10(
   unit.exponent = 0,
-  name = s.e.irrad_label(unit.exponent),
+  name = s.e.irrad_label(unit.exponent = unit.exponent, format = format, label.text =
+    label.text, scaled = scaled, normalized = round(normalized, 1)),
   labels = SI_pl_format(exponent = unit.exponent),
+  format = getOption("photobiology.math", default = "R.expression"),
+  label.text = axis_labels()[["s.e.irrad"]],
+  scaled = FALSE,
+  normalized = FALSE,
+  ...
+)
+
+scale_y_s.q.irrad_log10(
+  unit.exponent = ifelse(normalized, 0, -6),
+  name = s.q.irrad_label(unit.exponent = unit.exponent, format = format, label.text =
+    label.text, scaled = scaled, normalized = round(normalized, 1)),
+  labels = SI_pl_format(exponent = unit.exponent),
+  format = getOption("photobiology.math", default = "R.expression"),
+  label.text = axis_labels()[["s.q.irrad"]],
+  scaled = FALSE,
+  normalized = FALSE,
   ...
 )
 }
@@ -41,6 +61,16 @@ scale_y_s.e.irrad_log10(
 \item{name}{The name of the scale, used for the axis-label.}
 
 \item{labels}{The tick labels or a function to generate them.}
+
+\item{format}{character string, "R", "R.expression", "R.character", or
+"LaTeX".}
+
+\item{label.text}{character Textual portion of the labels.}
+
+\item{scaled}{logical If \code{TRUE} relative units are assumed.}
+
+\item{normalized}{logical (\code{FALSE}) or numeric Normalization wavelength
+in manometers (nm).}
 
 \item{...}{other named arguments passed to \code{scale_y_continuous}}
 }
@@ -60,7 +90,17 @@ ggplot(sun.spct) +
 
 ggplot(sun.spct) +
   geom_line() +
-  scale_y_s.e.irrad_continuous(-1) +
+  scale_y_s.e.irrad_continuous(label.text = "") +
+  scale_x_wl_continuous()
+
+ggplot(sun.spct) +
+  geom_line() +
+  scale_y_s.e.irrad_continuous(label.text = "Irradiancia spectral,") +
+  scale_x_wl_continuous(label.text = "Longitud de onda,")
+
+ggplot(sun.spct) +
+  geom_line() +
+  scale_y_s.e.irrad_continuous(unit.exponent = -1) +
   scale_x_wl_continuous()
 
 ggplot(sun.spct, unit.out = "photon") +
@@ -78,5 +118,15 @@ ggplot(clip_wl(sun.spct, c(295, NA)),
   geom_line(na.rm = TRUE) +
   scale_y_s.q.irrad_log10() +
   scale_x_wl_continuous()
+
+photon_as_default()
+normalized_sun.spct <- normalize(sun.spct)
+ggplot(normalized_sun.spct) +
+  geom_line(na.rm = TRUE) +
+  scale_y_s.q.irrad_continuous(normalized =
+                            getNormalized(normalized_sun.spct)) +
+  scale_x_wl_continuous()
+
+unset_radiation_unit_default()
 
 }

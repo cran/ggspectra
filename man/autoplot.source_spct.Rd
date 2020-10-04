@@ -3,7 +3,7 @@
 \name{autoplot.source_spct}
 \alias{autoplot.source_spct}
 \alias{autoplot.source_mspct}
-\title{Create a complete ggplot for a light-source spectrum.}
+\title{Create a complete ggplot for light-source spectra.}
 \usage{
 \method{autoplot}{source_spct}(
   object,
@@ -21,6 +21,7 @@
   text.size = 2.5,
   chroma.type = "CMF",
   idfactor = NULL,
+  facets = FALSE,
   ylim = c(NA, NA),
   object.label = deparse(substitute(object)),
   na.rm = TRUE
@@ -31,7 +32,8 @@
   ...,
   range = NULL,
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
-  plot.data = "as.is"
+  plot.data = "as.is",
+  idfactor = TRUE
 )
 }
 \arguments{
@@ -75,9 +77,11 @@ also accepted.}
 
 \item{idfactor}{character Name of an index column in data holding a
 \code{factor} with each spectrum in a long-form multispectrum object
-corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
-the factor is retrieved from metadata or if no metadata found, the default
-"spct.idx" is tried.}
+corresponding to a distinct level of the factor.}
+
+\item{facets}{logical Flag indicating if facets are to be created for the
+levels of \code{idfactor} when \code{spct} contain multiple spectra in long
+form.}
 
 \item{ylim}{numeric y axis limits,}
 
@@ -100,11 +104,24 @@ object or of the spectra contained in a source_mspct object.
 Note that scales are expanded so as to make space for the annotations.
   The object returned is a ggplot object, and can be further manipulated and
   added to.
+
+If \code{idfactor = NULL}, the default for single spectra, the name of
+  the factor is retrieved from metadata or if no metadata found, the default
+  "spct.idx" is tried. The default for collections of spectra is to create
+  a factor named "spct.idx", but if a different name is passed, it will be
+  used instead.
 }
 \examples{
 
 autoplot(sun.spct)
 autoplot(sun.spct, unit.out = "photon")
+
+two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct / 2))
+autoplot(two_suns.mspct)
+autoplot(two_suns.mspct, idfactor = "Spectra")
+autoplot(two_suns.mspct, facets = TRUE) # uses ggplot2's default
+autoplot(two_suns.mspct, facets = 1) # one column
+autoplot(two_suns.mspct, facets = 2) # two columns
 
 }
 \seealso{

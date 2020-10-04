@@ -4,7 +4,7 @@
 \alias{find_idfactor}
 \title{Find 'idfactor'}
 \usage{
-find_idfactor(spct, idfactor, annotations, ...)
+find_idfactor(spct, idfactor, annotations, facets = FALSE, ...)
 }
 \arguments{
 \item{spct}{generic_spct or derived object}
@@ -18,6 +18,9 @@ spectra and the user needs to use 'ggplot2' functions to manually map an
 aesthetic or use facets for the spectra.}
 
 \item{annotations}{a character vector.}
+
+\item{facets}{logical or numeric Flag indicating if facets are to be created
+when the data contains multiple spectra, if numeric the number of columns.}
 
 \item{...}{currently not used.}
 }

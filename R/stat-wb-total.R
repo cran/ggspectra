@@ -147,7 +147,7 @@ StatWbTotal <-
                        w.band <- waveband(data[["x"]])
                      }
                      if (is.any_spct(w.band) ||
-                         (is.numeric(w.band) && length(na.omit(w.band)) >= 2)) {
+                         (is.numeric(w.band) && length(stats::na.omit(w.band)) >= 2)) {
                        w.band <- waveband(range(w.band, na.rm = TRUE))
                      }
                      if (!is.list(w.band) || is.waveband(w.band)) {
@@ -181,9 +181,9 @@ StatWbTotal <-
                                                     wb.ymax = max(data[["y"]]),
                                                     wb.yint = yint.tmp,
                                                     wb.ymean = ymean.tmp,
-                                                    wb.color = color_of(wb, chroma.type = chroma.type),
+                                                    wb.color = fast_color_of_wb(wb, chroma.type = chroma.type),
                                                     wb.name = labels(wb)[["label"]],
-                                                    BW.color = black_or_white(color_of(wb, chroma.type = chroma.type)))
+                                                    BW.color = black_or_white(fast_color_of_wb(wb, chroma.type = chroma.type)))
                                          )
                      }
                      if (is.null(ypos.fixed)) {

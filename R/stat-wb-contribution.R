@@ -88,23 +88,36 @@
 #'
 #' library(photobiologyWavebands)
 #' # ggplot() methods for spectral objects set a default mapping for x and y.
+#'
+#' # Using defaults
 #' ggplot(sun.spct) +
 #'   geom_line() +
 #'   stat_wb_box(w.band = VIS()) +
 #'   stat_wb_contribution(w.band = VIS()) +
 #'   scale_fill_identity() + scale_color_identity()
 #'
+#' # Setting position and angle of the text
 #' ggplot(sun.spct) +
 #'   geom_line() +
 #'   stat_wb_box(w.band = VIS_bands()) +
 #'   stat_wb_contribution(w.band = VIS_bands(), angle = 90, size = 2.5) +
 #'   scale_fill_identity() + scale_color_identity()
 #'
+#' # Showing percentages, i.e., using a different format for numbers
 #' ggplot(sun.spct) +
 #'   geom_line() +
 #'   stat_wb_box(w.band = VIS_bands()) +
-#'   stat_wb_contribution(w.band = VIS_bands(), angle = 90, size = 2.5,
+#'   stat_wb_contribution(w.band = VIS_bands(), size = 2.5,
 #'                        label.mult = 100, label.fmt = "%3.0f%%") +
+#'   scale_fill_identity() + scale_color_identity()
+#'
+#' # Including the name of the waveband, i.e., changing the mapping for label
+#' ggplot(sun.spct, range = c(NA, 410)) +
+#'   geom_line() +
+#'   stat_wb_box(w.band = UV_bands(), color = "white") +
+#'   stat_wb_contribution(w.band = UV_bands(), size = 2.5,
+#'                        label.mult = 100, label.fmt = "%3.0f%%",
+#'                        mapping = aes(label = stat(paste(wb.name, y.label)))) +
 #'   scale_fill_identity() + scale_color_identity()
 #'
 #' @export
@@ -154,7 +167,7 @@ StatWbContrib <-
                        w.band <- waveband(data[["x"]])
                      }
                      if (is.any_spct(w.band) ||
-                         (is.numeric(w.band) && length(na.omit(w.band)) >= 2)) {
+                         (is.numeric(w.band) && length(stats::na.omit(w.band)) >= 2)) {
                        w.band <- waveband(range(w.band, na.rm = TRUE))
                      }
                      if (!is.list(w.band) || is.waveband(w.band)) {
@@ -188,9 +201,9 @@ StatWbContrib <-
                                                     wb.ymax = max(data[["y"]]),
                                                     wb.yint = yint.tmp,
                                                     wb.ymean = ymean.tmp,
-                                                    wb.color = color_of(wb, chroma.type = chroma.type),
+                                                    wb.color = photobiology::fast_color_of_wb(wb, chroma.type = chroma.type),
                                                     wb.name = labels(wb)[["label"]],
-                                                    BW.color = black_or_white(color_of(wb, chroma.type = chroma.type)))
+                                                    BW.color = black_or_white(photobiology::fast_color_of_wb(wb, chroma.type = chroma.type)))
                                          )
                      }
                      if (is.null(ypos.fixed)) {
