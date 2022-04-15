@@ -1,8 +1,8 @@
 Package: ggspectra
 Type: Package
 Title: Extensions to 'ggplot2' for Radiation Spectra
-Version: 0.3.7
-Date: 2020-10-03
+Version: 0.3.8
+Date: 2022-04-15
 Authors@R: 
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3385-972X")),
@@ -15,23 +15,23 @@ Description: Additional annotations, stats, geoms and scales for plotting
     stored in objects of classes defined in package 'photobiology'. Part of the 
     'r4photobiology' suite, Aphalo P. J. (2015) <doi:10.19232/uv4pb.2015.1.14>.
 License: GPL (>= 2)
-LazyData: TRUE
 LazyLoad: TRUE
 ByteCompile: TRUE
-Depends: R (>= 3.6.0), photobiology (>= 0.10.5), ggplot2 (>= 3.3.2)
-Imports: photobiologyWavebands (>= 0.4.3), scales (>= 1.1.1), ggrepel
-        (>= 0.8.2), dplyr (>= 1.0.2), lubridate (>= 1.7.9), tidyr (>=
-        1.0.2), tibble (>= 3.0.3)
-Suggests: rlang (>= 0.4.7), knitr (>= 1.29), rmarkdown (>= 2.3)
+Depends: R (>= 3.6.0), photobiology (>= 0.10.10), ggplot2 (>= 3.3.4)
+Imports: photobiologyWavebands (>= 0.4.3), scales (>= 1.2.0), ggrepel
+        (>= 0.9.1), lubridate (>= 1.8.0), tidyr (>= 1.2.0),
+        tidyselect(>= 1.1.2), tibble (>= 3.1.5)
+Suggests: knitr (>= 1.38), rmarkdown (>= 2.13), rlang (>= 1.0.2),
+        magrittr (>= 2.0.3)
 URL: https://docs.r4photobiology.info/ggspectra/,
-        https://bitbucket.org/aphalo/ggspectra/
-BugReports: https://bitbucket.org/aphalo/ggspectra/issues/
+        https://github.com/aphalo/ggspectra/
+BugReports: https://github.com/aphalo/ggspectra/issues/
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2020-10-03 22:00:19 UTC; Aphalo
+Packaged: 2022-04-15 20:37:16 UTC; Aphalo
 Author: Pedro J. Aphalo [aut, cre] (<https://orcid.org/0000-0003-3385-972X>),
   Titta K. Kotilainen [ctb] (<https://orcid.org/0000-0002-2822-9734>)
 Repository: CRAN
-Date/Publication: 2020-10-04 04:20:02 UTC
+Date/Publication: 2022-04-16 00:32:29 UTC

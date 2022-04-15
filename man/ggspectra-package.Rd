@@ -6,11 +6,9 @@
 \alias{ggspectra-package}
 \title{ggspectra: Extensions to 'ggplot2' for Radiation Spectra}
 \description{
-Additional annotations, stats, geoms and scales for plotting 
-    "light" spectra with 'ggplot2', together with specializations of ggplot()
-    and autoplot() methods for spectral data and waveband definitions
-    stored in objects of classes defined in package 'photobiology'. Part of the 
-    'r4photobiology' suite, Aphalo P. J. (2015) <doi:10.19232/uv4pb.2015.1.14>.
+\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
+
+Additional annotations, stats, geoms and scales for plotting "light" spectra with 'ggplot2', together with specializations of ggplot() and autoplot() methods for spectral data and waveband definitions stored in objects of classes defined in package 'photobiology'. Part of the 'r4photobiology' suite, Aphalo P. J. (2015) <doi:10.19232/uv4pb.2015.1.14>.
 }
 \details{
 Package `ggspectra` provides a set of stats, geoms and methods
@@ -73,7 +71,7 @@ plot(polyester.spct, UV_bands(), range = UV(),
 }
 \references{
 Aphalo, Pedro J. (2015) The r4photobiology suite. UV4Plants Bulletin, 2015:1,
-21-29. \url{https://doi.org/10.19232/uv4pb.2015.1.14}.
+21-29. \doi{10.19232/uv4pb.2015.1.14}.
 
 \code{ggplot2} web site at \url{https://ggplot2.tidyverse.org/}\cr
 \code{ggplot2} source code at \url{https://github.com/tidyverse/ggplot2}\cr
@@ -83,8 +81,8 @@ Function \code{multiplot} from \url{http://www.cookbook-r.com/}
 Useful links:
 \itemize{
   \item \url{https://docs.r4photobiology.info/ggspectra/}
-  \item \url{https://bitbucket.org/aphalo/ggspectra/}
-  \item Report bugs at \url{https://bitbucket.org/aphalo/ggspectra/issues/}
+  \item \url{https://github.com/aphalo/ggspectra/}
+  \item Report bugs at \url{https://github.com/aphalo/ggspectra/issues/}
 }
 
 }

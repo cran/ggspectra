@@ -13,9 +13,9 @@ q_rsp_plot(
   span,
   wls.target,
   annotations,
-  norm,
   text.size,
   idfactor,
+  facets,
   ylim,
   na.rm,
   ...
@@ -29,7 +29,8 @@ q_rsp_plot(
 \item{range}{an R object on which range() returns a vector of length 2, with
 min annd max wavelengths (nm).}
 
-\item{pc.out}{logical, if TRUE use percents instead of fraction of one.}
+\item{pc.out}{logical, if TRUE use percent instead of fraction of one for
+normalized spectral data.}
 
 \item{label.qty}{character string giving the type of summary quantity to use
 for labels, one of "mean", "total", "contribution", and "relative".}
@@ -46,9 +47,6 @@ also accepted.}
 
 \item{annotations}{a character vector.}
 
-\item{norm}{numeric normalization wavelength (nm) or character string "max"
-for normalization at the wavelength of highest peak.}
-
 \item{text.size}{numeric size of text in the plot decorations.}
 
 \item{idfactor}{character Name of an index column in data holding a
@@ -56,6 +54,10 @@ for normalization at the wavelength of highest peak.}
 corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
 the factor is retrieved from metadata or if no metadata found, the
 default "spct.idx" is tried.}
+
+\item{facets}{logical or integer Indicating if facets are to be created for
+the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+long form.}
 
 \item{ylim}{numeric y axis limits,}
 

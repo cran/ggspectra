@@ -2,6 +2,7 @@
 % Please edit documentation in R/autoplot-raw-spct.r
 \name{autoplot.raw_spct}
 \alias{autoplot.raw_spct}
+\alias{autoplot.raw_mspct}
 \title{Create a complete ggplot for raw detector-counts spectra.}
 \usage{
 \method{autoplot}{raw_spct}(
@@ -18,10 +19,25 @@
   annotations = NULL,
   time.format = "",
   tz = "UTC",
-  norm = NULL,
+  norm = "skip",
   text.size = 2.5,
   idfactor = NULL,
+  facets = FALSE,
   ylim = c(NA, NA),
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
+)
+
+\method{autoplot}{raw_mspct}(
+  object,
+  ...,
+  range = NULL,
+  norm = getOption("ggspectra.norm", default = "skip"),
+  unit.out = "counts",
+  pc.out = FALSE,
+  idfactor = TRUE,
+  facets = FALSE,
+  plot.data = "as.is",
   object.label = deparse(substitute(object)),
   na.rm = TRUE
 )
@@ -39,7 +55,8 @@ with min annd max wavelengths (nm).}
 
 \item{unit.out}{character IGNORED.}
 
-\item{pc.out}{logical, if TRUE use percents instead of fraction of one.}
+\item{pc.out}{logical, if TRUE use percent instead of fraction of one for
+normalized spectral data.}
 
 \item{label.qty}{character string giving the type of summary quantity to use
 for labels, one of "mean", "total", "contribution", and "relative".}
@@ -54,7 +71,8 @@ which wavelengths are to be searched and interpolated if need. The
 as arguments. A list with \code{numeric} and/or \code{character} values is
 also accepted.}
 
-\item{annotations}{a character vector ("summaries" is ignored).}
+\item{annotations}{a character vector ("summaries" is ignored). For details
+please see sections Plot Annotations and Title Annotations.}
 
 \item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
 
@@ -71,11 +89,20 @@ corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
 the factor is retrieved from metadata or if no metadata found, the
 default "spct.idx" is tried.}
 
+\item{facets}{logical or integer Indicating if facets are to be created for
+the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+long form.}
+
 \item{ylim}{numeric y axis limits,}
 
 \item{object.label}{character The name of the object being plotted.}
 
 \item{na.rm}{logical.}
+
+\item{plot.data}{character Data to plot. Default is "as.is" plotting one line
+per spectrum. When passing "mean", "median", "sum", "prod", "var", "sd",
+"se" as argument all the spectra must contain data at the same wavelength
+values.}
 }
 \value{
 a \code{ggplot} object.
@@ -84,11 +111,65 @@ a \code{ggplot} object.
 This function returns a ggplot object with an annotated plot of a
 raw_spct object.
 }
-\note{
+\details{
 Note that scales are expanded so as to make space for the annotations.
 The object returned is a ggplot objects, and can be further manipulated.
 }
+\section{Plot Annotations}{
+ The recognized annotation names are: \code{"summaries"}, \code{"peaks"},
+  \code{"peak.labels"}, \code{"valleys"}, \code{"valley.labels"},
+  \code{"wls"}, \code{"wls.labels"}, \code{"colour.guide"},
+  \code{"color.guide"}, \code{"boxes"}, \code{"segments"}, \code{"labels"}.
+  In addition, \code{"+"} is interpreted as a request to add to the already
+  present default annotations, \code{"-"} as request to remove annotations
+  and \code{"="} or missing\code{"+"} and \code{"-"} as a request to reset
+  annotations to those requested. If used, \code{"+"}, \code{"-"} or
+  \code{"="} must be the first member of a character vector, and followed by
+  one or more of the names given above. To simultaneously add and remove
+  annotations one can pass a \code{list} containing \code{character} vectors
+  each assembled as described. The vectors are applied in the order they
+  appear in the list. To disable all annotations pass \code{""} or
+  \code{c("=", "")} as argument. Adding a variation of an annotation already
+  present, replaces the existing one automatically: e.g., adding
+  \code{"peak.labels"} replaces\code{"peaks"} if present.
+}
+
+\section{Title Annotations}{
+ metadata retrieved from object \code{object} is
+  paased to \code{ggplot2::ggtitle()} as arguments for \code{title},
+  \code{subtitle} and \code{caption}. The specification for the title is
+  passed as argument to \code{annotations}, and consists in the keyword
+  \code{title} with optional modifiers selecting the kind of metatdata to
+  use, separated by colons. Up to three keywords separated by colons are
+  accepted, and correspond to title, subtitle and caption. The recognized
+  keywords are: \code{"objt"}, \code{"class"}, \code{"what"}, \code{"when"},
+  \code{"where"}, \code{"how"}, \code{"inst.name"}, \code{"inst.sn"},
+  \code{"comment"} and \code{"none"} are recognized as modifiers to
+  \code{"title"}; \code{"none"} is a placeholder. Default is
+  \code{"title:objt"} or no title depending on the context.
+}
+
+\examples{
+
+autoplot(white_led.raw_spct)
+autoplot(white_led.raw_spct, annotations = "")
+
+two_leds.mspct <-
+  raw_mspct(list("LED 1" = white_led.raw_spct,
+                 "LED 2" = white_led.raw_spct))
+autoplot(two_leds.mspct)
+autoplot(two_leds.mspct, idfactor = "Spectra")
+autoplot(two_leds.mspct, facets = 1) # one column
+autoplot(two_leds.mspct, facets = 2) # two columns
+
+}
 \seealso{
+\code{\link[photobiology]{normalize}},
+  \code{\link[photobiology]{raw_spct}},
+  \code{\link[photobiology]{waveband}},
+  \code{\link[photobiologyWavebands]{photobiologyWavebands-package}} and
+  \code{\link[ggplot2]{autoplot}}
+
 Other autoplot methods: 
 \code{\link{autoplot.calibration_spct}()},
 \code{\link{autoplot.cps_spct}()},
@@ -101,4 +182,3 @@ Other autoplot methods:
 \code{\link{set_annotations_default}()}
 }
 \concept{autoplot methods}
-\keyword{hplot}

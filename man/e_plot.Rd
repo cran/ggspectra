@@ -8,6 +8,7 @@ e_plot(
   spct,
   w.band,
   range,
+  pc.out,
   label.qty,
   span,
   wls.target,
@@ -28,6 +29,9 @@ e_plot(
 
 \item{range}{an R object on which range() returns a vector of length 2, with
 min annd max wavelengths (nm).}
+
+\item{pc.out}{logical, if TRUE use percent instead of fraction of one for
+normalized spectral data.}
 
 \item{label.qty}{character string giving the type of summary quantity to use
 for labels, one of "mean", "total", "contribution", and "relative".}
@@ -57,9 +61,9 @@ default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
 to the spectra and the user needs to use 'ggplot2' functions to manually
 map an aesthetic or use facets for the spectra.}
 
-\item{facets}{logical Flag indicating if facets are to be created for the
-levels of \code{idfactor} when \code{spct} contain multiple spectra in long
-form.}
+\item{facets}{logical or integer Indicating if facets are to be created for
+the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+long form.}
 
 \item{ylim}{numeric y axis limits,}
 

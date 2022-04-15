@@ -1,10 +1,11 @@
 ## -----------------------------------------------------------------------------
-library(dplyr)
+library(ggplot2)
 library(photobiologyWavebands)
 library(ggspectra)
+library(ggrepel)
 
-good_label_repel <- packageVersion('ggrepel') != "0.8.0" #||
-#  packageVersion('ggplot2') >= "3.1.0"
+good_label_repel <- packageVersion('ggrepel') != "0.9.0" # >= 0.9.0 required
+options(ggrepel.max.overlaps = Inf) # needed for 'ggrepel' (>= 0.9.0)
 
 ## ---- include=FALSE, echo=FALSE-----------------------------------------------
 library(knitr)
@@ -13,10 +14,14 @@ opts_chunk$set(fig.align = 'center', fig.show = 'hold',
 options(warnPartialMatchArgs = FALSE)
 
 ## -----------------------------------------------------------------------------
+two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct * 2))
 two_suns.spct <- rbindspct(list(sun1 = sun.spct, sun2 = sun.spct * 2))
 
 ## -----------------------------------------------------------------------------
 theme_set(theme_bw(10))
+
+## -----------------------------------------------------------------------------
+spct_classes()
 
 ## -----------------------------------------------------------------------------
 autoplot(sun.spct)
@@ -26,6 +31,37 @@ autoplot(sun.spct, unit.out = "photon")
 
 ## -----------------------------------------------------------------------------
 autoplot(two_suns.spct)
+
+## -----------------------------------------------------------------------------
+mspct_classes()
+
+## -----------------------------------------------------------------------------
+two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct / 2))
+mixed.mspct <- generic_mspct(list(sun = sun.spct, filter = polyester.spct))
+
+## -----------------------------------------------------------------------------
+autoplot(two_suns.mspct)
+
+## -----------------------------------------------------------------------------
+autoplot(two_suns.mspct, idfactor = "Spectra")
+
+## -----------------------------------------------------------------------------
+autoplot(two_suns.mspct, facets = 1)
+
+## -----------------------------------------------------------------------------
+autoplot(two_suns.mspct, facets = 2)
+
+## ---- fig.width = 7, fig.height = 8-------------------------------------------
+multiplot(plotlist = mslply(mixed.mspct, autoplot))
+
+## -----------------------------------------------------------------------------
+autoplot(two_suns.mspct, plot.data = "mean")
+
+## -----------------------------------------------------------------------------
+autoplot(sun.spct, norm = "max")
+
+## -----------------------------------------------------------------------------
+autoplot(sun.spct, norm = 400, pc.out = TRUE)
 
 ## -----------------------------------------------------------------------------
 autoplot(sun.spct, label.qty = "mean")
@@ -38,7 +74,7 @@ autoplot(sun.spct, label.qty = "relative")
 
 ## -----------------------------------------------------------------------------
 autoplot(sun.spct, 
-     annotations = c("+", "title:when:where"))
+     annotations = c("+", "title:objt:when:where"))
 
 ## -----------------------------------------------------------------------------
 autoplot(sun.spct, 
@@ -61,6 +97,18 @@ autoplot(sun.spct, annotations = c("-", "summaries", "peaks"))
 
 ## -----------------------------------------------------------------------------
 autoplot(sun.spct, annotations = c("+", "valleys"), span = 41)
+
+## ---- eval=good_label_repel---------------------------------------------------
+autoplot(sun.spct, 
+         annotations = list(c("+", "peak.labels"), 
+                            c("-", "boxes", "summaries", "labels")), 
+         span = 51)
+
+## ---- eval=good_label_repel---------------------------------------------------
+autoplot(sun.spct, 
+         annotations = list(c("+", "valley.labels"), 
+                            c("-", "peaks")), 
+         span = 51)
 
 ## ---- eval=good_label_repel---------------------------------------------------
 autoplot(sun.spct, annotations = c("+", "peak.labels", "valley.labels"), span = 51)
@@ -150,41 +198,21 @@ autoplot(white_led.raw_spct, annotations = c("+", "boundaries"))
 #  autoplot(dplyr::select(white_led.raw_spct, w.length, counts_1, counts_3),
 #       annotations = c("+", "boundaries"))
 
-## -----------------------------------------------------------------------------
-autoplot(sun.spct, 
-         chroma.type = beesxyzCMF.spct,
-          annotations = c("=", "color.guide"))
-
-## -----------------------------------------------------------------------------
-two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct / 2))
-mixed.mspct <- generic_mspct(list(sun = sun.spct, filter = polyester.spct))
-
-## -----------------------------------------------------------------------------
-autoplot(two_suns.mspct)
-
-## -----------------------------------------------------------------------------
-autoplot(two_suns.mspct, facets = 1)
-
-## ---- fig.width = 7, fig.height = 8-------------------------------------------
-autoplot(two_suns.mspct, idfactor = NA) + 
-  facet_wrap(~spct.idx, ncol = 1)
-
-## ---- fig.width = 7, fig.height = 8-------------------------------------------
-multiplot(plotlist = mslply(mixed.mspct, autoplot))
+## ---- eval=FALSE--------------------------------------------------------------
+#  # Not run so as to pass CRAN checks!!
+#  autoplot(yellow_gel.spct - 0.01, annotations = c("+", "boundaries"))
 
 ## -----------------------------------------------------------------------------
 autoplot(two_suns.mspct) + 
   aes(color = ifelse(spct.idx == "sun1", "darkgreen", "darkred"))
 
 ## -----------------------------------------------------------------------------
-autoplot(two_suns.mspct, annotations = c("color.guide", "valleys", "peaks"), span = 51)
-
-## -----------------------------------------------------------------------------
 autoplot(two_suns.mspct, annotations = c("-", "peaks")) +
   stat_peaks(span = NULL, color = "red") +
   stat_peaks(span = NULL, geom = "text", 
              label.fmt = "max at %3.1f nm",
-             vjust = -0.4, color = "red")
+             vjust = -0.5, hjust = 0,
+             color = "red", size = 3)
 
 ## -----------------------------------------------------------------------------
 autoplot(VIS())

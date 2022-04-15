@@ -11,7 +11,7 @@
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(),
     PAR())),
   range = NULL,
-  unit.out = "counts",
+  unit.out = "ignored",
   pc.out = FALSE,
   label.qty = "mean",
   span = NULL,
@@ -22,12 +22,25 @@
   norm = NULL,
   text.size = 2.5,
   idfactor = NULL,
+  facets = FALSE,
   ylim = c(NA, NA),
   object.label = deparse(substitute(object)),
   na.rm = TRUE
 )
 
-\method{autoplot}{calibration_mspct}(object, ..., range = NULL, plot.data = "as.is")
+\method{autoplot}{calibration_mspct}(
+  object,
+  ...,
+  range = NULL,
+  unit.out = "ignored",
+  norm = getOption("ggspectra.normalize", default = "skip"),
+  pc.out = FALSE,
+  plot.data = "as.is",
+  idfactor = TRUE,
+  facets = FALSE,
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
+)
 }
 \arguments{
 \item{object}{a calibration_spct object or a calibration_mspct object.}
@@ -37,8 +50,8 @@ to the plot methods for individual spectra, otherwise currently ignored.}
 
 \item{w.band}{a single waveband object or a list of waveband objects.}
 
-\item{range}{an R object on which range() returns a vector of length 2,
-with min annd max wavelengths (nm).}
+\item{range}{an R object on which range() returns a vector of length 2, with
+min annd max wavelengths (nm).}
 
 \item{unit.out}{character IGNORED.}
 
@@ -57,9 +70,11 @@ which wavelengths are to be searched and interpolated if need. The
 as arguments. A list with \code{numeric} and/or \code{character} values is
 also accepted.}
 
-\item{annotations}{a character vector ("summaries" is ignored).}
+\item{annotations}{a character vector ("summaries" is ignored). For details
+please see sections Plot Annotations and Title Annotations.}
 
-\item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
+\item{time.format}{character Format as accepted by
+\code{\link[base]{strptime}}.}
 
 \item{tz}{character Time zone to use for title and/or subtitle.}
 
@@ -71,10 +86,14 @@ for normalization at the wavelength of highest peak.}
 \item{idfactor}{character Name of an index column in data holding a
 \code{factor} with each spectrum in a long-form multispectrum object
 corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
-the factor is retrieved from metadata or if no metadata found, the
-default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
-to the spectra and the user needs to use 'ggplot2' functions to manually
-map an aesthetic or use facets for the spectra.}
+the factor is retrieved from metadata or if no metadata found, the default
+"spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped to the
+spectra and the user needs to use 'ggplot2' functions to manually map an
+aesthetic or use facets for the spectra.}
+
+\item{facets}{logical or integer Indicating if facets are to be created for
+the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+long form.}
 
 \item{ylim}{numeric y axis limits,}
 
@@ -82,9 +101,10 @@ map an aesthetic or use facets for the spectra.}
 
 \item{na.rm}{logical.}
 
-\item{plot.data}{character Data to plot. Default is "as.is" plotting
-one line per spectrum. When passing "mean" or "median" as
-argument all the spectra must contain data at the same wavelength values.}
+\item{plot.data}{character Data to plot. Default is "as.is" plotting one line
+per spectrum. When passing "mean", "median", "sum", "prod", var", "sd",
+"se" as argument all the spectra must contain data at the same wavelength
+values.}
 }
 \value{
 a \code{ggplot} object.
@@ -96,9 +116,49 @@ object.
 }
 \note{
 Note that scales are expanded so as to make space for the annotations.
-The object returned is a ggplot objects, and can be further manipulated.
+The object returned is a ggplot object, and can be further manipulated.
 }
+\section{Plot Annotations}{
+ The recognized annotation names are: \code{"summaries"}, \code{"peaks"},
+  \code{"peak.labels"}, \code{"valleys"}, \code{"valley.labels"},
+  \code{"wls"}, \code{"wls.labels"}, \code{"colour.guide"},
+  \code{"color.guide"}, \code{"boxes"}, \code{"segments"}, \code{"labels"}.
+  In addition, \code{"+"} is interpreted as a request to add to the already
+  present default annotations, \code{"-"} as request to remove annotations
+  and \code{"="} or missing\code{"+"} and \code{"-"} as a request to reset
+  annotations to those requested. If used, \code{"+"}, \code{"-"} or
+  \code{"="} must be the first member of a character vector, and followed by
+  one or more of the names given above. To simultaneously add and remove
+  annotations one can pass a \code{list} containing \code{character} vectors
+  each assembled as described. The vectors are applied in the order they
+  appear in the list. To disable all annotations pass \code{""} or
+  \code{c("=", "")} as argument. Adding a variation of an annotation already
+  present, replaces the existing one automatically: e.g., adding
+  \code{"peak.labels"} replaces\code{"peaks"} if present.
+}
+
+\section{Title Annotations}{
+ metadata retrieved from object \code{object} is
+  paased to \code{ggplot2::ggtitle()} as arguments for \code{title},
+  \code{subtitle} and \code{caption}. The specification for the title is
+  passed as argument to \code{annotations}, and consists in the keyword
+  \code{title} with optional modifiers selecting the kind of metatdata to
+  use, separated by colons. Up to three keywords separated by colons are
+  accepted, and correspond to title, subtitle and caption. The recognized
+  keywords are: \code{"objt"}, \code{"class"}, \code{"what"}, \code{"when"},
+  \code{"where"}, \code{"how"}, \code{"inst.name"}, \code{"inst.sn"},
+  \code{"comment"} and \code{"none"} are recognized as modifiers to
+  \code{"title"}; \code{"none"} is a placeholder. Default is
+  \code{"title:objt"} or no title depending on the context.
+}
+
 \seealso{
+\code{\link[photobiology]{normalize}},
+  \code{\link[photobiology]{calibration_spct}},
+  \code{\link[photobiology]{waveband}},
+  \code{\link[photobiologyWavebands]{photobiologyWavebands-package}} and
+  \code{\link[ggplot2]{autoplot}}
+
 Other autoplot methods: 
 \code{\link{autoplot.cps_spct}()},
 \code{\link{autoplot.filter_spct}()},
@@ -111,4 +171,3 @@ Other autoplot methods:
 \code{\link{set_annotations_default}()}
 }
 \concept{autoplot methods}
-\keyword{hplot}

@@ -11,6 +11,7 @@
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(),
     PAR())),
   range = NULL,
+  norm = getOption("ggspectra.norm", default = "max"),
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
   pc.out = FALSE,
   label.qty = NULL,
@@ -19,15 +20,27 @@
   annotations = NULL,
   time.format = "",
   tz = "UTC",
-  norm = "max",
   text.size = 2.5,
   idfactor = NULL,
+  facets = FALSE,
   ylim = c(NA, NA),
   object.label = deparse(substitute(object)),
   na.rm = TRUE
 )
 
-\method{autoplot}{response_mspct}(object, ..., range = NULL, plot.data = "as.is")
+\method{autoplot}{response_mspct}(
+  object,
+  ...,
+  range = NULL,
+  norm = getOption("ggspectra.norm", default = "max"),
+  unit.out = getOption("photobiology.radiation.unit", default = "energy"),
+  pc.out = FALSE,
+  plot.data = "as.is",
+  facets = FALSE,
+  idfactor = TRUE,
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
+)
 }
 \arguments{
 \item{object}{a response_spct object or a response_mspct object.}
@@ -40,10 +53,15 @@ to the plot methods for individual spectra, otherwise currently ignored.}
 \item{range}{an R object on which range() returns a vector of length 2, with
 min annd max wavelengths (nm).}
 
+\item{norm}{numeric normalization wavelength (nm) or character string \code{"max"}
+for normalization at the wavelength of highest peak, or \code{NULL} for
+plotting the spectrum as is.}
+
 \item{unit.out}{character string indicating type of radiation units to use
 for plotting: "photon" or its synomin "quantum", or "energy".}
 
-\item{pc.out}{logical, if TRUE use percents instead of fraction of one}
+\item{pc.out}{logical, if TRUE use percent instead of fraction of one for
+normalized spectral data.}
 
 \item{label.qty}{character string giving the type of summary quantity to use
 for labels, one of "mean", "total", "contribution", and "relative".}
@@ -58,16 +76,13 @@ which wavelengths are to be searched and interpolated if need. The
 as arguments. A list with \code{numeric} and/or \code{character} values is
 also accepted.}
 
-\item{annotations}{a character vector.}
+\item{annotations}{a character vector. For details please see sections Plot
+Annotations and Title Annotations.}
 
 \item{time.format}{character Format as accepted by
 \code{\link[base]{strptime}}.}
 
 \item{tz}{character Time zone to use for title and/or subtitle.}
-
-\item{norm}{numeric normalization wavelength (nm) or character string \code{"max"}
-for normalization at the wavelength of highest peak, or \code{NULL} for
-plotting the spectrum as is.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
 
@@ -77,15 +92,20 @@ corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
 the factor is retrieved from metadata or if no metadata found, the
 default "spct.idx" is tried.}
 
+\item{facets}{logical or integer Indicating if facets are to be created for
+the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+long form.}
+
 \item{ylim}{numeric y axis limits,}
 
 \item{object.label}{character The name of the object being plotted.}
 
 \item{na.rm}{logical.}
 
-\item{plot.data}{character Data to plot. Default is "as.is" plotting
-one line per spectrum. When passing "mean" or "median" as
-argument all the spectra must contain data at the same wavelength values.}
+\item{plot.data}{character Data to plot. Default is "as.is" plotting one line
+per spectrum. When passing "mean", "median", "sum", "prod", "var", "sd",
+"se" as argument all the spectra must contain data at the same wavelength
+values.}
 }
 \value{
 a \code{ggplot} object.
@@ -94,18 +114,68 @@ a \code{ggplot} object.
 These methods return a ggplot object with an annotated plot of a
 response_spct object or of the spectra contained in a response_mspct object.
 }
-\note{
-Note that scales are expanded so as to make space for the annotations.
-  The object returned is a ggplot object, and can be further manipulated and
-  added to.
+\details{
+Note that scales are expanded so as to make space for the annotations. The
+object returned is a ggplot object, and can be further manipulated and added
+to.
 }
+\section{Plot Annotations}{
+ The recognized annotation names are: \code{"summaries"}, \code{"peaks"},
+  \code{"peak.labels"}, \code{"valleys"}, \code{"valley.labels"},
+  \code{"wls"}, \code{"wls.labels"}, \code{"colour.guide"},
+  \code{"color.guide"}, \code{"boxes"}, \code{"segments"}, \code{"labels"}.
+  In addition, \code{"+"} is interpreted as a request to add to the already
+  present default annotations, \code{"-"} as request to remove annotations
+  and \code{"="} or missing\code{"+"} and \code{"-"} as a request to reset
+  annotations to those requested. If used, \code{"+"}, \code{"-"} or
+  \code{"="} must be the first member of a character vector, and followed by
+  one or more of the names given above. To simultaneously add and remove
+  annotations one can pass a \code{list} containing \code{character} vectors
+  each assembled as described. The vectors are applied in the order they
+  appear in the list. To disable all annotations pass \code{""} or
+  \code{c("=", "")} as argument. Adding a variation of an annotation already
+  present, replaces the existing one automatically: e.g., adding
+  \code{"peak.labels"} replaces\code{"peaks"} if present.
+}
+
+\section{Title Annotations}{
+ metadata retrieved from object \code{object} is
+  paased to \code{ggplot2::ggtitle()} as arguments for \code{title},
+  \code{subtitle} and \code{caption}. The specification for the title is
+  passed as argument to \code{annotations}, and consists in the keyword
+  \code{title} with optional modifiers selecting the kind of metatdata to
+  use, separated by colons. Up to three keywords separated by colons are
+  accepted, and correspond to title, subtitle and caption. The recognized
+  keywords are: \code{"objt"}, \code{"class"}, \code{"what"}, \code{"when"},
+  \code{"where"}, \code{"how"}, \code{"inst.name"}, \code{"inst.sn"},
+  \code{"comment"} and \code{"none"} are recognized as modifiers to
+  \code{"title"}; \code{"none"} is a placeholder. Default is
+  \code{"title:objt"} or no title depending on the context.
+}
+
 \examples{
 
 autoplot(photodiode.spct)
 autoplot(photodiode.spct, unit.out = "photon")
+autoplot(photodiode.spct, annotations = "")
+autoplot(photodiode.spct, norm = "skip")
+autoplot(photodiode.spct, norm = 400)
+
+two_sensors.mspct <-
+ response_mspct(list("Photodiode" = photodiode.spct,
+                     "Coupled charge device" = ccd.spct))
+autoplot(two_sensors.mspct, normalize = TRUE, unit.out = "photon")
+autoplot(two_sensors.mspct, normalize = TRUE, idfactor = "Spectra")
+autoplot(two_sensors.mspct, normalize = TRUE, facets = 2)
 
 }
 \seealso{
+\code{\link[photobiology]{normalize}},
+  \code{\link[photobiology]{response_spct}},
+  \code{\link[photobiology]{waveband}},
+  \code{\link[photobiologyWavebands]{photobiologyWavebands-package}} and
+  \code{\link[ggplot2]{autoplot}}
+
 Other autoplot methods: 
 \code{\link{autoplot.calibration_spct}()},
 \code{\link{autoplot.cps_spct}()},
@@ -118,4 +188,3 @@ Other autoplot methods:
 \code{\link{set_annotations_default}()}
 }
 \concept{autoplot methods}
-\keyword{hplot}

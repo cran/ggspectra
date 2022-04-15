@@ -137,7 +137,7 @@
 #'                span = 71, geom = "label",
 #'                size = 3, vjust = 1.2, label.fmt = "%.3g nm",
 #'                refine.wl = TRUE) +
-#'   expand_limits(y = 4e-6) +
+#'   expand_limits(y = 0.85) + # make room for label
 #'   scale_fill_identity() +
 #'   scale_color_identity()
 #'
@@ -218,19 +218,17 @@ StatPeaks <-
                                                      refine.wl = refine.wl,
                                                      method = method,
                                                      na.rm = FALSE)
-                     dplyr::mutate(peaks.df,
-                                   x.label = sprintf(x.label.fmt, x),
-                                   y.label = sprintf(y.label.fmt, y),
-                                   wl.color = photobiology::fast_color_of_wl(x, chroma.type = chroma.type),
-                                   BW.color = black_or_white(wl.color))
+                     peaks.df[["x.label"]] <- sprintf(x.label.fmt, peaks.df[["x"]])
+                     peaks.df[["y.label"]] <- sprintf(y.label.fmt, peaks.df[["y"]])
+                     peaks.df[["wl.color"]] <-
+                       photobiology::fast_color_of_wl(peaks.df[["x"]], chroma.type = chroma.type)
+                     peaks.df[["BW.color"]] <-  black_or_white(peaks.df[["wl.color"]])
+                     peaks.df
                    },
-                   default_aes = ggplot2::aes(label = stat(x.label),
-                                              fill = stat(wl.color),
-#                                              color = ..BW.color..,
-                                              xintercept = stat(x),
-                                              yintercept = stat(y),
-                                              hjust = 0.5,
-                                              vjust = 0.5),
+                   default_aes = ggplot2::aes(label = after_stat(x.label),
+                                              fill = after_stat(wl.color),
+                                              xintercept = after_stat(x),
+                                              yintercept = after_stat(y)),
                    required_aes = c("x", "y")
   )
 
@@ -241,6 +239,8 @@ StatPeaks <-
 stat_valleys <- function(mapping = NULL,
                          data = NULL,
                          geom = "point",
+                         position = "identity",
+                         ...,
                          span = 5,
                          ignore_threshold = -0.01,
                          strict = is.null(span),
@@ -250,11 +250,9 @@ stat_valleys <- function(mapping = NULL,
                          label.fmt = "%.3g",
                          x.label.fmt = label.fmt,
                          y.label.fmt = label.fmt,
-                         position = "identity",
                          na.rm = FALSE,
                          show.legend = FALSE,
-                         inherit.aes = TRUE,
-                         ...) {
+                         inherit.aes = TRUE) {
   ggplot2::layer(
     stat = StatValleys, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
@@ -298,18 +296,16 @@ StatValleys <-
                                                          refine.wl = refine.wl,
                                                          method = method,
                                                          na.rm = FALSE)
-                     dplyr::mutate(valleys.df,
-                                   x.label = sprintf(x.label.fmt, x),
-                                   y.label = sprintf(y.label.fmt, y),
-                                   wl.color = photobiology::fast_color_of_wl(x, chroma.type = chroma.type),
-                                   BW.color = black_or_white(wl.color))
+                     valleys.df[["x.label"]] <- sprintf(x.label.fmt, valleys.df[["x"]])
+                     valleys.df[["y.label"]] <- sprintf(y.label.fmt, valleys.df[["y"]])
+                     valleys.df[["wl.color"]] <-
+                       photobiology::fast_color_of_wl(valleys.df[["x"]], chroma.type = chroma.type)
+                     valleys.df[["BW.color"]] <-  black_or_white(valleys.df[["wl.color"]])
+                     valleys.df
                    },
-                   default_aes = ggplot2::aes(label = stat(x.label),
-                                              fill = stat(wl.color),
-#                                              color = stat(BW.color),
-                                              xintercept = stat(x),
-                                              yintercept = stat(y),
-                                              hjust = 0.5,
-                                              vjust = 0.5),
+                   default_aes = ggplot2::aes(label = after_stat(x.label),
+                                              fill = after_stat(wl.color),
+                                              xintercept = after_stat(x),
+                                              yintercept = after_stat(y)),
                    required_aes = c("x", "y")
   )

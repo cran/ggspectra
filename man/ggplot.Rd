@@ -10,9 +10,11 @@
 \alias{ggplot.calibration_spct}
 \alias{ggplot.raw_spct}
 \alias{ggplot.object_spct}
+\alias{ggplot.generic_spct}
 \alias{ggplot.generic_mspct}
 \alias{ggplot.filter_mspct}
 \alias{ggplot.source_mspct}
+\alias{ggplot.object_mspct}
 \title{Create a new ggplot plot from spectral data.}
 \usage{
 \method{ggplot}{source_spct}(
@@ -66,6 +68,15 @@
   environment = parent.frame()
 )
 
+\method{ggplot}{generic_spct}(
+  data,
+  mapping = NULL,
+  ...,
+  range = NULL,
+  spct_class,
+  environment = parent.frame()
+)
+
 \method{ggplot}{generic_mspct}(data, mapping = NULL, ..., range = NULL, environment = parent.frame())
 
 \method{ggplot}{filter_mspct}(
@@ -83,6 +94,16 @@
   ...,
   range = NULL,
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
+  environment = parent.frame()
+)
+
+\method{ggplot}{object_mspct}(
+  data,
+  mapping = NULL,
+  ...,
+  range = NULL,
+  plot.qty = getOption("photobiology.object.qty", default = ifelse(length(data) > 1L,
+    "as.is", "all")),
   environment = parent.frame()
 )
 }
@@ -112,6 +133,12 @@ to using the environment in which \code{ggplot()} is called.}
 \code{"absorptance"} or \code{"absorbance"} for \code{filter_spct} objects,
 and in addition to these \code{"reflectance"}, \code{"all"} or
 \code{"as.is"} for \code{object_spct} objects.}
+
+\item{spct_class}{character Class into which a \code{generic_spct} object
+will be converted before plotting. The column names in data should
+match those expected by the class constructor (see
+\code{\link[photobiology]{setGenericSpct}}); other arguments should be
+passed by name).}
 }
 \description{
 \code{ggplot()} initializes a ggplot object. It can be used to declare the

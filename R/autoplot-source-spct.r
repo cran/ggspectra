@@ -10,6 +10,8 @@
 #' @param w.band list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
 #'   min annd max wavelengths (nm).
+#' @param pc.out logical, if TRUE use percent instead of fraction of one for
+#'   normalized spectral data.
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
@@ -31,9 +33,9 @@
 #'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
 #'   to the spectra and the user needs to use 'ggplot2' functions to manually
 #'   map an aesthetic or use facets for the spectra.
-#' @param facets logical Flag indicating if facets are to be created for the
-#'   levels of \code{idfactor} when \code{spct} contain multiple spectra in long
-#'   form.
+#' @param facets logical or integer Indicating if facets are to be created for
+#'   the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+#'   long form.
 #' @param ylim numeric y axis limits,
 #' @param na.rm logical.
 #' @param ... currently ignored.
@@ -45,6 +47,7 @@
 e_plot <- function(spct,
                    w.band,
                    range,
+                   pc.out,
                    label.qty,
                    span,
                    wls.target,
@@ -70,49 +73,68 @@ e_plot <- function(spct,
     w.band <- trim_wl(w.band, range = range(spct))
   }
   duration.label <- NA
-  if (is_normalized(spct) || is_scaled(spct)) {
-    s.irrad.label <- "Spectral~~energy~~exposure~~E(lambda)~~(relative~~units)"
-    irrad.label.total <- "atop(E, (relative~~units))"
-    irrad.label.avg <- "atop(bar(E(lambda)), (relative~~units))"
+  if (is_scaled(spct)) {
+    if (pc.out) {
+      warning("Percent scale supported only for normalized source_spct objects.")
+      pc.out <- FALSE
+    }
+    s.irrad.label <- "Spectral~~energy~~irradiance~~k %*% E[lambda]~~(\"rel.\")"
+    irrad.label.total <- "atop(k %*% E, (\"rel.\"))"
+    irrad.label.avg <- "atop(bar(E[lambda]), (\"rel.\"))"
+    scale.factor <- 1
+  } else if (is_normalized(spct)) {
+    if (!pc.out) {
+      multiplier.label <- "rel."
+    } else {
+      multiplier.label <- "%"
+    }
+    norm <- round(getNormalization(spct)[["norm.wl"]], digits = 1)
+    s.irrad.label <- bquote(Spectral~~energy~~irradiance~~E[lambda]/E[lambda==.(norm)]~~(.(multiplier.label)))
+    irrad.label.total <- "atop(E, (\"rel.\"))"
+    irrad.label.avg <- bquote(atop(bar(E[lambda]), E[lambda==.(norm)]))
     scale.factor <- 1
   } else {
+    if (pc.out) {
+      warning("Percent scale supported only for normalized source_spct objects.")
+      pc.out <- FALSE
+    }
     time.unit <- getTimeUnit(spct)
     if (!length(time.unit)) {
       time.unit <- "unkonwn"
     }
     time.unit.char <- duration2character(time.unit)
     if (time.unit.char == "second")  {
-      s.irrad.label <- "Spectral~~energy~~irradiance~~E(lambda)~~(W~m^{-2}~nm^{-1})"
+      s.irrad.label <- "Spectral~~energy~~irradiance~~E[lambda]~~(W~m^{-2}~nm^{-1})"
       irrad.label.total  <- "atop(E, (W~m^{-2}))"
-      irrad.label.avg  <- "atop(bar(E(lambda)), (W~m^{-2}~nm^{-1}))"
+      irrad.label.avg  <- "atop(bar(E[lambda]), (W~m^{-2}~nm^{-1}))"
       scale.factor <- 1
     } else if (time.unit.char == "day") {
-      s.irrad.label <- "Spectral~~energy~~exposure~~E(lambda)~~(MJ~d^{-1}~m^{-2}~nm^{-1})"
+      s.irrad.label <- "Spectral~~energy~~exposure~~E[lambda]~~(MJ~d^{-1}~m^{-2}~nm^{-1})"
       irrad.label.total <- "atop(E, (MJ~d^{-1}~m^{-2}))"
-      irrad.label.avg <- "atop(bar(E(lambda)), (MJ~d^{-1}~m^{-2}~nm^{-1}))"
+      irrad.label.avg <- "atop(bar(E[lambda]), (MJ~d^{-1}~m^{-2}~nm^{-1}))"
       scale.factor <- 1e-6
     } else if (time.unit.char == "hour") {
-      s.irrad.label <- "Spectral~~energy~~exposure~~E(lambda)~~(kJ~h^{-1}~m^{-2}~nm^{-1})"
+      s.irrad.label <- "Spectral~~energy~~exposure~~E[lambda]~~(kJ~h^{-1}~m^{-2}~nm^{-1})"
       irrad.label.total <- "atop(E, (kJ~h^{-1}~m^{-2}))"
-      irrad.label.avg <- "atop(bar(E(lambda)), (kJ~h^{-1}~m^{-2}~nm^{-1}))"
+      irrad.label.avg <- "atop(bar(E[lambda]), (kJ~h^{-1}~m^{-2}~nm^{-1}))"
       scale.factor <- 1e-3
     } else if (time.unit.char == "duration") {
-      s.irrad.label <- "Spectral~~energy~~fluence~~E(lambda)~~(kJ~m^{-2}~nm^{-1})"
+      s.irrad.label <- "Spectral~~energy~~fluence~~E[lambda]~~(kJ~m^{-2}~nm^{-1})"
       irrad.label.total <- "atop(E, (kJ~m^{-2}))"
-      irrad.label.avg <- "atop(bar(E(lambda)), (kJ~m^{-2}~nm^{-1}))"
+      irrad.label.avg <- "atop(bar(E[lambda]), (kJ~m^{-2}~nm^{-1}))"
       duration.label <- paste("Length of exposure:",
                               ifelse(lubridate::is.duration(time.unit),
                               as.character(time.unit), "unknown"))
       scale.factor <- 1e-3
     } else if (time.unit.char == "exposure") {
-      s.irrad.label <- "Spectral~~energy~~fluence~~E(lambda)~~(J~m^{-2}~nm^{-1})"
+      s.irrad.label <- "Spectral~~energy~~fluence~~E[lambda]~~(J~m^{-2}~nm^{-1})"
       irrad.label.total <- "atop(E, (J~m^{-2}))"
-      irrad.label.avg <- "atop(bar(E(lambda)), (J~m^{-2}~nm^{-1}))"
+      irrad.label.avg <- "atop(bar(E[lambda]), (J~m^{-2}~nm^{-1}))"
       scale.factor <- 1
     } else {
-      s.irrad.label <- "Spectral~~energy~~exposure~~E(lambda)~~(arbitrary~~units)"
+      s.irrad.label <- "Spectral~~energy~~fluence~~E[lambda]~~(arbitrary~~units)"
       irrad.label.total <- "atop(E, (arbitrary~~units))"
-      irrad.label.avg <- "atop(bar(E(lambda)), (arbitrary~~units))"
+      irrad.label.avg <- "atop(bar(E[lambda]), (arbitrary~~units))"
       scale.factor <- 1
     }
   }
@@ -121,21 +143,21 @@ e_plot <- function(spct,
   } else if (label.qty %in% c("average", "mean")) {
     irrad.label <- irrad.label.avg
   }  else if (label.qty == "contribution") {
-    irrad.label <- "atop(Contribution~~to~~total, E~~(fraction))"
+    irrad.label <- "atop(Contribution~~to~~total, E~~(\"/1\"))"
   } else if (label.qty == "contribution.pc") {
-    irrad.label <- "atop(Contribution~~to~~total, E~~(percent))"
+    irrad.label <- "atop(Contribution~~to~~total, E~~(\"%\"))"
   } else if (label.qty == "relative") {
-    irrad.label <- "atop(Relative~~to~~sum, E~~(fraction))"
+    irrad.label <- "atop(Relative~~to~~sum, E~~(\"/1\"))"
   } else if (label.qty == "relative.pc") {
-    irrad.label <- "atop(Relative~~to~~sum, E~~(percent))"
+    irrad.label <- "atop(Relative~~to~~sum, E~~(\"%\"))"
   } else {
     irrad.label <- ""
   }
   if (is_effective(spct)) {
-    s.irrad.label <- sub("E", "E[eff]", s.irrad.label, fixed = TRUE)
-    irrad.label <- sub("E", "E[eff]", irrad.label, fixed = TRUE)
-    irrad.label.total <- sub("E", "E[eff]", irrad.label.total, fixed = TRUE)
-    irrad.label.avg <- sub("E", "E[eff]", irrad.label.avg, fixed = TRUE)
+    s.irrad.label <- sub("E[lambda]", "E[lambda]^{eff}", s.irrad.label, fixed = TRUE)
+    irrad.label <- sub("E", "E^{eff}", irrad.label, fixed = TRUE)
+    irrad.label.total <- sub("E", "E^{eff}", irrad.label.total, fixed = TRUE)
+    irrad.label.avg <- sub("E[lambda]", "E[lambda]^{eff}", irrad.label.avg, fixed = TRUE)
   }
   s.irrad.label <- parse(text = s.irrad.label)
   spct[["s.e.irrad"]] <- spct[["s.e.irrad"]] * scale.factor
@@ -215,6 +237,12 @@ e_plot <- function(spct,
                              na.rm = TRUE)
   }
 
+  if (abs(y.max - 1) < 0.02 && abs(y.min) < 0.02) {
+    y.breaks <- c(0, 0.25, 0.5, 0.75, 1)
+  } else {
+    y.breaks <- scales::pretty_breaks(n = 5)
+  }
+
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
@@ -224,14 +252,17 @@ e_plot <- function(spct,
     y.limits <- c(y.min, y.max * 1.05)
     x.limits <- range(spct)
   }
-  if (abs(y.min) < 5e-2 && (abs(y.max - 1) < 5.e-2)) {
-    plot <- plot +
-      scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1), limits = y.limits)
-  } else {
-    plot <- plot +
-      scale_y_continuous(limits = y.limits)
-  }
 
+  if (pc.out) {
+    plot <- plot +
+      scale_y_continuous(labels = scales::percent,
+                         breaks = y.breaks,
+                         limits = y.limits)
+  } else {
+    plot <-
+      plot + scale_y_continuous(breaks = y.breaks,
+                                limits = y.limits)
+  }
   plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 }
 
@@ -247,6 +278,8 @@ e_plot <- function(spct,
 #' @param w.band list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
 #'   min annd max wavelengths (nm).
+#' @param pc.out logical, if TRUE use percent instead of fraction of one for
+#'   normalized spectral data.
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
@@ -282,6 +315,7 @@ e_plot <- function(spct,
 q_plot <- function(spct,
                    w.band,
                    range,
+                   pc.out,
                    label.qty,
                    span,
                    wls.target,
@@ -308,49 +342,68 @@ q_plot <- function(spct,
   }
 
   duration.label <- NA
-  if (is_normalized(spct) || is_scaled(spct)) {
-    s.irrad.label <- "Spectral~~photon~~exposure~~Q(lambda)~~(relative~~units)"
-    irrad.label.total <- "atop(Q, (relative~~units))"
-    irrad.label.avg <- "atop(bar(Q(lambda)), (relative~~units))"
+  if (is_scaled(spct)) {
+    if (pc.out) {
+      warning("Percent scale supported only for normalized source_spct objects.")
+      pc.out <- FALSE
+    }
+    s.irrad.label <- "Spectral~~photon~~exposure~~k %*% Q[lambda]~~(\"rel.\")"
+    irrad.label.total <- "atop(k %*% Q, (\"rel.\"))"
+    irrad.label.avg <- "atop(bar(Q[lambda]), (\"rel.\"))"
+    scale.factor <- 1
+  } else  if (is_normalized(spct)) {
+    if (!pc.out) {
+      multiplier.label <- "rel."
+    } else {
+      multiplier.label <- "%"
+    }
+    norm <- round(getNormalization(spct)[["norm.wl"]], digits = 1)
+    s.irrad.label <- bquote(Spectral~~photon~~exposure~~Q[lambda]/Q[lambda==.(norm)]~~(.(multiplier.label)))
+    irrad.label.total <- "atop(Q, (\"rel.\"))"
+    irrad.label.avg <- bquote(atop(bar(Q[lambda]), Q[lambda==.(norm)]))
     scale.factor <- 1
   } else {
+    if (pc.out) {
+      warning("Percent scale supported only for normalized source_spct objects.")
+      pc.out <- FALSE
+    }
     time.unit <- getTimeUnit(spct)
     if (!length(time.unit)) {
       time.unit <- "unkonwn"
     }
     time.unit.char <- duration2character(time.unit)
     if (time.unit.char=="second") {
-      s.irrad.label <- "Spectral~~photon~~irradiance~~Q(lambda)~~(mu*mol~s^{-1}~m^{-2}~nm^{-1})"
+      s.irrad.label <- "Spectral~~photon~~irradiance~~Q[lambda]~~(mu*mol~s^{-1}~m^{-2}~nm^{-1})"
       irrad.label.total  <- "atop(Q, (mu*mol~s^{-1}~m^{-2}))"
-      irrad.label.avg  <- "atop(bar(Q(lambda)), (mu*mol~s^{-1}~m^{-2}~nm^{-1}))"
+      irrad.label.avg  <- "atop(bar(Q[lambda]), (mu*mol~s^{-1}~m^{-2}~nm^{-1}))"
       scale.factor <- 1e6
     } else if (time.unit.char=="day") {
-      s.irrad.label <- "Spectral~~photon~~exposure~~Q(lambda)~~(mol~d^{-1}~m^{-2}~nm^{-1})"
+      s.irrad.label <- "Spectral~~photon~~exposure~~Q[lambda]~~(mol~d^{-1}~m^{-2}~nm^{-1})"
       irrad.label.total <- "atop(Q, (mol~d^{-1}~m^{-2}))"
-      irrad.label.avg <- "atop(bar(Q(lambda)), (mol~d^{-1}~m^{-2}~nm^{-1}))"
+      irrad.label.avg <- "atop(bar(Q[lambda]), (mol~d^{-1}~m^{-2}~nm^{-1}))"
       scale.factor <- 1
     } else if (time.unit.char=="hour") {
-      s.irrad.label <- "Spectral~~photon~~exposure~~Q(lambda)~~(mmol~h^{-1}~m^{-2}~nm^{-1})"
+      s.irrad.label <- "Spectral~~photon~~exposure~~Q[lambda]~~(mmol~h^{-1}~m^{-2}~nm^{-1})"
       irrad.label.total <- "atop(Q, (mmol~h^{-1}~m^{-2}))"
-      irrad.label.avg <- "atop(bar(Q(lambda)), (mmol~h^{-1}~m^{-2}~nm^{-1}))"
+      irrad.label.avg <- "atop(bar(Q[lambda]), (mmol~h^{-1}~m^{-2}~nm^{-1}))"
       scale.factor <- 1e3
     } else if (time.unit.char=="duration" || lubridate::is.duration(time.unit)) {
-      s.irrad.label <- "Spectral~~photon~~fluence~~Q(lambda)~~(mol~m^{-2}~nm^{-1})"
+      s.irrad.label <- "Spectral~~photon~~fluence~~Q[lambda]~~(mol~m^{-2}~nm^{-1})"
       irrad.label.total <- "atop(Q, (mol~m^{-2}))"
-      irrad.label.avg <- "atop(bar(Q(lambda)), (mol~m^{-2}~nm^{-1}))"
+      irrad.label.avg <- "atop(bar(Q[lambda]), (mol~m^{-2}~nm^{-1}))"
       duration.label <- paste("Length of exposure:",
                               ifelse(lubridate::is.duration(time.unit),
                                      as.character(time.unit), "unknown"))
       scale.factor <- 1
     } else if (time.unit.char=="exposure" || lubridate::is.duration(time.unit)) {
-      s.irrad.label <- "Spectral~~photon~~fluence~~Q(lambda)~~(mol~m^{-2}~nm^{-1})"
+      s.irrad.label <- "Spectral~~photon~~fluence~~Q[lambda]~~(mol~m^{-2}~nm^{-1})"
       irrad.label.total <- "atop(Q, (mol~m^{-2}))"
-      irrad.label.avg <- "atop(bar(Q(lambda)), (mol~m^{-2}~nm^{-1}))"
+      irrad.label.avg <- "atop(bar(Q[lambda]), (mol~m^{-2}~nm^{-1}))"
       scale.factor <- 1
     } else {
-      s.irrad.label <- "Spectral~~photon~~exposure~~Q(lambda)~~(arbitrary~~units)"
+      s.irrad.label <- "Spectral~~photon~~exposure~~Q[lambda]~~(arbitrary~~units)"
       irrad.label.total <- "atop(Q, (arbitrary~~units))"
-      irrad.label.avg <- "atop(bar(Q(lambda)), (arbitrary~~units))"
+      irrad.label.avg <- "atop(bar(Q[lambda]), (arbitrary~~units))"
       scale.factor <- 1
     }
   }
@@ -359,21 +412,21 @@ q_plot <- function(spct,
   } else if (label.qty %in% c("average", "mean")) {
     irrad.label <- irrad.label.avg
   } else if (label.qty == "contribution") {
-    irrad.label <- "atop(Contribution~~to~~total, Q~~(fraction))"
+    irrad.label <- "atop(Contribution~~to~~total, Q~~(\"/1\"))"
   } else if (label.qty == "contribution.pc") {
-    irrad.label <- "atop(Contribution~~to~~total, Q~~(percent))"
+    irrad.label <- "atop(Contribution~~to~~total, Q~~(\"%\"))"
   } else if (label.qty == "relative") {
-    irrad.label <- "atop(Relative~~to~~sum, Q~~(fraction))"
+    irrad.label <- "atop(Relative~~to~~sum, Q~~(\"/1\"))"
   } else if (label.qty == "relative.pc") {
-    irrad.label <- "atop(Relative~~to~~sum, Q~~(percent))"
+    irrad.label <- "atop(Relative~~to~~sum, Q~~(\"%\"))"
   } else {
     irrad.label <- ""
   }
   if (is_effective(spct)) {
-    s.irrad.label <- sub("Q", "Q[eff]", s.irrad.label, fixed = TRUE)
-    irrad.label <- sub("Q", "Q[eff]", irrad.label, fixed = TRUE)
-    irrad.label.total <- sub("Q", "Q[eff]", irrad.label.total, fixed = TRUE)
-    irrad.label.avg <- sub("Q", "Q[eff]", irrad.label.avg, fixed = TRUE)
+    s.irrad.label <- sub("Q[lambda]", "Q[lambda]^{eff}", s.irrad.label, fixed = TRUE)
+    irrad.label <- sub("Q", "Q^{eff}", irrad.label, fixed = TRUE)
+    irrad.label.total <- sub("Q", "Q^{eff}", irrad.label.total, fixed = TRUE)
+    irrad.label.avg <- sub("Q[lambda]", "Q[lambda]^{eff}", irrad.label.avg, fixed = TRUE)
   }
   s.irrad.label <- parse(text = s.irrad.label)
   spct[["s.q.irrad"]] <- spct[["s.q.irrad"]] * scale.factor
@@ -453,6 +506,12 @@ q_plot <- function(spct,
                              na.rm = TRUE)
   }
 
+  if (abs(y.max - 1) < 0.02 && abs(y.min) < 0.02) {
+    y.breaks <- c(0, 0.25, 0.5, 0.75, 1)
+  } else {
+    y.breaks <- scales::pretty_breaks(n = 5)
+  }
+
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
@@ -463,13 +522,16 @@ q_plot <- function(spct,
     x.limits <- range(spct)
   }
 
-  if (abs(y.min) < 5e-2 && (abs(y.max - 1) < 5.e-2)) {
+  if (pc.out) {
     plot <- plot +
-      scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1), limits = y.limits)
+      scale_y_continuous(labels = scales::percent,
+                         breaks = y.breaks,
+                         limits = y.limits)
   } else {
-    plot <- plot + scale_y_continuous(limits = y.limits)
+    plot <-
+      plot + scale_y_continuous(breaks = y.breaks,
+                                limits = y.limits)
   }
-
   plot + scale_x_continuous(limits = x.limits, breaks = scales::pretty_breaks(n = 7))
 }
 
@@ -478,9 +540,12 @@ q_plot <- function(spct,
 #' These methods return a ggplot object with an annotated plot of a source_spct
 #' object or of the spectra contained in a source_mspct object.
 #'
-#' @note Note that scales are expanded so as to make space for the annotations.
-#'   The object returned is a ggplot object, and can be further manipulated and
-#'   added to.
+#' Note that scales are expanded so as to make space for the annotations. The
+#' object returned is a ggplot object, and can be further manipulated and added
+#' to.
+#'
+#' @inheritSection decoration Plot Annotations
+#' @inheritSection autotitle Title Annotations
 #'
 #' @param object a source_spct or a source_mspct object.
 #' @param ... in the case of collections of spectra, additional arguments passed
@@ -488,8 +553,15 @@ q_plot <- function(spct,
 #' @param w.band a single waveband object or a list of waveband objects.
 #' @param range an R object on which range() returns a vector of length 2, with
 #'   min annd max wavelengths (nm).
+#' @param norm numeric Normalization wavelength (nm) or character string "max",
+#'   or "min" for normalization at the corresponding wavelength, "update" to
+#'   update the normalization after modifying units of expression, quantity
+#'   or range but respecting the previously used criterion, or "skip" to force
+#'   return of \code{object} unchanged.
 #' @param unit.out character string indicating type of radiation units to use
-#'   for plotting: "photon" or its synomin "quantum", or "energy".
+#'   for plotting: "photon" or its synonym "quantum", or "energy".
+#' @param pc.out logical, if TRUE use percent instead of fraction of one for
+#'   normalized spectral data.
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
@@ -500,7 +572,8 @@ q_plot <- function(spct,
 #'   \code{character} strings "half.maximum" and "half.range" are also accepted
 #'   as arguments. A list with \code{numeric} and/or \code{character} values is
 #'   also accepted.
-#' @param annotations a character vector.
+#' @param annotations a character vector. For details please see sections Plot
+#'   Annotations and Title Annotations.
 #' @param time.format character Format as accepted by
 #'   \code{\link[base]{strptime}}.
 #' @param tz character Time zone to use for title and/or subtitle.
@@ -510,9 +583,9 @@ q_plot <- function(spct,
 #' @param idfactor character Name of an index column in data holding a
 #'   \code{factor} with each spectrum in a long-form multispectrum object
 #'   corresponding to a distinct level of the factor.
-#' @param facets logical Flag indicating if facets are to be created for the
-#'   levels of \code{idfactor} when \code{spct} contain multiple spectra in long
-#'   form.
+#' @param facets logical or integer Indicating if facets are to be created for
+#'   the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+#'   long form.
 #' @param ylim numeric y axis limits,
 #' @param object.label character The name of the object being plotted.
 #' @param na.rm logical.
@@ -525,30 +598,42 @@ q_plot <- function(spct,
 #'
 #' @return a \code{ggplot} object.
 #'
-#' @export
+#' @seealso \code{\link[photobiology]{normalize}},
+#'   \code{\link[photobiology]{source_spct}},
+#'   \code{\link[photobiology]{waveband}},
+#'   \code{\link[photobiologyWavebands]{photobiologyWavebands-package}} and
+#'   \code{\link[ggplot2]{autoplot}}
 #'
-#' @keywords hplot
+#' @export
 #'
 #' @examples
 #'
 #' autoplot(sun.spct)
 #' autoplot(sun.spct, unit.out = "photon")
+#' autoplot(sun.spct, norm = "max")
+#' autoplot(sun.spct, norm = "max", unit.out = "photon")
 #'
 #' two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct / 2))
 #' autoplot(two_suns.mspct)
+#' autoplot(two_suns.mspct, plot.data = "mean")
 #' autoplot(two_suns.mspct, idfactor = "Spectra")
 #' autoplot(two_suns.mspct, facets = TRUE) # uses ggplot2's default
 #' autoplot(two_suns.mspct, facets = 1) # one column
 #' autoplot(two_suns.mspct, facets = 2) # two columns
+#' autoplot(two_suns.mspct, norm = "max", facets = 2)
 #'
 #' @family autoplot methods
 #'
 autoplot.source_spct <-
   function(object, ...,
-           w.band=getOption("photobiology.plot.bands",
-                            default = list(UVC(), UVB(), UVA(), PAR())),
-           range=NULL,
-           unit.out=getOption("photobiology.radiation.unit", default = "energy"),
+           w.band = getOption("photobiology.plot.bands",
+                              default = list(UVC(), UVB(), UVA(), PAR())),
+           range = NULL,
+           norm = getOption("ggspectra.norm",
+                            default = "update"),
+           unit.out = getOption("photobiology.radiation.unit",
+                                default = "energy"),
+           pc.out = FALSE,
            label.qty = NULL,
            span = NULL,
            wls.target = "HM",
@@ -562,11 +647,24 @@ autoplot.source_spct <-
            ylim = c(NA, NA),
            object.label = deparse(substitute(object)),
            na.rm = TRUE) {
+
+    force(object.label)
+
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
     annotations <- decode_annotations(annotations,
                                       annotations.default)
+    # avoid warning in 'photobiology' (== 0.10.10)
+    if (is.character(norm) && norm == "update" && !is_normalized(object)) {
+      norm <- "skip"
+    }
+    # normalization needs to be redone if unit.out has changed
+    object <- normalize(x = object,
+                        range = range,
+                        norm = norm,
+                        unit.out = unit.out,
+                        na.rm = na.rm)
     if (is.null(label.qty)) {
       if (is_normalized(object) || is_scaled(object)) {
         label.qty = "contribution"
@@ -585,7 +683,10 @@ autoplot.source_spct <-
     }
 
     if (unit.out %in% c("photon", "quantum")) {
-      out.ggplot <- q_plot(spct = object, w.band = w.band, range = range,
+      out.ggplot <- q_plot(spct = object,
+                           w.band = w.band,
+                           range = range,
+                           pc.out = pc.out,
                            label.qty = label.qty,
                            span = span,
                            wls.target = wls.target,
@@ -598,7 +699,10 @@ autoplot.source_spct <-
                            na.rm = na.rm,
                            ...)
     } else if (unit.out == "energy") {
-      out.ggplot <- e_plot(spct = object, w.band = w.band, range = range,
+      out.ggplot <- e_plot(spct = object,
+                           w.band = w.band,
+                           range = range,
+                           pc.out = pc.out,
                            label.qty = label.qty,
                            span = span,
                            wls.target = wls.target,
@@ -615,17 +719,18 @@ autoplot.source_spct <-
     }
     out.ggplot +
       autotitle(object = object,
-                   object.label = object.label,
-                   time.format = time.format,
-                   tz = tz,
-                   annotations = annotations)
+                object.label = object.label,
+                time.format = time.format,
+                tz = tz,
+                annotations = annotations)
   }
 
 #' @rdname autoplot.source_spct
 #'
-#' @param plot.data character Data to plot. Default is "as.is" plotting
-#'   one line per spectrum. When passing "mean" or "median" as
-#'   argument all the spectra must contain data at the same wavelength values.
+#' @param plot.data character Data to plot. Default is "as.is" plotting one line
+#'   per spectrum. When passing "mean", "median", "sum", "prod", var", "sd",
+#'   "se" as argument all the spectra must contain data at the same wavelength
+#'   values.
 #'
 #' @export
 #'
@@ -633,33 +738,80 @@ autoplot.source_mspct <-
   function(object,
            ...,
            range = NULL,
+           norm = getOption("ggspectra.normalize",
+                            default = "update"),
            unit.out = getOption("photobiology.radiation.unit",
                                 default = "energy"),
+           pc.out = FALSE,
+           idfactor = TRUE,
+           facets = FALSE,
            plot.data = "as.is",
-           idfactor = TRUE) {
+           object.label = deparse(substitute(object)),
+           na.rm = TRUE) {
+
+    force(object.label)
+
+    idfactor <- validate_idfactor(idfactor = idfactor)
     # We trim the spectra to avoid unnecesary computaions later
     if (!is.null(range)) {
-      object <- trim_wl(object, range = range, use.hinges = TRUE, fill = NULL)
+      object <- photobiology::trim_wl(object,
+                                      range = range,
+                                      use.hinges = TRUE,
+                                      fill = NULL)
     }
-    # conversion before binding and summaries
-    if (unit.out == "energy") {
-      data <- q2e(object, action = "replace")
-    } else if (unit.out %in% c("photon", "quantum")) {
-      data <- e2q(object, action = "replace")
-    } else {
-      stop("Invalid 'unit.out' argument value: '", unit.out, "'")
+    # We apply the normalization to the collection if it is to be bound
+    # otherwise normalization is applied to the "parallel-summary" spectrum
+    if (plot.data == "as.is") {
+      object <- photobiology::normalize(object,
+                                        norm = norm,
+                                        unit.out = unit.out,
+                                        na.rm = na.rm)
+      norm <- "skip"
     }
+    # we ensure the units are correct
+    object <- switch(unit.out,
+                     photon = e2q(object, action = "replace"),
+                     energy = q2e(object, action = "replace"))
     # we convert the collection of spectra into a single spectrum object
     # containing a summary spectrum or multiple spectra in long form.
     z <- switch(plot.data,
-                mean = photobiology::s_mean(object),
-                median = photobiology::s_median(object),
                 as.is = photobiology::rbindspct(object,
                                                 idfactor = ifelse(is.na(idfactor),
                                                                   TRUE,
-                                                                  idfactor))
+                                                                  idfactor)),
+                mean = photobiology::s_mean(object),
+                median = photobiology::s_median(object),
+                sum = photobiology::s_sum(object),
+                prod = photobiology::s_prod(object),
+                var = photobiology::s_var(object),
+                sd = photobiology::s_sd(object),
+                se = photobiology::s_se(object)
     )
-    autoplot(object = z, range = NULL, idfactor = idfactor, ...)
+    col.name <- c(photon = "s.q.irrad", energy = "s.e.irrad")
+    if (is.source_spct(z) && any(col.name %in% names(z))) {
+      autoplot(object = z,
+               range = NULL,
+               norm = norm,
+               unit.out = unit.out,
+               pc.out = pc.out,
+               idfactor = idfactor,
+               facets = facets,
+               object.label = object.label,
+               na.rm = na.rm,
+               ...)
+    } else {
+      z <- as.generic_spct(z)
+      autoplot(object = z,
+               y.name = paste(col.name[unit.out], plot.data, sep = "."),
+               range = NULL,
+               norm = norm,
+               pc.out = pc.out,
+               idfactor = idfactor,
+               facets = facets,
+               object.label = object.label,
+               na.rm = na.rm,
+               ...)
+    }
   }
 
 ## internal

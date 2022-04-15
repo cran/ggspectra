@@ -11,6 +11,7 @@
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(),
     PAR())),
   range = NULL,
+  norm = getOption("ggspectra.norm", default = "update"),
   plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
   pc.out = FALSE,
   label.qty = NULL,
@@ -22,6 +23,7 @@
   text.size = 2.5,
   chroma.type = "CMF",
   idfactor = NULL,
+  facets = FALSE,
   ylim = c(NA, NA),
   object.label = deparse(substitute(object)),
   na.rm = TRUE
@@ -31,20 +33,32 @@
   object,
   ...,
   range = NULL,
+  norm = getOption("ggspectra.norm", default = "update"),
   plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
-  plot.data = "as.is"
+  pc.out = FALSE,
+  plot.data = "as.is",
+  idfactor = TRUE,
+  facets = FALSE,
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
 )
 }
 \arguments{
 \item{object}{a filter_spct object or a filter_mspct object.}
 
 \item{...}{in the case of collections of spectra, additional arguments passed
-to the plot methods for individual spectra, otherwise currently ignored.}
+to the autoplot methods for individual spectra, otherwise currently ignored.}
 
 \item{w.band}{a single waveband object or a list of waveband objects.}
 
 \item{range}{an R object on which range() returns a vector of length 2, with
-min annd max wavelengths (nm).}
+min and max wavelengths (nm).}
+
+\item{norm}{numeric Normalization wavelength (nm) or character string "max",
+or "min" for normalization at the corresponding wavelength, "update" to
+update the normalization after modifying units of expression, quantity
+or range but respecting the previously used criterion, or "skip" to force
+return of \code{object} unchanged.}
 
 \item{plot.qty}{character string one of "transmittance" or "absorbance".}
 
@@ -54,7 +68,7 @@ min annd max wavelengths (nm).}
 for labels, one of "mean", "total", "contribution", and "relative".}
 
 \item{span}{a peak is defined as an element in a sequence which is greater
-than all other elements within a window of width span centered at that
+than all other elements within a window of width span centred at that
 element.}
 
 \item{wls.target}{numeric vector indicating the spectral quantity values for
@@ -63,7 +77,8 @@ which wavelengths are to be searched and interpolated if need. The
 as arguments. A list with \code{numeric} and/or \code{character} values is
 also accepted.}
 
-\item{annotations}{a character vector.}
+\item{annotations}{a character vector. For details please see sections Plot
+Annotations and Title Annotations.}
 
 \item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
 
@@ -82,43 +97,101 @@ default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
 to the spectra and the user needs to use 'ggplot2' functions to manually
 map an aesthetic or use facets for the spectra.}
 
+\item{facets}{logical or integer Indicating if facets are to be created for
+the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+long form.}
+
 \item{ylim}{numeric y axis limits,}
 
 \item{object.label}{character The name of the object being plotted.}
 
 \item{na.rm}{logical.}
 
-\item{plot.data}{character Data to plot. Default is "as.is" plotting
-one line per spectrum. When passing "mean" or "median" as
-argument all the spectra must contain data at the same wavelength values.}
+\item{plot.data}{character Data to plot. Default is "as.is" plotting one line
+per spectrum. When passing "mean", "median", "sum", "prod", var", "sd",
+"se" as argument all the spectra must contain data at the same wavelength
+values.}
 }
 \value{
 a \code{ggplot} object.
 }
 \description{
-These methods return a ggplot object with an annotated plot of a
-filter_spct object or of the spectra contained in a filter_mspct
-object.
+These methods return a ggplot object with an annotated plot of a filter_spct
+object or of the spectra contained in a filter_mspct object.
 }
-\note{
-The ggplot object returned can be further manipulated and added to.
-  Except when no annotations are added, limits are set for the x-axis and
-  y-axis scales. The y scale limits are expanded to include all data, or at
-  least to the range of expected values. The plotting of absorbance is an
-  exception as the y-axis is not extended past 6 a.u. In the case of
-  absorbance, values larger than 6 a.u. are rarely meaningful due to stray
-  light during measurement. However, when transmittance values below the
-  detection limit are rounded to zero, and later converted into absorbance,
-  values Inf a.u. result, disrupting the plot. Scales are further expanded so
-  as to make space for the annotations.
+\details{
+The ggplot object returned can be further manipulated and added to. Except
+when no annotations are added, limits are set for the x-axis and y-axis
+scales. The y scale limits are expanded to include all data, or at least to
+the range of expected values. The plotting of absorbance is an exception as
+the y-axis is not extended past 6 a.u. In the case of absorbance, values
+larger than 6 a.u. are rarely meaningful due to stray light during
+measurement. However, when transmittance values below the detection limit are
+rounded to zero, and later converted into absorbance, values Inf a.u. result,
+disrupting the plot. Scales are further expanded so as to make space for the
+annotations.
 }
+\section{Plot Annotations}{
+ The recognized annotation names are: \code{"summaries"}, \code{"peaks"},
+  \code{"peak.labels"}, \code{"valleys"}, \code{"valley.labels"},
+  \code{"wls"}, \code{"wls.labels"}, \code{"colour.guide"},
+  \code{"color.guide"}, \code{"boxes"}, \code{"segments"}, \code{"labels"}.
+  In addition, \code{"+"} is interpreted as a request to add to the already
+  present default annotations, \code{"-"} as request to remove annotations
+  and \code{"="} or missing\code{"+"} and \code{"-"} as a request to reset
+  annotations to those requested. If used, \code{"+"}, \code{"-"} or
+  \code{"="} must be the first member of a character vector, and followed by
+  one or more of the names given above. To simultaneously add and remove
+  annotations one can pass a \code{list} containing \code{character} vectors
+  each assembled as described. The vectors are applied in the order they
+  appear in the list. To disable all annotations pass \code{""} or
+  \code{c("=", "")} as argument. Adding a variation of an annotation already
+  present, replaces the existing one automatically: e.g., adding
+  \code{"peak.labels"} replaces\code{"peaks"} if present.
+}
+
+\section{Title Annotations}{
+ metadata retrieved from object \code{object} is
+  paased to \code{ggplot2::ggtitle()} as arguments for \code{title},
+  \code{subtitle} and \code{caption}. The specification for the title is
+  passed as argument to \code{annotations}, and consists in the keyword
+  \code{title} with optional modifiers selecting the kind of metatdata to
+  use, separated by colons. Up to three keywords separated by colons are
+  accepted, and correspond to title, subtitle and caption. The recognized
+  keywords are: \code{"objt"}, \code{"class"}, \code{"what"}, \code{"when"},
+  \code{"where"}, \code{"how"}, \code{"inst.name"}, \code{"inst.sn"},
+  \code{"comment"} and \code{"none"} are recognized as modifiers to
+  \code{"title"}; \code{"none"} is a placeholder. Default is
+  \code{"title:objt"} or no title depending on the context.
+}
+
 \examples{
 
 autoplot(yellow_gel.spct)
+autoplot(yellow_gel.spct, plot.qty = "transmittance")
+autoplot(yellow_gel.spct, plot.qty = "absorptance")
+autoplot(yellow_gel.spct, plot.qty = "absorbance")
 autoplot(yellow_gel.spct, pc.out = TRUE)
+autoplot(yellow_gel.spct, annotations = "")
+autoplot(yellow_gel.spct, annotations = c("+", "wls"))
+
+two_filters.mspct <-
+ filter_mspct(list("Yellow gel" = yellow_gel.spct,
+                   "Polyester film" = polyester.spct))
+autoplot(two_filters.mspct)
+autoplot(two_filters.mspct, idfactor = "Spectra")
+autoplot(two_filters.mspct, facets = TRUE)
+autoplot(two_filters.mspct, facets = 1)
+autoplot(two_filters.mspct, facets = 2)
 
 }
 \seealso{
+\code{\link[photobiology]{normalize}},
+  \code{\link[photobiology]{filter_spct}},
+  \code{\link[photobiology]{waveband}},
+  \code{\link[photobiologyWavebands]{photobiologyWavebands-package}} and
+  \code{\link[ggplot2]{autoplot}}
+
 Other autoplot methods: 
 \code{\link{autoplot.calibration_spct}()},
 \code{\link{autoplot.cps_spct}()},

@@ -16,6 +16,7 @@ cal_plot(
   norm,
   text.size,
   idfactor,
+  facets,
   ylim,
   na.rm,
   ...
@@ -46,8 +47,12 @@ also accepted.}
 
 \item{annotations}{a character vector}
 
-\item{norm}{numeric normalization wavelength (nm) or character string "max"
-for normalization at the wavelength of highest peak.}
+\item{norm}{numeric Normalization wavelength (nm) or character string "max",
+or "min" for normalization at the corresponding wavelength, "update" to
+update the normalization after modifying units of expression, quantity
+or range but respecting the previously used criterion, or "skip" to force
+return of \code{object} unchanged. Always skipped for
+\code{plot.qty == "all"}, which is the default.}
 
 \item{text.size}{numeric size of text in the plot decorations.}
 
@@ -58,6 +63,10 @@ the factor is retrieved from metadata or if no metadata found, the
 default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
 to the spectra and the user needs to use 'ggplot2' functions to manually
 map an aesthetic or use facets for the spectra.}
+
+\item{facets}{logical or integer Indicating if facets are to be created for
+the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+long form.}
 
 \item{ylim}{numeric y axis limits,}
 

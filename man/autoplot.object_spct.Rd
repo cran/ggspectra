@@ -11,10 +11,11 @@
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(),
     PAR())),
   range = NULL,
+  norm = "skip",
   plot.qty = "all",
   pc.out = FALSE,
   label.qty = NULL,
-  span = 61,
+  span = NULL,
   wls.target = "HM",
   annotations = NULL,
   time.format = "",
@@ -23,12 +24,25 @@
   text.size = 2.5,
   chroma.type = "CMF",
   idfactor = NULL,
+  facets = FALSE,
   ylim = c(NA, NA),
   object.label = deparse(substitute(object)),
   na.rm = TRUE
 )
 
-\method{autoplot}{object_mspct}(object, ..., range = NULL)
+\method{autoplot}{object_mspct}(
+  object,
+  ...,
+  range = NULL,
+  norm = "update",
+  plot.qty = getOption("photobiology.filter.qty", default = "all"),
+  pc.out = FALSE,
+  plot.data = "as.is",
+  idfactor = TRUE,
+  facets = plot.qty == "all",
+  object.label = deparse(substitute(object)),
+  na.rm = TRUE
+)
 }
 \arguments{
 \item{object}{an object_spct object}
@@ -40,6 +54,13 @@ to the plot methods for individual spectra, otherwise currently ignored.}
 
 \item{range}{an R object on which range() returns a vector of length 2, with
 min annd max wavelengths (nm)}
+
+\item{norm}{numeric Normalization wavelength (nm) or character string "max",
+or "min" for normalization at the corresponding wavelength, "update" to
+update the normalization after modifying units of expression, quantity
+or range but respecting the previously used criterion, or "skip" to force
+return of \code{object} unchanged. Always skipped for
+\code{plot.qty == "all"}, which is the default.}
 
 \item{plot.qty}{character string, one of "all", "transmittance",
 "absorbance", "absorptance", or "reflectance".}
@@ -59,7 +80,8 @@ which wavelengths are to be searched and interpolated if need. The
 as arguments. A list with \code{numeric} and/or \code{character} values is
 also accepted.}
 
-\item{annotations}{a character vector}
+\item{annotations}{a character vector. For details please see sections Plot
+Annotations and Title Annotations.}
 
 \item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
 
@@ -80,11 +102,20 @@ default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
 to the spectra and the user needs to use 'ggplot2' functions to manually
 map an aesthetic or use facets for the spectra.}
 
+\item{facets}{logical or integer Indicating if facets are to be created for
+the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+long form.}
+
 \item{ylim}{numeric y axis limits,}
 
 \item{object.label}{character The name of the object being plotted.}
 
 \item{na.rm}{logical.}
+
+\item{plot.data}{character Data to plot. Default is "as.is" plotting one line
+per spectrum. When passing "mean", "median", "sum", "prod", var", "sd",
+"se" as argument all the spectra must contain data at the same wavelength
+values.}
 }
 \value{
 a \code{ggplot} object.
@@ -93,20 +124,75 @@ a \code{ggplot} object.
 This function returns a ggplot object with an annotated plot of an
 object_spct object.
 }
-\note{
-The ggplot object returned can be further manipulated and added to.
-  Except when no annotations are added, limits are set for the x-axis and
-  y-axis scales. The y scale limits are expanded to include all data, or at
-  least to the range of expected values. Scales are further expanded so
-  as to make space for the annotations. When all \code{"all"} quantities are
-  plotted, a single set of spectra is accepted as input.
+\details{
+The ggplot object returned can be further manipulated and added to. Except
+when no annotations are added, limits are set for the x-axis and y-axis
+scales. The y scale limits are expanded to include all data, or at least to
+the range of expected values. Scales are further expanded so as to make space
+for the annotations. When all \code{"all"} quantities are plotted, a single
+set of spectra is accepted as input.
 }
+\note{
+The method for collections of object spectra of length > 1 is
+  implemented for \code{plot.qty = "all"} using facets. Other plot
+  quantities are handled by the methods for \code{filter_spct} and
+  \code{reflector_spct} objects after on-the-fly conversion.
+}
+\section{Plot Annotations}{
+ The recognized annotation names are: \code{"summaries"}, \code{"peaks"},
+  \code{"peak.labels"}, \code{"valleys"}, \code{"valley.labels"},
+  \code{"wls"}, \code{"wls.labels"}, \code{"colour.guide"},
+  \code{"color.guide"}, \code{"boxes"}, \code{"segments"}, \code{"labels"}.
+  In addition, \code{"+"} is interpreted as a request to add to the already
+  present default annotations, \code{"-"} as request to remove annotations
+  and \code{"="} or missing\code{"+"} and \code{"-"} as a request to reset
+  annotations to those requested. If used, \code{"+"}, \code{"-"} or
+  \code{"="} must be the first member of a character vector, and followed by
+  one or more of the names given above. To simultaneously add and remove
+  annotations one can pass a \code{list} containing \code{character} vectors
+  each assembled as described. The vectors are applied in the order they
+  appear in the list. To disable all annotations pass \code{""} or
+  \code{c("=", "")} as argument. Adding a variation of an annotation already
+  present, replaces the existing one automatically: e.g., adding
+  \code{"peak.labels"} replaces\code{"peaks"} if present.
+}
+
+\section{Title Annotations}{
+ metadata retrieved from object \code{object} is
+  paased to \code{ggplot2::ggtitle()} as arguments for \code{title},
+  \code{subtitle} and \code{caption}. The specification for the title is
+  passed as argument to \code{annotations}, and consists in the keyword
+  \code{title} with optional modifiers selecting the kind of metatdata to
+  use, separated by colons. Up to three keywords separated by colons are
+  accepted, and correspond to title, subtitle and caption. The recognized
+  keywords are: \code{"objt"}, \code{"class"}, \code{"what"}, \code{"when"},
+  \code{"where"}, \code{"how"}, \code{"inst.name"}, \code{"inst.sn"},
+  \code{"comment"} and \code{"none"} are recognized as modifiers to
+  \code{"title"}; \code{"none"} is a placeholder. Default is
+  \code{"title:objt"} or no title depending on the context.
+}
+
 \examples{
 
 autoplot(Ler_leaf.spct)
+autoplot(Ler_leaf.spct, plot.qty = "transmittance")
+autoplot(Ler_leaf.spct, annotations = "")
+autoplot(Ler_leaf.spct, plot.qty = "transmittance", norm = "max")
+
+two_leaves.mspct <-
+ object_mspct(list("Arabidopsis leaf 1" = Ler_leaf.spct,
+                   "Arabidopsis leaf 2" = Ler_leaf.spct))
+autoplot(two_leaves.mspct, idfactor = "Spectra")
+autoplot(two_leaves.mspct, facets = TRUE)
 
 }
 \seealso{
+\code{\link[photobiology]{normalize}},
+  \code{\link[photobiology]{object_spct}},
+  \code{\link[photobiology]{waveband}},
+  \code{\link[photobiologyWavebands]{photobiologyWavebands-package}} and
+  \code{\link[ggplot2]{autoplot}}
+
 Other autoplot methods: 
 \code{\link{autoplot.calibration_spct}()},
 \code{\link{autoplot.cps_spct}()},
@@ -119,4 +205,3 @@ Other autoplot methods:
 \code{\link{set_annotations_default}()}
 }
 \concept{autoplot methods}
-\keyword{hplot}

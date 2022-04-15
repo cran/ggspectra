@@ -126,6 +126,8 @@ stat_label_peaks <-
   function(mapping = NULL,
            data = NULL,
            geom = "text",
+           position = "identity",
+           ...,
            span = 5,
            ignore_threshold = 0,
            strict = TRUE,
@@ -134,11 +136,9 @@ stat_label_peaks <-
            x.label.fmt = label.fmt,
            y.label.fmt = label.fmt,
            label.fill = "",
-           position = "identity",
            na.rm = TRUE,
            show.legend = FALSE,
-           inherit.aes = TRUE,
-           ...) {
+           inherit.aes = TRUE) {
     ggplot2::layer(
       stat = StatLabelPeaks, data = data, mapping = mapping, geom = geom,
       position = position, show.legend = show.legend, inherit.aes = inherit.aes,
@@ -188,7 +188,7 @@ StatLabelPeaks <-
                      if (!is.character(label.fill)) {
                        as.character(label.fill)
                      }
-                     out.df <- tibble::as_tibble(data)
+                     out.df <- data # previously conversion into tibble
                      if (is.null(span)) {
                        peaks.idx <- which.max(data[["y"]])
                      } else {
@@ -207,8 +207,8 @@ StatLabelPeaks <-
                                                    sprintf(y.label.fmt, out.df[["y"]]),
                                                    label.fill)
                      out.df[["wl.color"]] <- ifelse(out.df[["is_peak"]],
-                                                 photobiology::fast_color_of_wl(out.df[["x"]], chroma.type = chroma.type),
-                                                 rgb(1, 1, 1, 0))
+                                                    photobiology::fast_color_of_wl(out.df[["x"]], chroma.type = chroma.type),
+                                                    rgb(1, 1, 1, 0))
                      out.df[["BW.color"]] <- ifelse(out.df[["is_peak"]],
                                                     black_or_white(out.df[["wl.color"]]),
                                                     rgb(0, 0, 0, 0))
@@ -216,14 +216,15 @@ StatLabelPeaks <-
                      out.df[["lab.vjust"]] <- -0.2
                      out.df
                    },
-                   default_aes = ggplot2::aes(label = ..x.label..,
-                                              fill = ..wl.color..,
-                                              color = ..BW.color..,
+                   default_aes = ggplot2::aes(label = after_stat(x.label),
+                                              fill = after_stat(wl.color),
+                                              color = after_stat(BW.color),
                                               segment.color = "black",
-                                              xintercept = ..x..,
-                                              yintercept = ..y..,
-                                              hjust = ..lab.hjust..,
-                                              vjust = ..lab.vjust..),
+                                              xintercept = after_stat(x),
+                                              yintercept = after_stat(y)#,
+                                              # hjust = stat(lab.hjust),
+                                              # vjust = stat(lab.vjust)
+                   ),
                    required_aes = c("x", "y")
   )
 
@@ -234,6 +235,8 @@ StatLabelPeaks <-
 stat_label_valleys <- function(mapping = NULL,
                                data = NULL,
                                geom = "text",
+                               position = "identity",
+                               ...,
                                span = 5,
                                ignore_threshold = 0,
                                strict = TRUE,
@@ -242,11 +245,9 @@ stat_label_valleys <- function(mapping = NULL,
                                x.label.fmt = label.fmt,
                                y.label.fmt = label.fmt,
                                label.fill = "",
-                               position = "identity",
                                na.rm = TRUE,
                                show.legend = FALSE,
-                               inherit.aes = TRUE,
-                               ...) {
+                               inherit.aes = TRUE) {
     ggplot2::layer(
     stat = StatLabelValleys, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
@@ -269,16 +270,16 @@ stat_label_valleys <- function(mapping = NULL,
 #'
 StatLabelValleys <-
   ggplot2::ggproto("StatLabelValleys", ggplot2::Stat,
-                   compute_group = function(data,
-                                            scales,
-                                            span,
-                                            ignore_threshold,
-                                            strict,
-                                            chroma.type,
-                                            label.fmt,
-                                            x.label.fmt,
-                                            y.label.fmt,
-                                            label.fill) {
+                   compute_group =   function(data,
+                                              scales,
+                                              span,
+                                              ignore_threshold,
+                                              strict,
+                                              chroma.type,
+                                              label.fmt,
+                                              x.label.fmt,
+                                              y.label.fmt,
+                                              label.fill) {
                      if (!is.character(label.fill)) {
                        as.character(label.fill)
                      }
@@ -310,14 +311,15 @@ StatLabelValleys <-
                      out.df[["lab.vjust"]] <- 1.2
                      out.df
                    },
-                   default_aes = ggplot2::aes(label = ..x.label..,
-                                              fill = ..wl.color..,
-                                              color = ..BW.color..,
+                   default_aes = ggplot2::aes(label = after_stat(x.label),
+                                              fill = after_stat(wl.color),
+                                              color = after_stat(BW.color),
                                               segment.color = "black",
-                                              xintercept = ..x..,
-                                              yintercept = ..y..,
-                                              hjust = ..lab.hjust..,
-                                              vjust = ..lab.vjust..),
+                                              xintercept = after_stat(x),
+                                              yintercept = after_stat(y)#,
+ #                                             hjust = stat(lab.hjust),
+ #                                             vjust = stat(lab.vjust)
+                                              ),
                    required_aes = c("x", "y")
 )
 

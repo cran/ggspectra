@@ -1,13 +1,10 @@
 ## ---- message=FALSE-----------------------------------------------------------
 library(ggplot2)
-library(dplyr)
 library(scales)
 library(photobiology)
 library(photobiologyWavebands)
 library(ggspectra)
 library(ggrepel)
-
-good_label_repel <- packageVersion('ggrepel') != "0.8.0"
 
 ## ---- include=FALSE, echo=FALSE-----------------------------------------------
 library(knitr)
@@ -54,7 +51,6 @@ ggplot(yellow_gel.spct, plot.qty = "absorbance") + geom_line()
 ## -----------------------------------------------------------------------------
 Afr_as_default()
 ggplot(yellow_gel.spct) + geom_line()
-ggplot(polyester.spct) + geom_line()
 unset_user_defaults()
 
 ## -----------------------------------------------------------------------------
@@ -251,7 +247,7 @@ ggplot(sun.spct, unit.out = "photon") + geom_line() + stat_peaks(color = "red")
 ggplot(sun.spct) + geom_line() + stat_valleys(color = "blue")
 
 ## -----------------------------------------------------------------------------
-ggplot(yellow_gel.spct) + geom_line() + stat_find_wls(color = "darkgreen")
+ggplot(yellow_gel.spct) + geom_line() + stat_find_wls(color = "orange")
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
@@ -259,57 +255,102 @@ ggplot(sun.spct) + geom_line() +
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
-  stat_peaks(span = 21, shape = 4, color = "red", size = 2) +
-  stat_peaks(span = 21, color = "red", geom = "rug", sides = "b")
+  stat_peaks(span = 35, shape = 4, color = "red", size = 2) +
+  stat_peaks(span = 35, color = "red", geom = "rug", sides = "b")
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
-  stat_peaks(span = 21, geom = "text", color = "red", vjust = "bottom") 
+  stat_peaks(geom = "text", 
+             span = 35,
+             color = "red", 
+             vjust = "bottom",
+             position = position_nudge(y = 0.01)) 
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
-  stat_peaks(shape = 21, span = 25, size = 2) + 
+  stat_peaks(shape = 21, 
+             span = 35, 
+             size = 2) + 
+  stat_label_peaks(geom = "label", 
+                   span = 35, 
+                   vjust = "bottom", 
+                   size = 3,
+                   position = position_nudge(y = 0.01)) +
   scale_fill_identity() +
-  stat_peaks(aes(color = ..BW.color..), 
-             geom = "label", span = 25, vjust = "bottom", size = 3) + 
-  scale_color_identity()
-
-## ---- eval=good_label_repel---------------------------------------------------
-ggplot(sun.spct) + geom_line() + 
-  stat_peaks(shape = 21, span = 25, size = 2) + 
-  stat_label_peaks(geom = "label_repel", span = 41,
-                   segment.color = "black",
-                   size = 3, vjust = 1, nudge_y = 0.1,
-                   direction = "y") + 
-  stat_valleys(shape = 21, span = 25, size = 2) + 
-  stat_label_valleys(geom = "label_repel", span = 51, 
-                     segment.color = "black",
-                     size = 3, vjust = 0, nudge_y = -0.1,
-                     direction = "y") +
-  scale_fill_identity() + scale_color_identity() +
-  expand_limits(y = c(-0.08, 0.9))
+  scale_color_identity() + 
+  expand_limits(y = 0.9)
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
-  stat_peaks(shape = 21, span = 25, size = 2) + scale_fill_identity() +
-  stat_label_peaks(geom = "label", span = 25, size = 3, na.rm = TRUE) +
+  stat_peaks(shape = 21, 
+             span = 35, 
+             size = 2) + 
+  stat_label_peaks(geom = "label", 
+                   span = 35, 
+                   size = 3,
+                   na.rm = TRUE,
+                   vjust = "bottom",
+                   position = position_nudge(y = 0.01)) +
+  scale_fill_identity() +
   scale_color_identity() +
-  expand_limits(y = c(NA, 0.9))
+  expand_limits(y = 0.9)
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
   stat_peaks(span = NULL, geom = "vline", linetype = "dotted", color = "red") +
   stat_peaks(span = NULL, geom = "hline", linetype = "dotted", color = "red")
 
-## ---- eval=good_label_repel---------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
-  stat_label_peaks(aes(label = stat(y.label)), 
-                   span = 31, geom = "label_repel", size = 3,
-                   label.fmt = "y = %1.2f", segment.colour = "red",
-                   min.segment.length = unit(0.05, "lines"),
-                   nudge_y = 0.1) +
+  stat_peaks(shape = 21, span = 35, size = 2) + 
+  stat_label_peaks(aes(label = stat(y.label)),
+                   span = 35, geom = "label", size = 3,
+                   position = position_nudge(y = 0.04),
+                   label.fmt = "%1.2f") +
   expand_limits(y = 1) +
   scale_fill_identity() + scale_color_identity()
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + geom_line() + 
+  stat_valleys(shape = 21, 
+               span = 35, 
+               size = 2) + 
+  stat_label_valleys(geom = "label", 
+                     span = 35, 
+                     size = 3,
+                     na.rm = TRUE,
+                     vjust = "top",
+                     position = position_nudge(y = -0.01)) +
+  scale_fill_identity() +
+  scale_color_identity()
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + geom_line() + 
+  stat_peaks(shape = 21, span = 35, size = 2) + 
+  stat_label_peaks(segment.colour = "black", 
+                   span = 35, geom = "label_repel", size = 3,
+                   max.overlaps = Inf,
+                   position = position_nudge_repel(y = 0.12),
+                   min.segment.length = 0,
+                   box.padding = 0.5,
+                   force_pull = 0) +
+  expand_limits(y = 1) +
+  scale_fill_identity() + 
+  scale_color_identity()
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + geom_line() + 
+  stat_valleys(shape = 21, span = 35, size = 2) + 
+  stat_label_valleys(segment.colour = "black", 
+                     span = 35, geom = "label_repel", size = 3,
+                     max.overlaps = Inf,
+                     position = position_nudge_repel(y = -0.12),
+                     min.segment.length = 0,
+                     box.padding = 0.53,
+                     force = 0.5,
+                     force_pull = 1) +
+  scale_fill_identity() + 
+  scale_color_identity()
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + geom_line() + 
@@ -344,7 +385,8 @@ ggplot(white_led.raw_spct, aes(w.length, counts_3)) +
 ## -----------------------------------------------------------------------------
 ggplot(despike(white_led.raw_spct, z.threshold = 8, max.spike.width = 7), 
        aes(w.length, counts_3)) + 
-  geom_line()
+  geom_line() + 
+  stat_spikes(color = "red", z.threshold = 8, max.spike.width = 7)
 
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 

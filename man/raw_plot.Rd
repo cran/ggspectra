@@ -13,9 +13,10 @@ raw_plot(
   span,
   wls.target,
   annotations,
-  norm,
+  relative,
   text.size,
   idfactor,
+  facets,
   ylim,
   na.rm,
   ...
@@ -46,9 +47,6 @@ also accepted.}
 
 \item{annotations}{a character vector.}
 
-\item{norm}{numeric normalization wavelength (nm) or character string "max"
-for normalization at the wavelength of highest peak.}
-
 \item{text.size}{numeric size of text in the plot decorations.}
 
 \item{idfactor}{character Name of an index column in data holding a
@@ -56,6 +54,10 @@ for normalization at the wavelength of highest peak.}
 corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
 the factor is retrieved from metadata or if no metadata found, the
 default "spct.idx" is tried.}
+
+\item{facets}{logical or integer Indicating if facets are to be created for
+the levels of \code{idfactor} when \code{spct} contain multiple spectra in
+long form.}
 
 \item{ylim}{numeric y axis limits,}
 
@@ -72,11 +74,10 @@ Plot method for spectra expressed as raw detector counts.
 \details{
 This function returns a ggplot object with an annotated plot of a
 raw_spct object.
-}
-\note{
-Note that scales are expanded so as to make space for the annotations.
-  The object returned is a ggplot objects, and can be further manipulated.
-  When spct has more than one column with spectral data, each of these
-  columns is normalized individually.
+
+Note that scales are expanded so as to make space for the annotations. The
+object returned is a ggplot objects, and can be further manipulated. When
+spct has more than one column with spectral data, each of these columns is
+normalized individually.
 }
 \keyword{internal}
