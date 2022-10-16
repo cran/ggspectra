@@ -17,6 +17,7 @@
   span = NULL,
   wls.target = "HM",
   annotations = NULL,
+  geom = "line",
   time.format = "",
   tz = "UTC",
   norm = "skip",
@@ -73,6 +74,10 @@ also accepted.}
 
 \item{annotations}{a character vector ("summaries" is ignored). For details
 please see sections Plot Annotations and Title Annotations.}
+
+\item{geom}{character The name of a ggplot geometry, currently only
+\code{"area"}, \code{"spct"} and \code{"line"}. The default \code{NULL}
+selects between them based on \code{stacked}.}
 
 \item{time.format}{character Format as accepted by \code{\link[base]{strptime}}.}
 
@@ -151,16 +156,18 @@ The object returned is a ggplot objects, and can be further manipulated.
 
 \examples{
 
-autoplot(white_led.raw_spct)
-autoplot(white_led.raw_spct, annotations = "")
+low_res.raw_spct <- thin_wl(white_led.raw_spct,
+                            max.wl.step = 20,
+                            max.slope.delta = 0.05,
+                            col.names = "counts_3")
+autoplot(low_res.raw_spct)
+autoplot(low_res.raw_spct, annotations = "")
 
 two_leds.mspct <-
-  raw_mspct(list("LED 1" = white_led.raw_spct,
-                 "LED 2" = white_led.raw_spct))
+  raw_mspct(list("LED 1" = low_res.raw_spct,
+                 "LED 2" = low_res.raw_spct))
 autoplot(two_leds.mspct)
-autoplot(two_leds.mspct, idfactor = "Spectra")
 autoplot(two_leds.mspct, facets = 1) # one column
-autoplot(two_leds.mspct, facets = 2) # two columns
 
 }
 \seealso{

@@ -4,6 +4,12 @@ editor_options:
     wrap: 72
 ---
 
+# ggspectra 0.3.9
+
+-   Maintenance release for compatibility with 'ggplot2' >= 3.4.0.
+-   Several bug fixes.
+-   Revise all `autoplot()` methods adding formal parameter `geom`.
+
 # ggspectra 0.3.8
 
 This update brings many improvements to `autoplot()` methods. These
@@ -50,7 +56,7 @@ in 'photobiology' (\>= 0.10.10) and on 'ggrepel' (\>= 0.9.1).
     methods and by `autotitle()`.
 -   Remove direct dependency on 'dplyr'.
 -   Add to the documentation of all `autoplot()` methods an explanation
-    of how to modify the default plot annotations and tittles using
+    of how to modify the default plot annotations and titles using
     arguments passed to parameter `annotations`. Also add *see also*
     links to related help pages.
 
