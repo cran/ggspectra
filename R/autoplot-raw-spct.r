@@ -128,13 +128,7 @@ raw_plot <- function(spct,
   }
 
   if (num.counts.cols > 1L) {
-    # remove raw_spct class before melting as it invalidates expectations
-    rmDerivedSpct(spct)
-    spct <- tidyr::pivot_longer(data = spct,
-                                cols = tidyr::all_of(counts.cols),
-                                names_to = "scan",
-                                values_to = "counts")
-    setRawSpct(spct, multiple.wl = NULL) # guessed from data
+    spct <- photobiology::spct_wide2long(spct = spct, idfactor = "scan")
     plot <- ggplot(spct) + aes(x = .data[["w.length"]], y = .data[["counts"]], linetype = .data[["scan"]])
     temp <- find_idfactor(spct = spct,
                           idfactor = idfactor,
@@ -321,7 +315,7 @@ raw_plot <- function(spct,
 autoplot.raw_spct <-
   function(object, ...,
            w.band = getOption("photobiology.plot.bands",
-                              default = list(UVC(), UVB(), UVA(), PAR())),
+                              default = list(UVC(), UVB(), UVA(), PhR())),
            range = NULL,
            unit.out = "counts",
            pc.out = FALSE,

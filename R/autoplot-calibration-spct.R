@@ -141,13 +141,7 @@ cal_plot <- function(spct,
   }
 
   if (num.mult.cols > 1L) {
-    # remove calibration_spct class before melting as it invalidates expectations
-    rmDerivedSpct(spct)
-    spct <- tidyr::pivot_longer(data = spct,
-                                cols = tidyr::all_of(mult.cols),
-                                names_to = "scan",
-                                values_to = "irrad.mult")
-    setCalibrationSpct(spct, multiple.wl = NULL) # guessed from data
+    spct <- photobiology::spct_wide2long(spct = spct, idfactor = "scan")
     plot <- ggplot(spct) + aes(x = .data[["w.length"]], y = .data[["irrad.mult"]], linetype = .data[["scan"]])
     temp <- find_idfactor(spct = spct,
                           idfactor = idfactor,
@@ -301,7 +295,7 @@ cal_plot <- function(spct,
 autoplot.calibration_spct <-
   function(object, ...,
            w.band = getOption("photobiology.plot.bands",
-                              default = list(UVC(), UVB(), UVA(), PAR())),
+                              default = list(UVC(), UVB(), UVA(), PhR())),
            range = NULL,
            unit.out = "ignored",
            pc.out = FALSE,

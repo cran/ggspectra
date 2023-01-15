@@ -6,7 +6,9 @@
 [![cran
 version](https://www.r-pkg.org/badges/version/ggspectra)](https://cran.r-project.org/package=ggspectra)
 [![cran
-checks](https://cranchecks.info/badges/worst/ggspectra)](https://cran.r-project.org/web/checks/check_results_ggspectra.html)
+checks](https://badges.cranchecks.info/worst/ggspectra.svg)](https://cran.r-project.org/web/checks/check_results_ggspectra.html)
+[![R build
+status](https://github.com/aphalo/ggspectra/workflows/R-CMD-check/badge.svg)](https://github.com/aphalo/ggspectra/actions)
 
 The goal of ‘ggspectra’ is to make it easy to plot radiation spectra and
 similar data, such and transmittance, absorbance and reflectance
@@ -137,6 +139,6 @@ citation("ggspectra")
 
 ## License
 
-© 2015-2022 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>). Released under
+© 2015-2023 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>). Released under
 the GPL, version 2 or greater. This software carries no warranty of any
 kind.

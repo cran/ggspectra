@@ -66,6 +66,7 @@ e_plot <- function(spct,
   if (!is.source_spct(spct)) {
     stop("e_plot() can only plot source_spct objects.")
   }
+  spct[["s.q.irrad"]] <- NULL
   if (!is.null(geom) && !geom %in% c("area", "line", "spct")) {
     warning("'geom = ", geom, "' not supported, using default instead.")
     geom <- NULL
@@ -73,7 +74,6 @@ e_plot <- function(spct,
   if (is.null(ylim) || !is.numeric(ylim)) {
     ylim <- rep(NA_real_, 2L)
   }
-  q2e(spct, byref=TRUE)
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
   }
@@ -345,6 +345,7 @@ q_plot <- function(spct,
   if (!is.source_spct(spct)) {
     stop("q_plot() can only plot source_spct objects.")
   }
+  spct[["s.e.irrad"]] <- NULL
   if (!is.null(geom) && !geom %in% c("area", "line", "spct")) {
     warning("'geom = ", geom, "' not supported, using default instead.")
     geom <- NULL
@@ -352,7 +353,6 @@ q_plot <- function(spct,
   if (is.null(ylim) || !is.numeric(ylim)) {
     ylim <- rep(NA_real_, 2L)
   }
-  e2q(spct, byref = TRUE)
   if (!is.null(range)) {
     spct <- trim_wl(spct, range = range)
   }
@@ -649,7 +649,10 @@ q_plot <- function(spct,
 autoplot.source_spct <-
   function(object, ...,
            w.band = getOption("photobiology.plot.bands",
-                              default = list(UVC(), UVB(), UVA(), PAR())),
+                              default = list(photobiologyWavebands::UVC(),
+                                             photobiologyWavebands::UVB(),
+                                             photobiologyWavebands::UVA(),
+                                             photobiologyWavebands::PhR())),
            range = NULL,
            norm = getOption("ggspectra.norm",
                             default = "update"),
@@ -701,7 +704,15 @@ autoplot.source_spct <-
       } else if (is.waveband(range)) {
         w.band <- range
       } else {
-        w.band <-  waveband(range, wb.name = "Total")
+        w.band <- waveband(range, wb.name = "Total")
+      }
+    } else if (unit.out %in% c("photon", "quantum")) {
+      # change "PhR" label into "PAR" because we compute photon irradiance
+      labels <- sapply(w.band, labels)[1, ]
+      wb.PAR <- grep("^PhR$", labels)
+      if (length(wb.PAR)) {
+        w.band[[wb.PAR]] <-
+          photobiology::waveband(x = c(400, 700), wb.name = "PAR")
       }
     }
 
@@ -795,8 +806,8 @@ autoplot.source_mspct <-
     }
     # we ensure the units are correct
     object <- switch(unit.out,
-                     photon = e2q(object, action = "replace"),
-                     energy = q2e(object, action = "replace"))
+                     photon = photobiology::e2q(object, action = "replace"),
+                     energy = photobiology::q2e(object, action = "replace"))
     # we convert the collection of spectra into a single spectrum object
     # containing a summary spectrum or multiple spectra in long form.
     z <- switch(plot.data,
@@ -814,28 +825,28 @@ autoplot.source_mspct <-
     )
     col.name <- c(photon = "s.q.irrad", energy = "s.e.irrad")
     if (is.source_spct(z) && any(col.name %in% names(z))) {
-      autoplot(object = z,
-               range = NULL,
-               norm = norm,
-               unit.out = unit.out,
-               pc.out = pc.out,
-               idfactor = idfactor,
-               facets = facets,
-               object.label = object.label,
-               na.rm = na.rm,
-               ...)
+      ggplot2::autoplot(object = z,
+                        range = NULL,
+                        norm = norm,
+                        unit.out = unit.out,
+                        pc.out = pc.out,
+                        idfactor = idfactor,
+                        facets = facets,
+                        object.label = object.label,
+                        na.rm = na.rm,
+                        ...)
     } else {
-      z <- as.generic_spct(z)
-      autoplot(object = z,
-               y.name = paste(col.name[unit.out], plot.data, sep = "."),
-               range = NULL,
-               norm = norm,
-               pc.out = pc.out,
-               idfactor = idfactor,
-               facets = facets,
-               object.label = object.label,
-               na.rm = na.rm,
-               ...)
+      z <- photobiology::as.generic_spct(z)
+      ggplot2::autoplot(object = z,
+                        y.name = paste(col.name[unit.out], plot.data, sep = "."),
+                        range = NULL,
+                        norm = norm,
+                        pc.out = pc.out,
+                        idfactor = idfactor,
+                        facets = facets,
+                        object.label = object.label,
+                        na.rm = na.rm,
+                        ...)
     }
   }
 

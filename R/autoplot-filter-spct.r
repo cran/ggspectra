@@ -972,28 +972,10 @@ O_plot <- function(spct,
 
   }
 
-  columns.selector <- c("w.length", "Tfr", "Afr", "Rfr")
-  if (getMultipleWl(spct) > 1L) {
-    idfactor <- getIdFactor(spct)
-    if (is.na(idfactor)) {
-      stop("'idfactor' not found")
-    }
-    columns.selector <- c(columns.selector, idfactor)
-  }
-  # Once molten it will not pass checks as object_spct
-  spct.tb <- spct
-  photobiology::rmDerivedSpct(spct.tb)
-  molten.spct <-
-    tidyr::pivot_longer(data = spct.tb[ , columns.selector],
-                        cols = tidyr::all_of(c("Tfr", "Afr", "Rfr")),
-                        names_to = "variable",
-                        values_to = "value")
-  stack.levels <- c("Rfr", "Afr", "Tfr")
-  molten.spct[["variable"]] <-
-    factor(molten.spct[["variable"]], levels = stack.levels)
-#  setGenericSpct(molten.spct, multiple.wl = 3L * getMultipleWl(spct))
+  idfactor <- getIdFactor(spct) # needed as we will get a tibble back
+  molten.tb <- photobiology::spct_wide2long(spct, idfactor = "variable", rm.spct.class = TRUE)
 
-  plot <- ggplot(molten.spct, aes(x = .data[["w.length"]], y = .data[["value"]]), na.rm = na.rm)
+  plot <- ggplot(molten.tb, aes(x = .data[["w.length"]], y = .data[["value"]]), na.rm = na.rm)
   attributes(plot[["data"]]) <- c(attributes(plot[["data"]]), get_attributes(spct))
   if (stacked) {
     if (is.null(geom) || geom %in% c("spct", "area")) {
@@ -1185,7 +1167,7 @@ O_plot <- function(spct,
 autoplot.filter_spct <-
   function(object, ...,
            w.band = getOption("photobiology.plot.bands",
-                              default = list(UVC(), UVB(), UVA(), PAR())),
+                              default = list(UVC(), UVB(), UVA(), PhR())),
            range = NULL,
            norm = getOption("ggspectra.norm",
                             default = "update"),
@@ -1481,7 +1463,7 @@ autoplot.filter_mspct <-
 autoplot.reflector_spct <-
   function(object, ...,
            w.band=getOption("photobiology.plot.bands",
-                            default = list(UVC(), UVB(), UVA(), PAR())),
+                            default = list(UVC(), UVB(), UVA(), PhR())),
            range = NULL,
            norm = getOption("ggspectra.norm",
                             default = "update"),
@@ -1747,7 +1729,7 @@ autoplot.object_spct <-
   function(object,
            ...,
            w.band = getOption("photobiology.plot.bands",
-                              default = list(UVC(), UVB(), UVA(), PAR())),
+                              default = list(UVC(), UVB(), UVA(), PhR())),
            range = NULL,
            norm = "skip",
            plot.qty = "all",
