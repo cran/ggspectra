@@ -138,12 +138,23 @@ e_rsp_plot <- function(spct,
     }
   }
 
-  y.min <- ifelse(!is.na(ylim[1]),
-                  ylim[1],
-                  min(c(spct[["s.e.response"]], 0), na.rm = TRUE))
-  y.max <- ifelse(!is.na(ylim[2]),
-                  ylim[2],
-                  max(c(spct[["s.e.response"]], 0), na.rm = TRUE))
+  if (!is.na(ylim[1])) {
+    y.min <- ylim[1]
+    spct[["s.e.response"]] <- ifelse(spct[["s.e.response"]] < y.min,
+                                  NA_real_,
+                                  spct[["s.e.response"]])
+  } else {
+    y.min <- min(spct[["s.e.response"]], 0, na.rm = TRUE)
+  }
+
+  if (!is.na(ylim[2])) {
+    y.max <- ylim[2]
+    spct[["s.e.response"]] <- ifelse(spct[["s.e.response"]] > y.max,
+                                  NA_real_,
+                                  spct[["s.e.response"]])
+  } else {
+    y.max <- max(spct[["s.e.response"]], y.min, 0, na.rm = TRUE)
+  }
 
   if (label.qty == "total") {
     rsp.label <- "integral(R[E](lambda))"
@@ -214,7 +225,7 @@ e_rsp_plot <- function(spct,
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
-    y.limits <- c(y.min, y.max * 1.25)
+    y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
     x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
     y.limits <- c(y.min, y.max)
@@ -370,12 +381,23 @@ q_rsp_plot <- function(spct,
     }
   }
 
-  y.min <- ifelse(!is.na(ylim[1]),
-                  ylim[1],
-                  min(c(spct[["s.q.response"]], 0), na.rm = TRUE))
-  y.max <- ifelse(!is.na(ylim[2]),
-                  ylim[2],
-                  max(c(spct[["s.q.response"]], 0), na.rm = TRUE))
+  if (!is.na(ylim[1])) {
+    y.min <- ylim[1]
+    spct[["s.q.response"]] <- ifelse(spct[["s.q.response"]] < y.min,
+                                     NA_real_,
+                                     spct[["s.q.response"]])
+  } else {
+    y.min <- min(spct[["s.q.response"]], 0, na.rm = TRUE)
+  }
+
+  if (!is.na(ylim[2])) {
+    y.max <- ylim[2]
+    spct[["s.q.response"]] <- ifelse(spct[["s.q.response"]] > y.max,
+                                     NA_real_,
+                                     spct[["s.q.response"]])
+  } else {
+    y.max <- max(spct[["s.q.response"]], y.min, 0, na.rm = TRUE)
+  }
 
   if (label.qty == "total") {
     rsp.label <- "integral(R[Q](lambda))"
@@ -452,7 +474,7 @@ q_rsp_plot <- function(spct,
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
-    y.limits <- c(y.min, y.max * 1.25)
+    y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
     x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
     y.limits <- c(y.min, y.max)
@@ -611,6 +633,7 @@ autoplot.response_spct <-
         label.qty = "total"
       }
     }
+
     if (length(w.band) == 0) {
       if (is.null(range)) {
         w.band <- photobiology::waveband(object)
@@ -618,6 +641,18 @@ autoplot.response_spct <-
         w.band <- range
       } else {
         w.band <- photobiology::waveband(range, wb.name = "Total")
+      }
+    }
+    if (is.waveband(w.band)) {
+      w.band <- list(w.band)
+    }
+    labels <- sapply(w.band, labels)[1, ]
+    if (unit.out %in% c("photon", "quantum")) {
+      # change "PhR" label into "PAR" because we compute photon irradiance
+      wb.PAR <- grep("^PhR$", labels)
+      if (length(wb.PAR)) {
+        w.band[[wb.PAR]] <-
+          photobiology::waveband(x = c(400, 700), wb.name = "PAR")
       }
     }
 

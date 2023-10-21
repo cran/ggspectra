@@ -14,7 +14,7 @@ if (eval_chunks) {
   message("Please, install packages 'rlang' and 'magrittr'.")
 }
 
-## ---- include=FALSE, echo=FALSE-----------------------------------------------
+## ----include=FALSE, echo=FALSE------------------------------------------------
 library(knitr)
 opts_chunk$set(fig.align = 'center', 
                fig.show = 'hold', fig.width = 7, fig.height = 4,
@@ -30,31 +30,31 @@ two_suns.spct <- rbindspct(two_suns.mspct)
 ## -----------------------------------------------------------------------------
 theme_set(theme_bw())
 
-## ---- eval=eval_chunks--------------------------------------------------------
+## ----eval=eval_chunks---------------------------------------------------------
 ggplot() + 
   geom_line(data = sun.spct, mapping = aes(w.length, s.e.irrad)) + 
   geom_line(data = smooth_spct(sun.spct, method = "supsmu"), 
             mapping = aes(w.length, s.e.irrad), 
             colour = "red", linewidth = 1.2)
 
-## ---- eval=eval_chunks--------------------------------------------------------
+## ----eval=eval_chunks---------------------------------------------------------
 ggplot() + 
   geom_line(data = sun.spct, mapping = aes(w.length, s.e.irrad)) + 
   geom_line(data = sun.spct |> smooth_spct(method = "supsmu"), 
             mapping = aes(w.length, s.e.irrad), 
             colour = "red", linewidth = 1.2)
 
-## ---- eval = eval_chunks------------------------------------------------------
+## ----eval = eval_chunks-------------------------------------------------------
 p <- ggplot(sun.spct) + geom_line()
 class(p$data)
 
-## ---- eval = eval_chunks------------------------------------------------------
+## ----eval = eval_chunks-------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() + 
   geom_line(data = . %>% smooth_spct(method = "supsmu"), 
             colour = "red", linewidth = 1.2)
 
-## ---- eval = eval_chunks------------------------------------------------------
+## ----eval = eval_chunks-------------------------------------------------------
 photon_as_default()
 ggplot(sun.spct) + 
   geom_line() + 
@@ -62,18 +62,18 @@ ggplot(sun.spct) +
             colour = "red", linewidth = 1.2)
 unset_radiation_unit_default()
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  ggplot(sun.spct) +
 #    geom_line(data = . %>% smooth_spct(method = "supsmu"),
 #              colour = "red", linewidth = 1.2)
 
-## ---- eval=eval_chunks--------------------------------------------------------
+## ----eval=eval_chunks---------------------------------------------------------
 sun.spct |> 
   smooth_spct(method = "supsmu") |>
   ggplot() + 
   geom_line(colour = "red", linewidth = 1.2)
 
-## ---- eval = eval_chunks------------------------------------------------------
+## ----eval = eval_chunks-------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() + 
   geom_line(data = . %>% smooth_spct(method = "custom"), 
@@ -83,7 +83,7 @@ ggplot(sun.spct) +
   geom_line(data = . %>% smooth_spct(method = "supsmu"), 
             colour = "red", linewidth = 1)
 
-## ---- eval = eval_chunks------------------------------------------------------
+## ----eval = eval_chunks-------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() + 
   stat_peaks(size = 3, span = NULL) +
@@ -96,12 +96,12 @@ ggplot(sun.spct) +
              geom = "vline", colour = "red", 
              linetype = "dotted", span = NULL)
 
-## ---- eval = eval_chunks------------------------------------------------------
+## ----eval = eval_chunks-------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() + 
   geom_line(data = . %>% trim_wl(range = PAR()), colour = "red")
 
-## ---- eval = eval_chunks------------------------------------------------------
+## ----eval = eval_chunks-------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() + 
   geom_point(data = . %>% trim_wl(range = VIS()) %>% tag(),
@@ -109,7 +109,7 @@ ggplot(sun.spct) +
             shape = "circle", size = 1.3) +
   scale_color_identity()
 
-## ---- eval = eval_chunks------------------------------------------------------
+## ----eval = eval_chunks-------------------------------------------------------
 ggplot(sun.spct) + 
   geom_area(data = . %>% trim_wl(range = VIS()) %>% tag(w.band = VIS_bands()),
             mapping = aes(fill = wb.color)) +

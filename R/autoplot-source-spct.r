@@ -170,12 +170,23 @@ e_plot <- function(spct,
   s.irrad.label <- parse(text = s.irrad.label)
   spct[["s.e.irrad"]] <- spct[["s.e.irrad"]] * scale.factor
 
-  y.min <- ifelse(!is.na(ylim[1]),
-                  ylim[1],
-                  min(c(spct[["s.e.irrad"]], 0), na.rm = TRUE))
-  y.max <- ifelse(!is.na(ylim[2]),
-                  ylim[2],
-                  max(c(spct[["s.e.irrad"]], 0), na.rm = TRUE))
+  if (!is.na(ylim[1])) {
+    y.min <- ylim[1]
+    spct[["s.e.irrad"]] <- ifelse(spct[["s.e.irrad"]] < y.min,
+                                  NA_real_,
+                                  spct[["s.e.irrad"]])
+  } else {
+    y.min <- min(spct[["s.e.irrad"]], 0, na.rm = TRUE)
+  }
+
+  if (!is.na(ylim[2])) {
+    y.max <- ylim[2]
+    spct[["s.e.irrad"]] <- ifelse(spct[["s.e.irrad"]] > y.max,
+                                  NA_real_,
+                                  spct[["s.e.irrad"]])
+  } else {
+    y.max <- max(spct[["s.e.irrad"]], y.min, 0, na.rm = TRUE)
+  }
 
   plot <- ggplot(spct, aes(x = .data[["w.length"]], y = .data[["s.e.irrad"]]))
   temp <- find_idfactor(spct = spct,
@@ -257,7 +268,7 @@ e_plot <- function(spct,
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
-    y.limits <- c(y.min, y.max * 1.25)
+    y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
     x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
     y.limits <- c(y.min, y.max * 1.05)
@@ -450,12 +461,23 @@ q_plot <- function(spct,
   s.irrad.label <- parse(text = s.irrad.label)
   spct[["s.q.irrad"]] <- spct[["s.q.irrad"]] * scale.factor
 
-  y.min <- ifelse(!is.na(ylim[1]),
-                  ylim[1],
-                  min(c(spct[["s.q.irrad"]], 0), na.rm = TRUE))
-  y.max <- ifelse(!is.na(ylim[2]),
-                  ylim[2],
-                  max(c(spct[["s.q.irrad"]], 0), na.rm = TRUE))
+  if (!is.na(ylim[1])) {
+    y.min <- ylim[1]
+    spct[["s.q.irrad"]] <- ifelse(spct[["s.q.irrad"]] < y.min,
+                                  NA_real_,
+                                  spct[["s.q.irrad"]])
+  } else {
+    y.min <- min(spct[["s.q.irrad"]], 0, na.rm = TRUE)
+  }
+
+  if (!is.na(ylim[2])) {
+    y.max <- ylim[2]
+    spct[["s.q.irrad"]] <- ifelse(spct[["s.q.irrad"]] > y.max,
+                                  NA_real_,
+                                  spct[["s.q.irrad"]])
+  } else {
+    y.max <- max(spct[["s.q.irrad"]], y.min, 0, na.rm = TRUE)
+  }
 
   plot <- ggplot(spct, aes(x = .data[["w.length"]], y = .data[["s.q.irrad"]]))
   temp <- find_idfactor(spct = spct,
@@ -537,7 +559,7 @@ q_plot <- function(spct,
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
-    y.limits <- c(y.min, y.max * 1.25)
+    y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
     x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
   } else {
     y.limits <- c(y.min, y.max * 1.05)
@@ -698,6 +720,7 @@ autoplot.source_spct <-
         label.qty = "total"
       }
     }
+
     if (length(w.band) == 0) {
       if (is.null(range)) {
         w.band <- waveband(object)
@@ -706,9 +729,13 @@ autoplot.source_spct <-
       } else {
         w.band <- waveband(range, wb.name = "Total")
       }
-    } else if (unit.out %in% c("photon", "quantum")) {
+    }
+    if (is.waveband(w.band)) {
+      w.band <- list(w.band)
+    }
+    labels <- sapply(w.band, labels)[1, ]
+    if (unit.out %in% c("photon", "quantum")) {
       # change "PhR" label into "PAR" because we compute photon irradiance
-      labels <- sapply(w.band, labels)[1, ]
       wb.PAR <- grep("^PhR$", labels)
       if (length(wb.PAR)) {
         w.band[[wb.PAR]] <-

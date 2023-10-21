@@ -1,4 +1,4 @@
-## ---- message=FALSE-----------------------------------------------------------
+## ----message=FALSE------------------------------------------------------------
 library(ggplot2)
 library(scales)
 library(photobiology)
@@ -6,7 +6,7 @@ library(photobiologyWavebands)
 library(ggspectra)
 library(ggrepel)
 
-## ---- include=FALSE, echo=FALSE-----------------------------------------------
+## ----include=FALSE, echo=FALSE------------------------------------------------
 library(knitr)
 opts_chunk$set(fig.align = 'center', 
                fig.show = 'hold', fig.width = 7, fig.height = 4,

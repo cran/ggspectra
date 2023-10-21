@@ -7,7 +7,6 @@
 #'
 #' @param w.band waveband object or list of waveband objects
 #' @param y.max,y.min,x.max,x.min,x.expanse,y.expanse numeric
-#' @param nudge_npcx,nudge_npcy numeric
 #' @param annotations character vector
 #' @param span numeric
 #' @param strict logical
@@ -125,7 +124,7 @@ decoration <- function(w.band,
                       na.rm = na.rm))
   }
   if ("peak.labels" %in% annotations) {
-    nudge.y <- 0.06 * y.expanse
+    nudge.y <- 0.04 * y.expanse
     z <- c(z,
            stat_label_peaks(geom = "label_repel",
                             mapping = ggplot2::aes(color = after_stat(BW.color)),
@@ -146,11 +145,11 @@ decoration <- function(w.band,
                             na.rm = na.rm),
            stat_peaks(geom = "point",
                       chroma.type = chroma.type,
-                      color = "red",
+                      color = "black",
                       span = span,
                       ignore_threshold = 0.02,
                       strict = strict,
-                      shape = 16,
+                      shape = "circle filled",
                       na.rm = na.rm))
   }
   if ("valleys" %in% annotations) {
@@ -178,7 +177,7 @@ decoration <- function(w.band,
                         na.rm = na.rm))
   }
   if ("valley.labels" %in% annotations) {
-    nudge.y <- -0.06 * y.expanse
+    nudge.y <- -0.04 * y.expanse
     z <- c(z,
            stat_label_valleys(geom = "label_repel",
                               mapping = ggplot2::aes(color = after_stat(BW.color)),
@@ -202,8 +201,8 @@ decoration <- function(w.band,
                         ignore_threshold = -0.02,
                         strict = strict,
                         chroma.type = chroma.type,
-                        color = "blue",
-                        shape = 16,
+                        color = "black",
+                        shape = "circle filled",
                         na.rm = na.rm))
   }
   if ("wls" %in% annotations) {
@@ -213,6 +212,7 @@ decoration <- function(w.band,
                          target = wls.target,
                          interpolate = TRUE,
                          chroma.type = chroma.type,
+                         label.fmt = "%.4g",
                          color = "black",
                          hjust = 0,
                          position = ggplot2::position_nudge(x = nudge.x),
@@ -227,7 +227,7 @@ decoration <- function(w.band,
                          na.rm = na.rm))
   }
   if ("wls.labels" %in% annotations) {
-    nudge.x <- 0.1 * x.expanse
+    nudge.x <- 0.03 * x.expanse
     z <- c(z,
            stat_find_wls(geom = "label_repel",
                          mapping = ggplot2::aes(color = after_stat(BW.color)),
@@ -251,14 +251,14 @@ decoration <- function(w.band,
                          interpolate = TRUE,
                          chroma.type = chroma.type,
                          color = "black",
-                         shape = 16,
+                         shape = "circle filled",
                          na.rm = na.rm))
   }
   if ("colour.guide" %in% annotations) {
     z <- c(z,
            stat_wl_strip(chroma.type = chroma.type,
-                         ymax = y.max * 1.26,
-                         ymin = y.max * 1.22,
+                         ymax = y.min + y.expanse * 1.26,
+                         ymin = y.min + y.expanse * 1.22,
                          na.rm = na.rm,
                          color = NA))
   }
@@ -266,8 +266,8 @@ decoration <- function(w.band,
     z <- c(z,
            stat_wl_strip(w.band = w.band,
                          chroma.type = chroma.type,
-                         ymax = y.max * 1.20,
-                         ymin = y.max * 1.08,
+                         ymax = y.min + y.expanse * 1.20,
+                         ymin = y.min + y.expanse * 1.08,
                          color = "white",
                          linetype = "solid",
                          na.rm = na.rm
@@ -281,8 +281,8 @@ decoration <- function(w.band,
     z <- c(z,
            stat_wl_strip(w.band = w.band,
                          chroma.type = chroma.type,
-                         ymax = y.max * 1.10,
-                         ymin = y.max * 1.07,
+                         ymax = y.min + y.expanse * 1.10,
+                         ymin = y.min + y.expanse * 1.07,
                          color = "white",
                          linetype = "solid",
                          na.rm = na.rm
@@ -311,7 +311,7 @@ decoration <- function(w.band,
                                  w.band = w.band,
                                  label.mult = label.mult,
                                  chroma.type = chroma.type,
-                                 ypos.fixed = y.max * 1.143 + pos.shift,
+                                 ypos.fixed = y.min  + y.expanse * 1.143 + pos.shift,
                                  mapping = mapping,
                                  size = text.size,
                                  na.rm = na.rm))
@@ -323,7 +323,7 @@ decoration <- function(w.band,
                                  w.band = w.band,
                                  label.mult = label.mult,
                                  chroma.type = chroma.type,
-                                 ypos.fixed = y.max * 1.143 + pos.shift,
+                                 ypos.fixed = y.min  + y.expanse * 1.143 + pos.shift,
                                  color = label.color,
                                  mapping = mapping,
                                  size = text.size,
@@ -335,7 +335,7 @@ decoration <- function(w.band,
                                     w.band = w.band,
                                     label.mult = label.mult,
                                     chroma.type = chroma.type,
-                                    ypos.fixed = y.max * 1.143 + pos.shift,
+                                    ypos.fixed = y.min + y.expanse * 1.143 + pos.shift,
                                     mapping = mapping,
                                     size = text.size,
                                     na.rm = na.rm))
@@ -344,7 +344,7 @@ decoration <- function(w.band,
                                     w.band = w.band,
                                     label.mult = label.mult,
                                     chroma.type = chroma.type,
-                                    ypos.fixed = y.max * 1.143 + pos.shift,
+                                    ypos.fixed = y.min  + y.expanse * 1.143 + pos.shift,
                                     color = label.color,
                                     mapping = mapping,
                                     size = text.size,
@@ -353,7 +353,7 @@ decoration <- function(w.band,
       }
       z <- c(z,
              annotate(geom = "text",
-                      x = x.min, y = y.max * 1.09 + 0.5 * y.max * 0.085,
+                      x = x.min, y = y.min  + y.expanse * 1.09 + 0.5 * y.expanse * 0.085,
                       size = rel(2), vjust = -0.3, hjust = 0.5, angle = 90,
                       label = summary.label, parse = TRUE,
                       na.rm = na.rm))
@@ -363,13 +363,13 @@ decoration <- function(w.band,
                stat_wb_label(mapping = ggplot2::aes(color = after_stat(BW.color)),
                              w.band = w.band,
                              chroma.type = chroma.type,
-                             ypos.fixed = y.max * (1.143 + pos.shift),
+                             ypos.fixed = y.min + y.expanse * (1.143 + pos.shift),
                              size = text.size,
                              na.rm = na.rm))
       } else {
         z <- c(z,
                stat_wb_label(w.band = w.band,
-                             ypos.fixed = y.max * (1.143 + pos.shift),
+                             ypos.fixed = y.min + y.expanse * (1.143 + pos.shift),
                              color = label.color,
                              chroma.type = chroma.type,
                              size = text.size,

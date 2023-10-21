@@ -8,7 +8,7 @@ exp_pfix.df <-
                c("y", "z", "a", "f", "p", "n", "u", "m", "c", "d", "",
                  "da", "h", "k", "M", "G", "T", "P", "E", "Z", "Y"),
              utf8 =
-               c("y", "z", "a", "f", "p", "n", "\u03bc", "m", "c", "d", "",
+               c("y", "z", "a", "f", "p", "n", "\u00b5", "m", "c", "d", "",
                  "da", "h", "k", "M", "G", "T", "P", "E", "Z", "Y"),
              latex =
                c("y", "z", "a", "f", "p", "n", "$\\mu$", "m", "c", "d", "",
@@ -26,6 +26,8 @@ exp_pfix.df <-
 #' @param exponent numeric The power of 10 of the unit multiplier.
 #' @param char.set character How to encode Greek letters and other fancy
 #'    characters in prefixes: \code{"utf8"}, \code{"ascii"}, \code{"LaTeX"}.
+#'    The difference between \code{"utf8"} and \code{"ascii"} is that the first
+#'    uses UTF8 character "micro" (similar to Greek mu) and the second uses "u".
 #'
 #' @export
 #'

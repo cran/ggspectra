@@ -1,8 +1,8 @@
 Package: ggspectra
 Type: Package
 Title: Extensions to 'ggplot2' for Radiation Spectra
-Version: 0.3.11
-Date: 2023-04-03
+Version: 0.3.12
+Date: 2023-10-20
 Authors@R: 
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3385-972X")),
@@ -29,8 +29,8 @@ Encoding: UTF-8
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2023-04-03 08:13:34 UTC; aphalo_2
+Packaged: 2023-10-20 22:45:29 UTC; aphalo
 Author: Pedro J. Aphalo [aut, cre] (<https://orcid.org/0000-0003-3385-972X>),
   Titta K. Kotilainen [ctb] (<https://orcid.org/0000-0002-2822-9734>)
 Repository: CRAN
-Date/Publication: 2023-04-03 09:10:02 UTC
+Date/Publication: 2023-10-21 23:10:03 UTC

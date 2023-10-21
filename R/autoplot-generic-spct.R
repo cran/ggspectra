@@ -15,7 +15,6 @@
 #' @param w.band list of waveband objects
 #' @param range an R object on which range() returns a vector of length 2, with
 #'   min annd max wavelengths (nm)
-#' @param pc.out logical, if TRUE use percents instead of fraction of one
 #' @param label.qty character string giving the type of summary quantity to use
 #'   for labels, one of "mean", "total", "contribution", and "relative".
 #' @param span a peak is defined as an element in a sequence which is greater
@@ -105,11 +104,11 @@ generic_plot <- function(spct,
 
   if (with.band) {
     plot <- plot + ggplot2::geom_ribbon(fill = "grey50", alpha = 0.5)
-    y.min <- min(c(spct[[ymin.name]], ylim), na.rm = TRUE)
-    y.max <- max(c(spct[[ymax.name]], ylim), na.rm = TRUE)
+    y.min <- min(spct[[ymin.name]], ylim, na.rm = TRUE)
+    y.max <- max(spct[[ymax.name]], ylim, na.rm = TRUE)
   } else {
-    y.min <- min(c(spct[[y.name]], ylim), na.rm = TRUE)
-    y.max <- max(c(spct[[y.name]], ylim), na.rm = TRUE)
+    y.min <- min(spct[[y.name]], ylim, na.rm = TRUE)
+    y.max <- max(spct[[y.name]], ylim, na.rm = TRUE)
   }
 
   temp <- find_idfactor(spct = spct,
@@ -219,7 +218,7 @@ generic_plot <- function(spct,
 #' @param facets logical or integer Indicating if facets are to be created for
 #'   the levels of \code{idfactor} when \code{spct} contain multiple spectra in
 #'   long form.
-#' @param ylim numeric y axis limits,
+#' @param ylim numeric y axis limits (expansion only!).
 #' @param object.label character The name of the object being plotted.
 #' @param na.rm logical.
 #'

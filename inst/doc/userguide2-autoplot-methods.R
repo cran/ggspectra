@@ -7,7 +7,7 @@ library(ggrepel)
 good_label_repel <- packageVersion('ggrepel') != "0.9.0" # >= 0.9.0 required
 options(ggrepel.max.overlaps = Inf) # needed for 'ggrepel' (>= 0.9.0)
 
-## ---- include=FALSE, echo=FALSE-----------------------------------------------
+## ----include=FALSE, echo=FALSE------------------------------------------------
 library(knitr)
 opts_chunk$set(fig.align = 'center', fig.show = 'hold',
                fig.width = 7, fig.height = 4, cache = FALSE)
@@ -68,7 +68,7 @@ autoplot(sun.spct, w.band = waveband(c(380, 760)))
 ## -----------------------------------------------------------------------------
 autoplot(sun.spct, w.band = NULL)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  set_w.band_default(w.band = Plant_bands())
 
 ## -----------------------------------------------------------------------------
@@ -109,19 +109,19 @@ autoplot(sun.spct, annotations = c("-", "summaries", "peaks"))
 ## -----------------------------------------------------------------------------
 autoplot(sun.spct, annotations = c("+", "valleys"), span = 41)
 
-## ---- eval=good_label_repel---------------------------------------------------
+## ----eval=good_label_repel----------------------------------------------------
 autoplot(sun.spct, 
          annotations = list(c("+", "peak.labels"), 
                             c("-", "boxes", "summaries", "labels")), 
          span = 21)
 
-## ---- eval=good_label_repel---------------------------------------------------
+## ----eval=good_label_repel----------------------------------------------------
 autoplot(sun.spct, 
          annotations = list(c("+", "valley.labels"), 
                             c("-", "peaks")), 
          span = 31)
 
-## ---- eval=good_label_repel---------------------------------------------------
+## ----eval=good_label_repel----------------------------------------------------
 autoplot(sun.spct, annotations = c("+", "peak.labels", "valley.labels"), span = 31)
 
 ## -----------------------------------------------------------------------------
@@ -158,7 +158,7 @@ autoplot(yellow_gel.spct,
 autoplot(yellow_gel.spct, plot.qty = "absorbance", wls.target = 2,
          annotations = list(c("-", "peaks"), c("+", "wls")))
 
-## ---- eval=FALSE, echo=FALSE--------------------------------------------------
+## ----eval=FALSE, echo=FALSE---------------------------------------------------
 #  yellow_gel.spct$Rfr <- 1 - max(yellow_gel.spct$Tfr)
 #  autoplot(yellow_gel.spct, plot.qty = "absorptance", annotations = c("-", "peaks"))
 
@@ -173,15 +173,15 @@ autoplot(yellow_gel.spct, annotations = c("+", "boundaries"))
 ## -----------------------------------------------------------------------------
 autoplot(white_led.raw_spct, annotations = c("+", "boundaries"))
 
-## ---- eval=FALSE, message = FALSE---------------------------------------------
+## ----eval=FALSE, message = FALSE----------------------------------------------
 #  autoplot(white_led.raw_spct[ , c("w.length", "counts_1")],
 #           annotations = c("+", "boundaries"))
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  autoplot(white_led.raw_spct[ , c("w.length", "counts_1", "counts_3")],
 #       annotations = c("+", "boundaries"))
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  # Not run so as to pass CRAN checks!!
 #  autoplot(yellow_gel.spct - 0.01, annotations = c("+", "boundaries"))
 
