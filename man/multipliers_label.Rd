@@ -9,13 +9,14 @@ multipliers_label(
   format = getOption("photobiology.math", default = "R.expression"),
   label.text = axis_labels()[["e.mult"]],
   scaled = FALSE,
-  normalized = FALSE
+  normalized = FALSE,
+  axis.symbols = getOption("ggspectra.axis.symbols", default = TRUE)
 )
 }
 \arguments{
 \item{unit.exponent}{integer}
 
-\item{format}{character string, "R", "R.expresion", "R.character", or
+\item{format}{character string, "R", "R.expression", "R.character", or
 "LaTeX".}
 
 \item{label.text}{character Textual portion of the labels.}
@@ -24,6 +25,9 @@ multipliers_label(
 
 \item{normalized}{logical (\code{FALSE}) or numeric Normalization wavelength
 in manometers (nm).}
+
+\item{axis.symbols}{logical If \code{TRUE} symbols of the quantities are
+added to the \code{name}. Supported only by \code{format = "R.expression"}.}
 }
 \value{
 a character string or an R expression.

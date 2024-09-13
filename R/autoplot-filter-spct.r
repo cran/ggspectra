@@ -164,7 +164,7 @@ Afr_plot <- function(spct,
     plot <- plot + geom_spct(fill = "black", colour = NA, alpha = 0.2)
   }
   plot <- plot + geom_line(na.rm = na.rm)
-  plot <- plot + labs(x = "Wavelength (nm)", y = s.Afr.label)
+  plot <- plot + labs(x = expression("Wavelength, "*lambda~(nm)), y = s.Afr.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -407,7 +407,7 @@ T_plot <- function(spct,
     plot <- plot + geom_spct(fill = "black", colour = NA, alpha = 0.2)
   }
   plot <- plot + geom_line(na.rm = na.rm)
-  plot <- plot + labs(x = "Wavelength (nm)", y = s.Tfr.label)
+  plot <- plot + labs(x = expression("Wavelength, "*lambda~(nm)), y = s.Tfr.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -620,7 +620,7 @@ A_plot <- function(spct,
     plot <- plot + geom_spct(fill = "black", colour = NA, alpha = 0.2)
   }
   plot <- plot + geom_line(na.rm = na.rm)
-  plot <- plot + labs(x = "Wavelength (nm)", y = s.A.label)
+  plot <- plot + labs(x = expression("Wavelength, "*lambda~(nm)), y = s.A.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -845,7 +845,7 @@ R_plot <- function(spct,
     plot <- plot + geom_spct(fill = "black", colour = NA, alpha = 0.2)
   }
   plot <- plot + geom_line(na.rm = na.rm)
-  plot <- plot + labs(x = "Wavelength (nm)", y = s.Rfr.label)
+  plot <- plot + labs(x = expression("Wavelength, "*lambda~(nm)), y = s.Rfr.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -917,7 +917,6 @@ R_plot <- function(spct,
 #'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
 #' @param na.rm logical.
 #' @param ylim numeric y axis limits,
-#' @param ... currently ignored.
 #'
 #' @return a \code{ggplot} object.
 #'
@@ -937,8 +936,7 @@ O_plot <- function(spct,
                    chroma.type,
                    facets,
                    na.rm,
-                   ylim,
-                   ...) {
+                   ylim) {
   if (!is.object_spct(spct)) {
     stop("O_plot() can only plot object_spct objects.")
   }
@@ -1038,7 +1036,7 @@ O_plot <- function(spct,
   idfactor <- getIdFactor(spct) # needed as we will get a tibble back
   molten.tb <- photobiology::spct_wide2long(spct, idfactor = "variable", rm.spct.class = TRUE)
 
-  plot <- ggplot(molten.tb, aes(x = .data[["w.length"]], y = .data[["value"]]), na.rm = na.rm)
+  plot <- ggplot(molten.tb, aes(x = .data[["w.length"]], y = .data[["value"]]))
   attributes(plot[["data"]]) <- c(attributes(plot[["data"]]), get_attributes(spct))
   if (stacked) {
     if (is.null(geom) || geom %in% c("spct", "area")) {
@@ -1077,7 +1075,7 @@ O_plot <- function(spct,
     plot <- plot +
       facet_wrap(facets = vars(.data[[idfactor]]))
   }
-  plot <- plot + labs(x = "Wavelength (nm)", y = s.Rfr.label)
+  plot <- plot + labs(x = expression("Wavelength, "*lambda~(nm)), y = s.Rfr.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -1130,73 +1128,32 @@ O_plot <- function(spct,
 
 # autoplot methods -------------------------------------------------------------
 
-#' Create a complete ggplot for a filter spectrum.
+#' Plot one or more "filter" spectra.
 #'
-#' These methods return a ggplot object with an annotated plot of a filter_spct
-#' object or of the spectra contained in a filter_mspct object.
+#' These methods return a ggplot object of an annotated plot from spectral data
+#' contained in a \code{filter_spct} or a \code{filter_mspct} object. Data can
+#' be expressed as absorbance, absorptance or transmittance.
 #'
-#' The ggplot object returned can be further manipulated and added to. Except
-#' when no annotations are added, limits are set for the x-axis and y-axis
-#' scales. The y scale limits are expanded to include all data, or at least to
-#' the range of expected values. The plotting of absorbance is an exception as
-#' the y-axis is not extended past 6 a.u. In the case of absorbance, values
-#' larger than 6 a.u. are rarely meaningful due to stray light during
-#' measurement. However, when transmittance values below the detection limit are
-#' rounded to zero, and later converted into absorbance, values Inf a.u. result,
-#' disrupting the plot. Scales are further expanded so as to make space for the
-#' annotations.
+#' @note The plotting of absorbance is an exception to scale limits as the
+#'   \emph{y}-axis is not extended past 6 a.u. In the case of absorbance, values
+#'   larger than 6 a.u. are rarely meaningful due to stray light during
+#'   measurement. However, when transmittance values below the detection limit
+#'   are rounded to zero, and later converted into absorbance, values Inf a.u.
+#'   result, disrupting the plot. Scales are further expanded so as to make
+#'   space for the annotations.
+#'
+#'   If \code{idfactor = NULL}, the default for single spectra, the name of the
+#'   factor is retrieved from metadata or if no metadata found, the default
+#'   \code{"spct.idx"} is tried. The default for multiple spectra is to create a
+#'   factor named \code{"spct.idx"}, but if a different name is passed, it will
+#'   be used instead, possibly renaminig a pre-existing one.
 #'
 #' @inheritSection decoration Plot Annotations
 #' @inheritSection autotitle Title Annotations
+#' @inherit autoplot.source_spct
 #'
 #' @param object a filter_spct object or a filter_mspct object.
-#' @param ... in the case of collections of spectra, additional arguments passed
-#'   to the autoplot methods for individual spectra, otherwise currently ignored.
-#' @param w.band a single waveband object or a list of waveband objects.
-#' @param range an R object on which range() returns a vector of length 2, with
-#'   min and max wavelengths (nm).
-#' @param norm numeric Normalization wavelength (nm) or character string "max",
-#'   or "min" for normalization at the corresponding wavelength, "update" to
-#'   update the normalization after modifying units of expression, quantity
-#'   or range but respecting the previously used criterion, or "skip" to force
-#'   return of \code{object} unchanged.
 #' @param plot.qty character string one of "transmittance" or "absorbance".
-#' @param pc.out logical, if TRUE use percents instead of fraction of one.
-#' @param label.qty character string giving the type of summary quantity to use
-#'   for labels, one of "mean", "total", "contribution", and "relative".
-#' @param span a peak is defined as an element in a sequence which is greater
-#'   than all other elements within a window of width span centred at that
-#'   element.
-#' @param wls.target numeric vector indicating the spectral quantity values for
-#'   which wavelengths are to be searched and interpolated if need. The
-#'   \code{character} strings "half.maximum" and "half.range" are also accepted
-#'   as arguments. A list with \code{numeric} and/or \code{character} values is
-#'   also accepted.
-#' @param annotations a character vector. For details please see sections Plot
-#'   Annotations and Title Annotations.
-#' @param geom character The name of a ggplot geometry, currently only
-#'   \code{"area"}, \code{"spct"} and \code{"line"}. The default \code{NULL}
-#'   selects between them based on \code{stacked}.
-#' @param time.format character Format as accepted by \code{\link[base]{strptime}}.
-#' @param tz character Time zone to use for title and/or subtitle.
-#' @param text.size numeric size of text in the plot decorations.
-#' @param chroma.type character one of "CMF" (color matching function) or "CC"
-#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
-#' @param idfactor character Name of an index column in data holding a
-#'   \code{factor} with each spectrum in a long-form multispectrum object
-#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
-#'   the factor is retrieved from metadata or if no metadata found, the
-#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
-#'   to the spectra and the user needs to use 'ggplot2' functions to manually
-#'   map an aesthetic or use facets for the spectra.
-#' @param facets logical or integer Indicating if facets are to be created for
-#'   the levels of \code{idfactor} when \code{spct} contain multiple spectra in
-#'   long form.
-#' @param ylim numeric y axis limits,
-#' @param object.label character The name of the object being plotted.
-#' @param na.rm logical.
-#'
-#' @return a \code{ggplot} object.
 #'
 #' @seealso \code{\link[photobiology]{normalize}},
 #'   \code{\link[photobiology]{filter_spct}},
@@ -1206,10 +1163,8 @@ O_plot <- function(spct,
 #'
 #' @export
 #'
-#' @keywords hplot
-#'
 #' @examples
-#'
+#' # one spectrum
 #' autoplot(yellow_gel.spct)
 #' autoplot(yellow_gel.spct, geom = "spct")
 #' autoplot(yellow_gel.spct, plot.qty = "transmittance")
@@ -1218,9 +1173,12 @@ O_plot <- function(spct,
 #' autoplot(yellow_gel.spct, pc.out = TRUE)
 #' autoplot(yellow_gel.spct, annotations = c("+", "wls"))
 #'
-#' two_filters.mspct <-
-#'  filter_mspct(list("Yellow gel" = yellow_gel.spct,
-#'                    "Polyester film" = polyester.spct))
+#' # spectra for two filters in long form
+#' autoplot(two_filters.spct)
+#' autoplot(two_filters.spct, idfactor = "Spectra")
+#' autoplot(two_filters.spct, facets = TRUE)
+#'
+#' # spectra for two filters as a collection
 #' autoplot(two_filters.mspct)
 #' autoplot(two_filters.mspct, idfactor = "Spectra")
 #' autoplot(two_filters.mspct, facets = TRUE)
@@ -1231,12 +1189,13 @@ autoplot.filter_spct <-
   function(object, ...,
            w.band = getOption("photobiology.plot.bands",
                               default = list(UVC(), UVB(), UVA(), PhR())),
-           range = NULL,
+           range = getOption("ggspectra.wlrange", default = NULL),
            norm = getOption("ggspectra.norm",
                             default = "update"),
            plot.qty = getOption("photobiology.filter.qty",
                                 default = "transmittance"),
-           pc.out = FALSE,
+           pc.out = getOption("ggspectra.pc.out",
+                              default = FALSE),
            label.qty = NULL,
            span = NULL,
            wls.target = "HM",
@@ -1248,9 +1207,43 @@ autoplot.filter_spct <-
            chroma.type = "CMF",
            idfactor = NULL,
            facets = FALSE,
+           plot.data = "as.is",
            ylim = c(NA, NA),
            object.label = deparse(substitute(object)),
            na.rm = TRUE) {
+
+    if (is.null(idfactor)) {
+      idfactor <- getIdFactor(object)
+    }
+    if (is.na(idfactor) || !is.character(idfactor)) {
+      idfactor <- getMultipleWl(object) > 1L
+    }
+
+    if (plot.data != "as.is") {
+      return(
+        autoplot(object = subset2mspct(object),
+                 w.band = w.band,
+                 range = range,
+                 norm = norm,
+                 plot.qty = plot.qty,
+                 pc.out = pc.out,
+                 label.qty = label.qty,
+                 span = span,
+                 wls.target = wls.target,
+                 annotations = annotations,
+                 geom = geom,
+                 time.format = time.format,
+                 tz = tz,
+                 text.size = text.size,
+                 chroma.type = chroma.type,
+                 idfactor = idfactor,
+                 facets = facets,
+                 plot.data = plot.data,
+                 ylim = ylim,
+                 object.label = object.label,
+                 na.rm = na.rm)
+      )
+    }
 
     force(object.label)
 
@@ -1302,8 +1295,7 @@ autoplot.filter_spct <-
                            idfactor = idfactor,
                            facets = facets,
                            ylim = ylim,
-                           na.rm = na.rm,
-                           ...)
+                           na.rm = na.rm)
     } else if (plot.qty == "absorbance") {
       out.ggplot <- A_plot(spct = object,
                            w.band = w.band,
@@ -1318,8 +1310,7 @@ autoplot.filter_spct <-
                            idfactor = idfactor,
                            facets = facets,
                            ylim = ylim,
-                           na.rm = na.rm,
-                           ...)
+                           na.rm = na.rm)
     } else if (plot.qty == "absorptance") {
       out.ggplot <- Afr_plot(spct = object,
                              w.band = w.band,
@@ -1335,8 +1326,7 @@ autoplot.filter_spct <-
                              idfactor = idfactor,
                              facets = facets,
                              ylim = ylim,
-                             na.rm = na.rm,
-                             ...)
+                             na.rm = na.rm)
     } else {
       stop("Invalid 'plot.qty' argument value: '", plot.qty, "'")
     }
@@ -1350,22 +1340,18 @@ autoplot.filter_spct <-
 
 #' @rdname autoplot.filter_spct
 #'
-#' @param plot.data character Data to plot. Default is "as.is" plotting one line
-#'   per spectrum. When passing "mean", "median", "sum", "prod", var", "sd",
-#'   "se" as argument all the spectra must contain data at the same wavelength
-#'   values.
-#'
 #' @export
 #'
 autoplot.filter_mspct <-
   function(object,
            ...,
-           range = NULL,
+           range = getOption("ggspectra.wlrange", default = NULL),
            norm = getOption("ggspectra.norm",
                             default = "update"),
            plot.qty = getOption("photobiology.filter.qty",
                                 default = "transmittance"),
-           pc.out = FALSE,
+           pc.out = getOption("ggspectra.pc.out",
+                              default = FALSE),
            plot.data = "as.is",
            idfactor = TRUE,
            facets = FALSE,
@@ -1410,7 +1396,7 @@ autoplot.filter_mspct <-
     col.name <- c(transmittance = "Tfr", absorptance = "Afr", absorbance = "A")
     if (is.filter_spct(z) && col.name[plot.qty] %in% names(z)) {
       autoplot(object = z,
-               range = NULL,
+               range = getOption("ggspectra.wlrange", default = NULL),
                norm = norm,
                plot.qty = plot.qty,
                pc.out = pc.out,
@@ -1424,7 +1410,7 @@ autoplot.filter_mspct <-
       z <- as.generic_spct(z)
       autoplot(object = z,
                y.name = paste(col.name[plot.qty], plot.data, sep = "."),
-               range = NULL,
+               range = getOption("ggspectra.wlrange", default = NULL),
                norm = norm,
                pc.out = pc.out,
                idfactor = idfactor,
@@ -1435,70 +1421,17 @@ autoplot.filter_mspct <-
     }
   }
 
-#' Create a complete ggplot for a reflector spectrum.
+#' Plot one or more reflector spectra.
 #'
-#' These methods return a ggplot object with an annotated plot of a
-#' reflector_spct object or of the spectra contained in a reflector_mspct
-#' object.
-#'
-#' The ggplot object returned can be further manipulated and added to. Except
-#' when no annotations are added, limits are set for the x-axis and y-axis
-#' scales. The y scale limits are expanded to include all data, or at least to
-#' the range of expected values. Scales are further expanded so as to make space
-#' for the annotations.
+#' These methods return a ggplot object for an annotated plot from spectral data
+#' stored in a \code{reflector_spct} or a \code{reflector_mspct} object.
 #'
 #' @inheritSection decoration Plot Annotations
 #' @inheritSection autotitle Title Annotations
+#' @inherit autoplot.source_spct
 #'
 #' @param object a reflector_spct object or a reflector_mspct object.
-#' @param ... in the case of collections of spectra, additional arguments passed
-#'   to the plot methods for individual spectra, otherwise currently ignored.
-#' @param w.band a single waveband object or a list of waveband objects.
-#' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm).
-#' @param norm numeric Normalization wavelength (nm) or character string "max",
-#'   or "min" for normalization at the corresponding wavelength, "update" to
-#'   update the normalization after modifying units of expression, quantity
-#'   or range but respecting the previously used criterion, or "skip" to force
-#'   return of \code{object} unchanged.
 #' @param plot.qty character string (currently ignored).
-#' @param pc.out logical, if TRUE use percents instead of fraction of one.
-#' @param label.qty character string giving the type of summary quantity to use
-#'   for labels, one of "mean", "total", "contribution", and "relative".
-#' @param span a peak is defined as an element in a sequence which is greater
-#'   than all other elements within a window of width span centered at that
-#'   element.
-#' @param wls.target numeric vector indicating the spectral quantity values for
-#'   which wavelengths are to be searched and interpolated if need. The
-#'   \code{character} strings "half.maximum" and "half.range" are also accepted
-#'   as arguments. A list with \code{numeric} and/or \code{character} values is
-#'   also accepted.
-#' @param annotations a character vector. For details please see sections Plot
-#'   Annotations and Title Annotations.
-#' @param geom character The name of a ggplot geometry, currently only
-#'   \code{"area"}, \code{"spct"} and \code{"line"}. The default \code{NULL}
-#'   selects between them based on \code{stacked}.
-#' @param time.format character Format as accepted by
-#'   \code{\link[base]{strptime}}.
-#' @param tz character Time zone to use for title and/or subtitle.
-#' @param chroma.type character one of "CMF" (color matching function) or "CC"
-#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
-#' @param text.size numeric size of text in the plot decorations.
-#' @param idfactor character Name of an index column in data holding a
-#'   \code{factor} with each spectrum in a long-form multispectrum object
-#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
-#'   the factor is retrieved from metadata or if no metadata found, the
-#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
-#'   to the spectra and the user needs to use 'ggplot2' functions to manually
-#'   map an aesthetic or use facets for the spectra.
-#' @param facets logical or integer Indicating if facets are to be created for
-#'   the levels of \code{idfactor} when \code{spct} contain multiple spectra in
-#'   long form.
-#' @param ylim numeric y axis limits,
-#' @param object.label character The name of the object being plotted.
-#' @param na.rm logical.
-#'
-#' @return a \code{ggplot} object.
 #'
 #' @seealso \code{\link[photobiology]{normalize}},
 #'   \code{\link[photobiology]{reflector_spct}},
@@ -1527,12 +1460,13 @@ autoplot.reflector_spct <-
   function(object, ...,
            w.band=getOption("photobiology.plot.bands",
                             default = list(UVC(), UVB(), UVA(), PhR())),
-           range = NULL,
+           range = getOption("ggspectra.wlrange", default = NULL),
            norm = getOption("ggspectra.norm",
                             default = "update"),
            plot.qty = getOption("photobiology.reflector.qty",
                                 default = "reflectance"),
-           pc.out = FALSE,
+           pc.out = getOption("ggspectra.pc.out",
+                              default = FALSE),
            label.qty = NULL,
            span = NULL,
            wls.target = "HM",
@@ -1544,9 +1478,43 @@ autoplot.reflector_spct <-
            chroma.type = "CMF",
            idfactor = NULL,
            facets = FALSE,
+           plot.data = "as.is",
            ylim = c(NA, NA),
            object.label = deparse(substitute(object)),
            na.rm = TRUE) {
+
+    if (is.null(idfactor)) {
+      idfactor <- getIdFactor(object)
+    }
+    if (is.na(idfactor) || !is.character(idfactor)) {
+      idfactor <- getMultipleWl(object) > 1L
+    }
+
+    if (plot.data != "as.is") {
+      return(
+        autoplot(object = subset2mspct(object),
+                 w.band = w.band,
+                 range = range,
+                 norm = norm,
+                 plot.qty = plot.qty,
+                 pc.out = pc.out,
+                 label.qty = label.qty,
+                 span = span,
+                 wls.target = wls.target,
+                 annotations = annotations,
+                 geom = geom,
+                 time.format = time.format,
+                 tz = tz,
+                 text.size = text.size,
+                 chroma.type = chroma.type,
+                 idfactor = idfactor,
+                 facets = facets,
+                 plot.data = plot.data,
+                 ylim = ylim,
+                 object.label = object.label,
+                 na.rm = na.rm)
+      )
+    }
 
     force(object.label)
 
@@ -1612,21 +1580,17 @@ autoplot.reflector_spct <-
 
 #' @rdname autoplot.reflector_spct
 #'
-#' @param plot.data character Data to plot. Default is "as.is" plotting one line
-#'   per spectrum. When passing "mean", "median", "sum", "prod", "var", "sd",
-#'   "se" as argument all the spectra must contain data at the same wavelength
-#'   values.
-#'
 #' @export
 #'
 autoplot.reflector_mspct <-
   function(object,
            ...,
-           range = NULL,
+           range = getOption("ggspectra.wlrange", default = NULL),
            norm = getOption("ggspectra.normalize", default = "update"),
            plot.qty = getOption("photobiology.reflector.qty",
                                 default = "reflectance"),
-           pc.out = FALSE,
+           pc.out = getOption("ggspectra.pc.out",
+                              default = FALSE),
            plot.data = "as.is",
            idfactor = TRUE,
            facets = FALSE,
@@ -1666,7 +1630,7 @@ autoplot.reflector_mspct <-
     )
     if (is.reflector_spct(z) && "Rfr" %in% names(z)) {
       autoplot(object = z,
-               range = NULL,
+               range = getOption("ggspectra.wlrange", default = NULL),
                norm = norm,
                plot.qty = plot.qty,
                pc.out = pc.out,
@@ -1679,7 +1643,7 @@ autoplot.reflector_mspct <-
       z <- as.generic_spct(z)
       autoplot(object = z,
                y.name = paste("Rfr", plot.data, sep = "."),
-               range = NULL,
+               range = getOption("ggspectra.wlrange", default = NULL),
                norm = norm,
                pc.out = pc.out,
                idfactor = idfactor,
@@ -1690,79 +1654,37 @@ autoplot.reflector_mspct <-
     }
   }
 
-#' Create a complete ggplot for a object spectrum.
+#' Plot one or more "object" spectra.
 #'
-#' This function returns a ggplot object with an annotated plot of an
-#' object_spct object.
-#'
-#' The ggplot object returned can be further manipulated and added to. Except
-#' when no annotations are added, limits are set for the x-axis and y-axis
-#' scales. The y scale limits are expanded to include all data, or at least to
-#' the range of expected values. Scales are further expanded so as to make space
-#' for the annotations. When all \code{"all"} quantities are plotted, a single
-#' set of spectra is accepted as input.
+#' These methods return a ggplot object with an annotated plot of an
+#' \code{object_spct} or an \code{object_spct} object. This objects contain
+#' spectral transmittance, reflectance and possibly absorptance data. As these
+#' quantities add up to one, only two are needed.
 #'
 #' @inheritSection decoration Plot Annotations
 #' @inheritSection autotitle Title Annotations
+#' @inherit autoplot.source_spct
 #'
 #' @param object an object_spct object
-#' @param ... in the case of collections of spectra, additional arguments passed
-#'   to the plot methods for individual spectra, otherwise currently ignored.
-#' @param w.band a single waveband object or a list of waveband objects
-#' @param range an R object on which range() returns a vector of length 2, with
-#'   min annd max wavelengths (nm)
-#' @param norm numeric Normalization wavelength (nm) or character string "max",
-#'   or "min" for normalization at the corresponding wavelength, "update" to
-#'   update the normalization after modifying units of expression, quantity
-#'   or range but respecting the previously used criterion, or "skip" to force
-#'   return of \code{object} unchanged. Always skipped for
-#'   \code{plot.qty == "all"}, which is the default.
 #' @param plot.qty character string, one of "all", "transmittance",
 #'   "absorbance", "absorptance", or "reflectance".
-#' @param pc.out logical, if TRUE use percents instead of fraction of one
-#' @param label.qty character string giving the type of summary quantity to use
-#'   for labels, one of "mean", "total", "contribution", and "relative".
-#' @param span a peak is defined as an element in a sequence which is greater
-#'   than all other elements within a window of width span centered at that
-#'   element.
-#' @param wls.target numeric vector indicating the spectral quantity values for
-#'   which wavelengths are to be searched and interpolated if need. The
-#'   \code{character} strings "half.maximum" and "half.range" are also accepted
-#'   as arguments. A list with \code{numeric} and/or \code{character} values is
-#'   also accepted.
-#' @param annotations a character vector. For details please see sections Plot
-#'   Annotations and Title Annotations.
 #' @param geom character The name of a ggplot geometry, currently only
 #'   \code{"area"}, \code{"spct"} and \code{"line"}. The default \code{NULL}
 #'   selects between them based on \code{stacked}.
-#' @param time.format character Format as accepted by
-#'   \code{\link[base]{strptime}}.
-#' @param tz character Time zone to use for title and/or subtitle.
 #' @param stacked logical Whether to use \code{position_stack()} or
 #'   \code{position_identity()}.
-#' @param chroma.type character one of "CMF" (color matching function) or "CC"
-#'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
-#' @param text.size numeric size of text in the plot decorations.
-#' @param idfactor character Name of an index column in data holding a
-#'   \code{factor} with each spectrum in a long-form multispectrum object
-#'   corresponding to a distinct spectrum. If \code{idfactor=NULL} the name of
-#'   the factor is retrieved from metadata or if no metadata found, the
-#'   default "spct.idx" is tried. If \code{idfactor=NA} no aesthetic is mapped
-#'   to the spectra and the user needs to use 'ggplot2' functions to manually
-#'   map an aesthetic or use facets for the spectra.
-#' @param facets logical or integer Indicating if facets are to be created for
-#'   the levels of \code{idfactor} when \code{spct} contain multiple spectra in
-#'   long form.
-#' @param ylim numeric y axis limits,
-#' @param object.label character The name of the object being plotted.
-#' @param na.rm logical.
 #'
-#' @return a \code{ggplot} object.
+#' @note In the case of multiple spectra contained in the argument to
+#'   \code{object} plotting is for \code{plot.qty = "all"} is always done using
+#'   facets. Other plot quantities are handled by the methods for
+#'   \code{filter_spct} and \code{reflector_spct} objects after on-the-fly
+#'   conversion and the use of facets is possible but not the default.
 #'
-#' @note The method for collections of object spectra of length > 1 is
-#'   implemented for \code{plot.qty = "all"} using facets. Other plot
-#'   quantities are handled by the methods for \code{filter_spct} and
-#'   \code{reflector_spct} objects after on-the-fly conversion.
+#'   If \code{idfactor = NULL}, the default for single spectra, the name of the
+#'   factor is retrieved from metadata or if no metadata found, the default
+#'   "spct.idx" is tried. The default for multiple spectra is to create a factor
+#'   named "spct.idx", but if a different name is passed, it will be used
+#'   instead, possibly renaminig a pre-existing one.
 #'
 #' @export
 #'
@@ -1793,10 +1715,11 @@ autoplot.object_spct <-
            ...,
            w.band = getOption("photobiology.plot.bands",
                               default = list(UVC(), UVB(), UVA(), PhR())),
-           range = NULL,
+           range = getOption("ggspectra.wlrange", default = NULL),
            norm = "skip",
            plot.qty = "all",
-           pc.out = FALSE,
+           pc.out = getOption("ggspectra.pc.out",
+                              default = FALSE),
            label.qty = NULL,
            span = NULL,
            wls.target = "HM",
@@ -1809,9 +1732,44 @@ autoplot.object_spct <-
            chroma.type = "CMF",
            idfactor = NULL,
            facets = NULL,
+           plot.data = "as.is",
            ylim = c(NA, NA),
            object.label = deparse(substitute(object)),
            na.rm = TRUE) {
+
+    if (is.null(idfactor)) {
+      idfactor <- getIdFactor(object)
+    }
+    if (is.na(idfactor) || !is.character(idfactor)) {
+      idfactor <- getMultipleWl(object) > 1L
+    }
+
+    if (plot.data != "as.is") {
+      return(
+        autoplot(object = subset2mspct(object),
+                 w.band = w.band,
+                 range = range,
+                 norm = norm,
+                 plot.qty = plot.qty,
+                 pc.out = pc.out,
+                 label.qty = label.qty,
+                 span = span,
+                 wls.target = wls.target,
+                 annotations = annotations,
+                 geom = geom,
+                 time.format = time.format,
+                 tz = tz,
+                 stacked = stacked,
+                 text.size = text.size,
+                 chroma.type = chroma.type,
+                 idfactor = idfactor,
+                 facets = facets,
+                 plot.data = plot.data,
+                 ylim = ylim,
+                 object.label = object.label,
+                 na.rm = na.rm)
+      )
+    }
 
     force(object.label)
     if (is.null(plot.qty)) {
@@ -1859,8 +1817,7 @@ autoplot.object_spct <-
                            chroma.type = chroma.type,
                            facets = facets,
                            ylim = ylim,
-                           na.rm = na.rm,
-                           ...)
+                           na.rm = na.rm)
       out.ggplot +
         autotitle(object = object,
                   time.format = time.format,
@@ -1878,7 +1835,6 @@ autoplot.object_spct <-
         stop("Invalid 'plot.qty' argument value: '", plot.qty, "'")
       }
       autoplot(object = object,
-               ...,
                w.band = w.band,
                range = range,
                norm = norm,
@@ -1903,20 +1859,17 @@ autoplot.object_spct <-
 
 #' @rdname autoplot.object_spct
 #'
-#' @param plot.data character Data to plot. Default is "as.is" plotting one line
-#'   per spectrum. When passing "mean", "median", "sum", "prod", var", "sd",
-#'   "se" as argument all the spectra must contain data at the same wavelength
-#'   values.
-#'
 #' @export
 #'
 autoplot.object_mspct <-
   function(object,
            ...,
-           range = NULL,
-           norm = "update",
-           plot.qty = getOption("photobiology.filter.qty", default = "all"),
-           pc.out = FALSE,
+           range = getOption("ggspectra.wlrange", default = NULL),
+           norm = "skip",
+           plot.qty = getOption("photobiology.filter.qty",
+                                default = "all"),
+           pc.out = getOption("ggspectra.pc.out",
+                              default = FALSE),
            plot.data = "as.is",
            idfactor = TRUE,
            facets = plot.qty == "all",
@@ -1965,7 +1918,7 @@ autoplot.object_mspct <-
         (is.filter_spct(z) && any(c("Tfr", "Afr", "A")) %in% names(z)) ||
         (is.reflector_spct(z) && "Rfr" %in% names(z)))  {
       autoplot(object = z,
-               range = NULL,
+               range = getOption("ggspectra.wlrange", default = NULL),
                norm = norm,
                plot.qty = plot.qty,
                pc.out = pc.out,
@@ -1978,7 +1931,7 @@ autoplot.object_mspct <-
       z <- as.generic_spct(z)
       autoplot(object = z,
                y.name = paste(col.name[plot.qty], plot.data, sep = "."),
-               range = NULL,
+               range = getOption("ggspectra.wlrange", default = NULL),
                norm = norm,
                pc.out = pc.out,
                idfactor = idfactor,
@@ -1990,7 +1943,7 @@ autoplot.object_mspct <-
       z <- as.generic_spct(z)
       autoplot(object = z,
                y.name = paste("Rfr", plot.data, sep = "."),
-               range = NULL,
+               range = getOption("ggspectra.wlrange", default = NULL),
                norm = norm,
                pc.out = pc.out,
                idfactor = idfactor,

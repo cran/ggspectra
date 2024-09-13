@@ -82,6 +82,12 @@ ggplot(sun.spct) +
 ## -----------------------------------------------------------------------------
 ggplot(sun.spct) + 
   geom_line() +
+  scale_x_wl_continuous(axis.symbols = FALSE) +
+  scale_y_s.e.irrad_continuous(axis.symbols = FALSE)
+
+## -----------------------------------------------------------------------------
+ggplot(sun.spct) + 
+  geom_line() +
   scale_x_wl_continuous(unit.exponent = -6) +
   scale_y_s.e.irrad_continuous(unit.exponent = -3)
 
@@ -121,7 +127,7 @@ ggplot(temp.spct) +
 ggplot(sun.spct) + 
   geom_line() +
   scale_x_wl_continuous(label.text = "Longitud de onda,") +
-  scale_y_s.e.irrad_continuous(label.text = "Irradiancia,")
+  scale_y_s.e.irrad_continuous(label.text = "Irradiancia espectral,")
 
 ## -----------------------------------------------------------------------------
 norm_sun.spct <- normalize(sun.spct)

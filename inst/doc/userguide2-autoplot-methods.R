@@ -4,8 +4,8 @@ library(photobiologyWavebands)
 library(ggspectra)
 library(ggrepel)
 
-good_label_repel <- packageVersion('ggrepel') != "0.9.0" # >= 0.9.0 required
-options(ggrepel.max.overlaps = Inf) # needed for 'ggrepel' (>= 0.9.0)
+# ensure all labels are plotted
+options(ggrepel.max.overlaps = Inf)
 
 ## ----include=FALSE, echo=FALSE------------------------------------------------
 library(knitr)
@@ -14,8 +14,13 @@ opts_chunk$set(fig.align = 'center', fig.show = 'hold',
 options(warnPartialMatchArgs = FALSE)
 
 ## -----------------------------------------------------------------------------
-two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct * 2))
-two_suns.spct <- rbindspct(list(sun1 = sun.spct, sun2 = sun.spct * 2))
+summary(sun.spct)
+
+## -----------------------------------------------------------------------------
+summary(sun_evening.spct)
+
+## -----------------------------------------------------------------------------
+summary(sun_evening.mspct)
 
 ## -----------------------------------------------------------------------------
 theme_set(theme_bw(10))
@@ -33,28 +38,27 @@ autoplot(sun.spct, unit.out = "photon")
 autoplot(sun.spct, geom = "spct")
 
 ## -----------------------------------------------------------------------------
-autoplot(two_suns.spct)
+autoplot(sun_evening.spct)
 
 ## -----------------------------------------------------------------------------
 mspct_classes()
 
 ## -----------------------------------------------------------------------------
-two_suns.mspct <- source_mspct(list(sun1 = sun.spct, sun2 = sun.spct / 2))
+autoplot(sun_evening.mspct)
 
 ## -----------------------------------------------------------------------------
-autoplot(two_suns.mspct)
+autoplot(sun_evening.mspct, idfactor = "Spectra")
 
 ## -----------------------------------------------------------------------------
-autoplot(two_suns.mspct, idfactor = "Spectra")
+autoplot(sun_evening.spct, facets = TRUE)
 
 ## -----------------------------------------------------------------------------
-autoplot(two_suns.spct, facets = TRUE)
+autoplot(sun_evening.mspct, facets = 2)
 
 ## -----------------------------------------------------------------------------
-autoplot(two_suns.mspct, facets = 1)
-
-## -----------------------------------------------------------------------------
-autoplot(two_suns.mspct, facets = 2)
+p1 <- autoplot(sun.spct)
+summary(p1)
+summary(p1$data)
 
 ## -----------------------------------------------------------------------------
 autoplot(sun.spct, range = c(400, 700))
@@ -72,7 +76,7 @@ autoplot(sun.spct, w.band = NULL)
 #  set_w.band_default(w.band = Plant_bands())
 
 ## -----------------------------------------------------------------------------
-autoplot(two_suns.mspct, plot.data = "mean")
+autoplot(sun_evening.mspct, plot.data = "mean")
 
 ## -----------------------------------------------------------------------------
 autoplot(sun.spct, label.qty = "mean")
@@ -109,19 +113,19 @@ autoplot(sun.spct, annotations = c("-", "summaries", "peaks"))
 ## -----------------------------------------------------------------------------
 autoplot(sun.spct, annotations = c("+", "valleys"), span = 41)
 
-## ----eval=good_label_repel----------------------------------------------------
+## -----------------------------------------------------------------------------
 autoplot(sun.spct, 
          annotations = list(c("+", "peak.labels"), 
                             c("-", "boxes", "summaries", "labels")), 
          span = 21)
 
-## ----eval=good_label_repel----------------------------------------------------
+## -----------------------------------------------------------------------------
 autoplot(sun.spct, 
          annotations = list(c("+", "valley.labels"), 
                             c("-", "peaks")), 
          span = 31)
 
-## ----eval=good_label_repel----------------------------------------------------
+## -----------------------------------------------------------------------------
 autoplot(sun.spct, annotations = c("+", "peak.labels", "valley.labels"), span = 31)
 
 ## -----------------------------------------------------------------------------
@@ -142,7 +146,8 @@ getTimeUnit(sun.daily.spct)
 autoplot(sun.daily.spct)
 
 ## -----------------------------------------------------------------------------
-autoplot(two_suns.spct, idfactor = NA) + facet_wrap(facets = vars(spct.idx))
+autoplot(sun_evening.spct, facets = 3) +
+  geom_vline(xintercept = c(400, 700), linetype = "dashed")
 
 ## -----------------------------------------------------------------------------
 filter_no_yes.spct <- 
@@ -186,12 +191,12 @@ autoplot(white_led.raw_spct, annotations = c("+", "boundaries"))
 #  autoplot(yellow_gel.spct - 0.01, annotations = c("+", "boundaries"))
 
 ## -----------------------------------------------------------------------------
-autoplot(two_suns.mspct, annotations = c("-", "peaks")) +
-  aes(color = ifelse(spct.idx == "sun1", "darkgreen", "darkred"), linetype = "solid") +
+autoplot(sun_evening.mspct, annotations = c("-", "peaks")) +
+  aes(color = ifelse(spct.idx == "time.05", "black", "darkred")) +
   theme(legend.position = "none")
 
 ## -----------------------------------------------------------------------------
-autoplot(two_suns.mspct, annotations = c("-", "peaks")) +
+autoplot(sun_evening.mspct, annotations = c("-", "peaks"), facets = TRUE) +
   stat_peaks(span = NULL, color = "red") +
   stat_peaks(span = NULL, geom = "text", 
              label.fmt = "max at %3.1f nm",

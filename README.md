@@ -4,11 +4,14 @@
 # ggspectra <img src="man/figures/logo.png" align="right" width="120" />
 
 [![cran
-version](https://www.r-pkg.org/badges/version/ggspectra)](https://cran.r-project.org/package=ggspectra)
+version](https://www.r-pkg.org/badges/version-last-release/ggspectra)](https://cran.r-project.org/package=ggspectra)
 [![cran
 checks](https://badges.cranchecks.info/worst/ggspectra.svg)](https://cran.r-project.org/web/checks/check_results_ggspectra.html)
-[![R build
-status](https://github.com/aphalo/ggspectra/workflows/R-CMD-check/badge.svg)](https://github.com/aphalo/ggspectra/actions)
+[![photobiology status
+badge](https://aphalo.r-universe.dev/badges/ggspectra)](https://aphalo.r-universe.dev/ggspectra)
+[![R-CMD-check](https://github.com/aphalo/ggspectra/workflows/R-CMD-check/badge.svg)](https://github.com/aphalo/ggspectra/actions)
+[![Documentation](https://img.shields.io/badge/documentation-ggspectra-informational.svg)](https://docs.r4photobiology.info/ggspectra/)
+[![doi](https://img.shields.io/badge/doi-10.32614/CRAN.package.ggspectra-blue.svg)](https://doi.org/10.32614/CRAN.package.ggspectra)
 
 The goal of ‘ggspectra’ is to make it easy to plot radiation spectra and
 similar data, such and transmittance, absorbance and reflectance
@@ -80,8 +83,8 @@ remotes::install_github("aphalo/ggspectra")
 ## Documentation
 
 HTML documentation is available at
-(<https://docs.r4photobiology.info/ggspectra/>), including a *User
-Guide*.
+(<https://docs.r4photobiology.info/ggspectra/>), including additional
+on-line-only articles.
 
 News on updates to the different packages of the ‘r4photobiology’ suite
 are regularly posted at (<https://www.r4photobiology.info/>).
@@ -117,8 +120,7 @@ publications, please cite according to:
 
 ``` r
 citation("ggspectra")
-#> 
-#> To cite package 'ggspectra' in publications, please use:
+#> To cite package ‘photobiology’ in publications use:
 #> 
 #>   Aphalo, Pedro J. (2015) The r4photobiology suite. UV4Plants Bulletin,
 #>   2015:1, 21-29. DOI:10.19232/uv4pb.2015.1.14
@@ -139,6 +141,6 @@ citation("ggspectra")
 
 ## License
 
-© 2015-2023 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>). Released under
+© 2015-2024 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>). Released under
 the GPL, version 2 or greater. This software carries no warranty of any
 kind.

@@ -20,8 +20,7 @@ generic_plot(
   idfactor,
   facets,
   ylim,
-  na.rm,
-  ...
+  na.rm
 )
 }
 \arguments{
@@ -67,17 +66,15 @@ long form.}
 \item{ylim}{numeric y axis limits,}
 
 \item{na.rm}{logical.}
-
-\item{...}{currently ignored.}
 }
 \value{
 a \code{ggplot} object.
 }
 \description{
 This function returns a ggplot object with an annotated plot of a
-generic_spct object.
+\code{generic_spct object}.
 }
-\details{
+\note{
 Note that scales are expanded so as to make space for the annotations. The
 object returned is a ggplot object, and can be further manipulated. When spct
 has more than one column with spectral data, each of these columns is
