@@ -2,7 +2,8 @@
 #'
 #' \code{stat_wb_box} plots boxes corresponding to wavebands, by default located
 #' slightly above the peak of the spectrum. Sets suitable default aesthetics for
-#' "rect" geom.
+#' \code{geom_rect()}. \strong{\code{x}-scale transformations and axis
+#'   flipping are currently not supported}.
 #'
 #' @param mapping The aesthetic mapping, usually constructed with
 #'   \code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_}}. Only needs
@@ -88,8 +89,8 @@
 #'   scale_fill_identity()
 #'
 #' @note This stat uses a panel function and ignores grouping as it is meant to
-#'   be used for annotations.The value returned as default value for \code{y} is
-#'   based on the y-range of spectral values for the whole data set.
+#'   be used for annotations. The value returned as default value for \code{y}
+#'   is based on the y-range of spectral values for the whole data set.
 #'
 #' @export
 #' @family stats functions
@@ -97,16 +98,16 @@
 stat_wb_box <- function(mapping = NULL,
                         data = NULL,
                         geom = "rect",
+                        position = "identity",
+                        ...,
                         w.band = NULL,
                         chroma.type = "CMF",
                         ypos.mult = 1.07,
                         ypos.fixed = NULL,
                         box.height = 0.06,
-                        position = "identity",
                         na.rm = FALSE,
                         show.legend = NA,
-                        inherit.aes = TRUE,
-                        ...) {
+                        inherit.aes = TRUE) {
   ggplot2::layer(
     stat = StatWbBox, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,

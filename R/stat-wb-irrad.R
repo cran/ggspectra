@@ -1,6 +1,10 @@
 #' Integrate irradiance for wavebands.
 #'
-#' \code{stat_wb_irrad} computes areas under a curve.
+#' \code{stat_wb_irrad} integrates the area under a spectral irradiance curve,
+#' yielding energy or photon irradiance. The range(s) of wavelengths to
+#' integrate are set with a list of \code{waveband} objects.
+#' \strong{\code{x}-scale transformations and axis flipping are currently not
+#' supported}.
 #'
 #' @param mapping The aesthetic mapping, usually constructed with
 #'   \code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_}}. Only needs
@@ -132,6 +136,8 @@
 stat_wb_irrad <- function(mapping = NULL,
                           data = NULL,
                           geom = "text",
+                          position = "identity",
+                          ...,
                           w.band = NULL,
                           time.unit,
                           unit.in,
@@ -141,11 +147,9 @@ stat_wb_irrad <- function(mapping = NULL,
                           label.fmt = "%.3g",
                           ypos.mult = 1.07,
                           ypos.fixed = NULL,
-                          position = "identity",
                           na.rm = FALSE,
                           show.legend = NA,
-                          inherit.aes = TRUE,
-                          ...) {
+                          inherit.aes = TRUE) {
   ggplot2::layer(
     stat = StatWbIrrad, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
@@ -168,6 +172,8 @@ stat_wb_irrad <- function(mapping = NULL,
 stat_wb_e_irrad <- function(mapping = NULL,
                             data = NULL,
                             geom = "text",
+                            position = "identity",
+                            ...,
                             w.band = NULL,
                             time.unit = "second",
                             unit.in = "energy",
@@ -177,11 +183,9 @@ stat_wb_e_irrad <- function(mapping = NULL,
                             label.fmt = "%.3g",
                             ypos.mult = 1.07,
                             ypos.fixed = NULL,
-                            position = "identity",
                             na.rm = FALSE,
                             show.legend = NA,
-                            inherit.aes = TRUE,
-                            ...) {
+                            inherit.aes = TRUE) {
     ggplot2::layer(
     stat = StatWbIrrad, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
@@ -204,6 +208,8 @@ stat_wb_e_irrad <- function(mapping = NULL,
 stat_wb_q_irrad <- function(mapping = NULL,
                             data = NULL,
                             geom = "text",
+                            position = "identity",
+                            ...,
                             w.band = NULL,
                             time.unit = "second",
                             unit.in = "photon",
@@ -213,11 +219,9 @@ stat_wb_q_irrad <- function(mapping = NULL,
                             label.fmt = "%.3g",
                             ypos.mult = 1.07,
                             ypos.fixed = NULL,
-                            position = "identity",
                             na.rm = FALSE,
                             show.legend = NA,
-                            inherit.aes = TRUE,
-                            ...) {
+                            inherit.aes = TRUE) {
   ggplot2::layer(
     stat = StatWbIrrad, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,

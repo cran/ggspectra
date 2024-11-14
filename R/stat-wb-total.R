@@ -1,10 +1,9 @@
 #' Integrate ranges under spectral curve.
 #'
-#' \code{stat_wb_total} computes integral under a curve. It first integrates the
-#'   area under a spectral curve and also the mean expressed per nanaometre of
-#'   wavelength for each waveband in the input. Sets suitable default aesthetics
-#'   for "rect", "hline", "vline", "text" and "label" geoms displaying "totals"
-#'   per waveband.
+#' \code{stat_wb_total} computes integral under a curve. Sets suitable default
+#' aesthetics for "rect", "hline", "vline", "text" and "label" geoms displaying
+#' "totals" per waveband. \strong{\code{x}-scale transformations and axis
+#' flipping are currently not supported}.
 #'
 #' @param mapping The aesthetic mapping, usually constructed with
 #'   \code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_}}. Only needs
@@ -103,16 +102,21 @@
 #' @export
 #' @family stats functions
 #'
-stat_wb_total <- function(mapping = NULL, data = NULL, geom = "text",
-                       w.band = NULL,
-                       integral.fun = integrate_xy,
-                       label.mult = 1,
-                       chroma.type = "CMF",
-                       label.fmt = "%.3g",
-                       ypos.mult = 1.07,
-                       ypos.fixed = NULL,
-                       position = "identity", na.rm = FALSE, show.legend = NA,
-                       inherit.aes = TRUE, ...) {
+stat_wb_total <- function(mapping = NULL,
+                          data = NULL,
+                          geom = "text",
+                          position = "identity",
+                          ...,
+                          w.band = NULL,
+                          integral.fun = integrate_xy,
+                          label.mult = 1,
+                          chroma.type = "CMF",
+                          label.fmt = "%.3g",
+                          ypos.mult = 1.07,
+                          ypos.fixed = NULL,
+                          na.rm = FALSE,
+                          show.legend = NA,
+                          inherit.aes = TRUE) {
   ggplot2::layer(
     stat = StatWbTotal, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,

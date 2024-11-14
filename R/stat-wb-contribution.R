@@ -1,10 +1,13 @@
 #' Integrate ranges under spectral curve.
 #'
-#' \code{stat_wb_contribution} computes means under a curve. It first integrates the
-#'   area under a spectral curve and also the mean expressed per nanaometre of
-#'   wavelength for each waveband in the input. Sets suitable default aesthetics
-#'   for "rect", "hline", "vline", "text" and "label" geoms displaying "contributions"
-#'   per waveband to the total of the spectral integral.
+#' \code{stat_wb_contribution} integrates the area under a spectral curve. It
+#' first integrates the area under the curve for each waveband and for the whole
+#' curve and then expresses the integral for each band as a relative
+#' contribution to the area under the whole spectral curve. Sets suitable
+#' default aesthetics for "rect", "hline", "vline", "text" and "label" geoms
+#' displaying "contributions" per waveband to the total of the spectral
+#' integral. \strong{\code{x}-scale transformations and axis flipping are
+#' currently not supported}.
 #'
 #' @param mapping The aesthetic mapping, usually constructed with
 #'   \code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_}}. Only needs
@@ -123,17 +126,22 @@
 #' @export
 #' @family stats functions
 #'
-stat_wb_contribution <- function(mapping = NULL, data = NULL, geom = "text",
-                       w.band = NULL,
-                       integral.fun = integrate_xy,
-                       label.mult = 1,
-                       chroma.type = "CMF",
-                       label.fmt = "%1.2f",
-                       ypos.mult = 1.07,
-                       ypos.fixed = NULL,
-                       position = "identity", na.rm = FALSE, show.legend = NA,
-                       inherit.aes = TRUE, ...) {
-  ggplot2::layer(
+stat_wb_contribution <- function(mapping = NULL,
+                                 data = NULL,
+                                 geom = "text",
+                                 position = "identity",
+                                 ...,
+                                 w.band = NULL,
+                                 integral.fun = integrate_xy,
+                                 label.mult = 1,
+                                 chroma.type = "CMF",
+                                 label.fmt = "%1.2f",
+                                 ypos.mult = 1.07,
+                                 ypos.fixed = NULL,
+                                 na.rm = FALSE,
+                                 show.legend = NA,
+                                 inherit.aes = TRUE) {
+    ggplot2::layer(
     stat = StatWbContrib, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(w.band = w.band,

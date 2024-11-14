@@ -1,9 +1,9 @@
 #' Integrate ranges under curve.
 #'
-#' \code{stat_wb_mean} computes means under a curve. It first integrates the
-#'   area under a spectral curve and also the mean expressed per nanaometre of
-#'   wavelength for each waveband in the input. Sets suitable default aesthetics
-#'   for "rect", "hline", "vline", "text" and "label" geoms.
+#' \code{stat_wb_mean} computes mean spectral irradiance under a curve for each
+#' waveband in the input. Sets suitable default aesthetics for "rect", "hline",
+#' "vline", "text" and "label" geoms. \strong{\code{x}-scale transformations
+#' and axis flipping are currently not supported}.
 #'
 #' @param mapping The aesthetic mapping, usually constructed with
 #'   \code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_}}. Only needs
@@ -135,6 +135,8 @@
 stat_wb_mean <- function(mapping = NULL,
                          data = NULL,
                          geom = "text",
+                         position = "identity",
+                         ...,
                          w.band = NULL,
                          integral.fun = integrate_xy,
                          label.mult = 1,
@@ -143,10 +145,9 @@ stat_wb_mean <- function(mapping = NULL,
                          ypos.mult = 1.07,
                          xpos.fixed = NULL,
                          ypos.fixed = NULL,
-                         position = "identity",
                          na.rm = FALSE,
                          show.legend = NA,
-                         inherit.aes = TRUE, ...) {
+                         inherit.aes = TRUE) {
   ggplot2::layer(
     stat = StatWbMean, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,

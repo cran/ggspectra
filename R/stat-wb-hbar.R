@@ -4,7 +4,8 @@
 #' area under a spectral curve and also the mean expressed per nanaometre of
 #' wavelength for each waveband in the input. Sets suitable default aesthetics
 #' for geoms "errorbarh" and "hline" from 'ggplot', and "linerangeh",
-#' and "errorbarh" from 'ggstance'.
+#' and "errorbarh" from 'ggstance'. \strong{\code{x}-scale transformations and
+#' axis flipping are currently not supported}.
 #'
 #' @param mapping The aesthetic mapping, usually constructed with
 #'   \code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_}}. Only needs
@@ -97,15 +98,16 @@
 #'
 stat_wb_hbar <- function(mapping = NULL,
                          data = NULL,
-                         geom = "errorbarh",
+                         geom = "linerange",
+                         position = "identity",
+                         ...,
                          w.band = NULL,
                          integral.fun = integrate_xy,
                          chroma.type = "CMF",
                          ypos.fixed = NULL,
-                         position = "identity",
                          na.rm = FALSE,
                          show.legend = NA,
-                         inherit.aes = TRUE, ...) {
+                         inherit.aes = TRUE) {
   ggplot2::layer(
     stat = StatWbHbar, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
@@ -153,10 +155,10 @@ StatWbHbar <-
                        mydata <- trim_tails(data[["x"]], data[["y"]], use.hinges = TRUE,
                                             low.limit = range[1],
                                             high.limit = range[2])
-                       yint.tmp <- integral.fun(mydata[["x"]] , mydata[["y"]] )
+                       yint.tmp <- integral.fun(mydata[["x"]] , mydata[["y"]])
                        ymean.tmp <- yint.tmp / wl_expanse(wb)
                        integ.df <- rbind(integ.df,
-                                         data.frame(x = midpoint(mydata[["x"]] ),
+                                         data.frame(x = midpoint(mydata[["x"]]),
                                                     wb.xmin = min(wb),
                                                     wb.xmax = max(wb),
                                                     wb.ymin = min(data[["y"]]),
