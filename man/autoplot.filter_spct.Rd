@@ -11,7 +11,7 @@
   w.band = getOption("photobiology.plot.bands", default = list(UVC(), UVB(), UVA(),
     PhR())),
   range = getOption("ggspectra.wlrange", default = NULL),
-  norm = getOption("ggspectra.norm", default = "update"),
+  norm = NA,
   plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
   pc.out = getOption("ggspectra.pc.out", default = FALSE),
   label.qty = NULL,
@@ -35,7 +35,7 @@
   object,
   ...,
   range = getOption("ggspectra.wlrange", default = NULL),
-  norm = getOption("ggspectra.norm", default = "update"),
+  norm = NA,
   plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
   pc.out = getOption("ggspectra.pc.out", default = FALSE),
   plot.data = "as.is",
@@ -56,11 +56,9 @@ to the plot methods for individual spectra, otherwise currently ignored.}
 \item{range}{an R object on which \code{range()} returns a vector of length
 2, with minimum and maximum wavelengths (nm).}
 
-\item{norm}{numeric Normalization wavelength (nm) or character string
-\code{"max"}, or \code{"min"} for normalization at the corresponding
-wavelength, \code{"update"} to update the normalization after modifying
-units of expression, quantity or range but respecting the previously used
-criterion, or \code{"skip"} to force return of \code{object} unchanged.}
+\item{norm}{numeric or character. Normalization to apply before plotting, If
+\code{object} is already normalized, the normalization is updated when a
+unit conversion applied.}
 
 \item{plot.qty}{character string one of "transmittance" or "absorbance".}
 
@@ -99,9 +97,10 @@ selects between them based on \code{stacked}.}
 \code{"CC"} (color coordinates) or a
 \code{\link[photobiology]{chroma_spct}} object.}
 
-\item{idfactor}{character Name of an index column in data holding a
-\code{factor} with each spectrum in a long-form multispectrum object
-corresponding to a distinct level of the factor.}
+\item{idfactor}{character Name of an index \code{factor} used to identify
+each spectrum when multiple spectra are included in a plot. It is used as
+title to the guide in the plot and can include embedded spaces and new
+lines.}
 
 \item{facets}{logical or integer Indicating if facets are to be created for
 the levels of \code{idfactor} when \code{spct} contain multiple spectra in
@@ -120,7 +119,8 @@ argument all the spectra must contain data at the same wavelength values.}
 }
 \value{
 A \code{ggplot} object with a number of layers that depends on the
-  data and annotations.
+  data and annotations. The \code{data} member retains its original class
+  and metadata attributes.
 }
 \description{
 These methods return a ggplot object of an annotated plot from spectral data
@@ -142,6 +142,23 @@ The plot object returned is a ggplot (an object of class
   package 'ggplot2'. Package 'ggspectra' defines specializations for the
   different classes for storage of spectral data defined in package
   \code{\link[photobiology]{photobiology}}.
+
+  For details about normalization and arguments to parameter \code{norm},
+  please, see \code{\link[photobiology]{normalize}}. If \code{norm = NA},
+  the default, \code{normalize()} is not called. All other values passed
+  as argument to \code{norm} result in a call to \code{normalize()} with
+  this value as its argument. In the case of objects
+  created with 'photobiology' (<= 0.10.9) \code{norm = "undo"} is not
+  supported. Be aware that calls to \code{normalize()} remove any scaling
+  previously applied with \code{\link[photobiology]{fscale}} methods.
+
+  For multiple spectra in long form spectral objects, with \code{idfactor
+  = NULL}, the default, the name of the factor is retrieved from metadata. If
+  the character string passed as argument to \code{idfactor} does not match
+  the one retrieved from the object, results in renaming of the pre-existing
+  factor. The default for collections of spectra is to create a factor named
+  \code{"spct.idx"}, but if a different name is passed, it will be used
+  instead.
 }
 \note{
 The plotting of absorbance is an exception to scale limits as the
@@ -197,13 +214,13 @@ The plotting of absorbance is an exception to scale limits as the
 autoplot(yellow_gel.spct)
 autoplot(yellow_gel.spct, geom = "spct")
 autoplot(yellow_gel.spct, plot.qty = "transmittance")
-autoplot(yellow_gel.spct, plot.qty = "absorptance")
 autoplot(yellow_gel.spct, plot.qty = "absorbance")
 autoplot(yellow_gel.spct, pc.out = TRUE)
 autoplot(yellow_gel.spct, annotations = c("+", "wls"))
 
 # spectra for two filters in long form
 autoplot(two_filters.spct)
+autoplot(two_filters.spct, idfactor = TRUE)
 autoplot(two_filters.spct, idfactor = "Spectra")
 autoplot(two_filters.spct, facets = TRUE)
 

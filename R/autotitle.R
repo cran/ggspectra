@@ -61,6 +61,7 @@ autotitle <- function(object,
                       tz = "",
                       default.title  = "title:objt") {
 
+  force(object.label)
   if (!is.character(object.label)) {
     if (is.name(object.label)) {
       object.label <- as.character(object.label)
@@ -129,9 +130,9 @@ autotitle <- function(object,
                  when <- "when measured not known"
                } else {
                  if (is.list(when)) {
-                   when <- cbind(unname(when))
-                   when <- as.POSIXct(unique(range(when)))
-                   if ((when[2] - when[1]) >= lubridate::ddays(1)) {
+                   when <- as.POSIXct(unique(range(when, na.rm = TRUE)), tz = tz)
+                   if (length(when) > 1L &&
+                       (when[2] - when[1]) >= lubridate::ddays(1)) {
                      time.format[2] <- time.format[1]
                    }
                  }
@@ -157,7 +158,7 @@ autotitle <- function(object,
            where =
              {
                where <- getWhereMeasured(object)
-               if (all(is.na(where))) {
+               if (all(is.na(where$lon)) && all(is.na(where$lat))) {
                  "where measured not know"
                } else {
                  if (!is.data.frame(where) && is.list(where)) {

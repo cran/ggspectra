@@ -236,7 +236,7 @@ cps_plot <- function(spct,
 #'
 #' autoplot(white_led.cps_spct)
 #' autoplot(white_led.cps_spct, geom = "spct")
-#' autoplot(white_led.cps_spct, norm = "max")
+#' autoplot(normalize(white_led.cps_spct, norm = "max"))
 #'
 #' two_leds.mspct <-
 #'   cps_mspct(list("LED 1" = white_led.cps_spct,
@@ -253,7 +253,7 @@ autoplot.cps_spct <-
            w.band = getOption("photobiology.plot.bands",
                               default = list(UVC(), UVB(), UVA(), PhR())),
            range = getOption("ggspectra.wlrange", default = NULL),
-           norm = "skip",
+           norm = NA,
            unit.out = NULL,
            pc.out = getOption("ggspectra.pc.out", default = FALSE),
            label.qty = "mean",
@@ -271,19 +271,16 @@ autoplot.cps_spct <-
            object.label = deparse(substitute(object)),
            na.rm = TRUE) {
 
-    if (is.null(idfactor)) {
-      idfactor <- getIdFactor(object)
-    }
-    if (is.na(idfactor) || !is.character(idfactor)) {
-      idfactor <- getMultipleWl(object) > 1L
-    }
+    force(object.label)
+    object <- apply_normalization(object, norm)
+    idfactor <- check_idfactor_arg(object, idfactor)
+    object <- rename_idfactor(object, idfactor)
 
     if (plot.data != "as.is") {
       return(
         autoplot(object = subset2mspct(object),
                  w.band = w.band,
                  range = range,
-                 norm = norm,
                  unit.out = unit.out,
                  pc.out = pc.out,
                  label.qty = label.qty,
@@ -304,22 +301,12 @@ autoplot.cps_spct <-
       )
     }
 
-    force(object.label)
-
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "colour.guide", "peaks"))
     annotations <- decode_annotations(annotations,
                                       annotations.default)
-    # avoid warning in 'photobiology' (== 0.10.10)
-    if (is.character(norm) && norm == "update" && !is_normalized(object)) {
-      norm <- "skip"
-    }
-    # normalization skipping is handled by normalize()
-    object <- photobiology::normalize(x = object,
-                                      range = range,
-                                      norm = norm,
-                                      na.rm = na.rm)
+
     if (length(w.band) == 0) {
       if (is.null(range)) {
         w.band <- waveband(object)
@@ -360,7 +347,7 @@ autoplot.cps_mspct <-
   function(object,
            ...,
            range = getOption("ggspectra.wlrange", default = NULL),
-           norm = "skip",
+           norm = NA,
            unit.out = NULL,
            pc.out = getOption("ggspectra.pc.out", default = FALSE),
            idfactor = TRUE,
@@ -370,23 +357,15 @@ autoplot.cps_mspct <-
            na.rm = TRUE) {
 
     force(object.label)
+    object <- apply_normalization(object, norm)
+    idfactor <- check_idfactor_arg(object, idfactor = idfactor, default = TRUE)
 
-    idfactor <- validate_idfactor(idfactor = idfactor)
     # We trim the spectra to avoid unnecessary computations later
     if (!is.null(range)) {
       object <- photobiology::trim_wl(object,
                                       range = range,
                                       use.hinges = TRUE,
                                       fill = NULL)
-    }
-    # We apply the normalization to the collection if it is to be bound
-    # otherwise normalization is applied to the "parallel-summary" spectrum
-    if (plot.data == "as.is") {
-      object <- photobiology::normalize(object,
-                                        range = getOption("ggspectra.wlrange", default = NULL),
-                                        norm = norm,
-                                        na.rm = na.rm)
-      norm <- "skip"
     }
     # we convert the collection of spectra into a single spectrum object
     # containing a summary spectrum or multiple spectra in long form.
@@ -402,10 +381,9 @@ autoplot.cps_mspct <-
     )
     if (is.cps_spct(z) && any(c("cps", "cps_1") %in% names(z))) {
       autoplot(object = z,
-               range = getOption("ggspectra.wlrange", default = NULL),
-               norm = norm,
+               range = NULL, # trimmed above
                pc.out = pc.out,
-               idfactor = idfactor,
+               idfactor = NULL, # use idfactor already set in z
                facets = facets,
                object.label = object.label,
                na.rm = na.rm,
@@ -414,10 +392,9 @@ autoplot.cps_mspct <-
       z <- as.generic_spct(z)
       autoplot(object = z,
                y.name = paste("cps", plot.data, sep = "."),
-               range = getOption("ggspectra.wlrange", default = NULL),
-               norm = norm,
+               range = NULL, # trimmed above
                pc.out = pc.out,
-               idfactor = idfactor,
+               idfactor = NULL, # use idfactor already set in z
                facets = facets,
                object.label = object.label,
                na.rm = na.rm,

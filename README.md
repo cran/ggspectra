@@ -17,7 +17,7 @@ The goal of ‘ggspectra’ is to make it easy to plot radiation spectra and
 similar data, such and transmittance, absorbance and reflectance
 spectra, producing fully annotated publication- and presentation-ready
 plots. It is an extension to packages ‘ggplot2’ and ‘photobiology’, and
-part of the ‘r4phototbiology’ suite.
+part of the ‘r4photobiology’ suite.
 
 Package ‘ggspectra’ provides stats, geoms, scales and functions to be
 used for plotting radiation-related spectra and annotating the plots
@@ -32,7 +32,9 @@ packages available as part of the suite, and on how to install them.
 ## Examples
 
 Plotting spectra with an specialization of the `autoplot()` method
-provides the most automatic approach.
+provides the most automatic approach. The specializations provided
+support the classes defined in package ‘photobiology’, both for
+individual spectra and for collections of spectra.
 
 ``` r
 library(ggspectra)
@@ -49,11 +51,14 @@ autoplot(sun.spct, annotations = c("+", "title:where:when"), unit.out = "photon"
 
 ![](man/figures/README-example1-1.png)<!-- -->
 
-Maximum flexibilty is achieved when building a plot layer by layer using
-the grammar of graphics approach, as implemented in ‘ggplot2’, but
+Maximum flexibility is achieved when building a plot layer by layer
+using the grammar of graphics approach, as implemented in ‘ggplot2’, but
 taking advantage of the specialized `ggplot()` methods, *geometries*,
 *statistics* and *scales* specialized for the plotting of spectra,
-defined in this package .
+defined in this package. Although designed with the classes defined from
+package ‘photobiology’ in mind, geometries, statistics and scales can
+also be used with data stored in other formats, as long as the user pays
+attention to the expected units and bases of expression expected.
 
 ``` r
 ggplot(sun.spct, unit.out = "photon") +
@@ -95,7 +100,7 @@ and its use: Aphalo P. J. (2015)
 (<https://doi.org/10.19232/uv4pb.2016.1.15>).
 
 A book is under preparation, and the draft is currently available at
-(<https://leanpub.com/r4photobiology/>). The book conatins many examples
+(<https://leanpub.com/r4photobiology/>). The book contains many examples
 of plots created with ‘ggspectra’.
 
 A handbook written before the suite was developed contains useful
@@ -141,6 +146,6 @@ citation("ggspectra")
 
 ## License
 
-© 2015-2024 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>). Released under
+© 2015-2025 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>). Released under
 the GPL, version 2 or greater. This software carries no warranty of any
 kind.

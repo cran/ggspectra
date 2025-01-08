@@ -49,7 +49,10 @@ cps_label <- function(unit.exponent = 0,
     } else if (format == "R.character") {
       paste(label.text, "n(lambda) (rel. units)")
     }
-  } else if (normalized) {
+  } else if (is.character(normalized) || normalized) {
+    if (is.logical(normalized)) {
+      normalized <- "norm"
+    }
     if (tolower(format) == "latex") {
       paste(label.text, " rate $n_{\\lambda} / N_{", normalized, "}$ (/1)", sep = "")
     } else if (format == "R.expression") {
@@ -133,12 +136,25 @@ cps_label <- function(unit.exponent = 0,
 #'   scale_y_cps_continuous(scaled = TRUE) +
 #'   scale_x_wl_continuous()
 #'
-#' norm_led.cps_spct <- normalize(white_led.cps_spct, norm = "max")
+#' if (packageVersion("photobiology") > "0.11.4") {
+#'   norm_led.cps_spct <- normalize(white_led.cps_spct, norm = "max")
 #'
-#' ggplot(norm_led.cps_spct) +
-#'   geom_line() +
-#'   scale_y_cps_continuous(normalized = getNormalized(norm_led.cps_spct)) +
-#'   scale_x_wl_continuous()
+#'   ggplot(norm_led.cps_spct) +
+#'     geom_line() +
+#'     scale_y_cps_continuous(normalized = is_normalized(norm_led.cps_spct)) +
+#'     scale_x_wl_continuous()
+#'
+#'   ggplot(norm_led.cps_spct) +
+#'     geom_line() +
+#'     scale_y_cps_continuous(normalized = getNormalized(norm_led.cps_spct)) +
+#'     scale_x_wl_continuous()
+#'
+#'   ggplot(norm_led.cps_spct) +
+#'     geom_line() +
+#'     scale_y_cps_continuous(normalized =
+#'        normalization(norm_led.cps_spct)$norm.type) +
+#'     scale_x_wl_continuous()
+#' }
 #'
 scale_y_cps_continuous <-
   function(unit.exponent = 0,
@@ -146,7 +162,9 @@ scale_y_cps_continuous <-
                             format = format,
                             label.text = label.text,
                             scaled = scaled,
-                            normalized = round(normalized, 1),
+                            normalized = ifelse(is.numeric(normalized),
+                                                round(normalized, 1),
+                                                unique(normalized)),
                             axis.symbols = axis.symbols),
            labels = SI_pl_format(exponent = unit.exponent),
            format = getOption("photobiology.math",
