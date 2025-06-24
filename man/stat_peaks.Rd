@@ -13,15 +13,22 @@ stat_peaks(
   ...,
   span = 5,
   ignore_threshold = 0.01,
-  strict = is.null(span),
+  global.threshold = ignore_threshold,
+  local.threshold = NULL,
+  local.reference = "median",
+  strict = FALSE,
   refine.wl = FALSE,
   method = "spline",
   chroma.type = "CMF",
   label.fmt = "\%.3g",
   x.label.fmt = label.fmt,
   y.label.fmt = label.fmt,
-  x.label.transform = I,
-  y.label.transform = I,
+  x.label.transform = function(x) {
+     x
+ },
+  y.label.transform = function(x) {
+     x
+ },
   x.colour.transform = x.label.transform,
   na.rm = FALSE,
   show.legend = FALSE,
@@ -35,16 +42,23 @@ stat_valleys(
   position = "identity",
   ...,
   span = 5,
-  ignore_threshold = -0.01,
-  strict = is.null(span),
+  ignore_threshold = 0.01,
+  global.threshold = ignore_threshold,
+  local.threshold = NULL,
+  local.reference = "median",
+  strict = FALSE,
   refine.wl = FALSE,
   method = "spline",
   chroma.type = "CMF",
   label.fmt = "\%.3g",
   x.label.fmt = label.fmt,
   y.label.fmt = label.fmt,
-  x.label.transform = I,
-  y.label.transform = I,
+  x.label.transform = function(x) {
+     x
+ },
+  y.label.transform = function(x) {
+     x
+ },
   x.colour.transform = x.label.transform,
   na.rm = FALSE,
   show.legend = FALSE,
@@ -68,22 +82,40 @@ on this layer}
 include aesthetics whose values you want to set, not map. See
 \code{\link[ggplot2]{layer}} for more details.}
 
-\item{span}{integer A peak is defined as an element in a sequence which is
-greater than all other elements within a window of width \code{span}
-centered at that element. Use \code{NULL} for the global peak. Valleys are
-the reverse.}
+\item{span}{odd positive integer A peak is defined as an element in a
+sequence which is greater than all other elements within a moving window of
+width \code{span} centred at that element. The default value is 5, meaning
+that a peak is taller than its four nearest neighbours. \code{span = NULL}
+extends the span to the whole length of \code{x}.}
 
-\item{ignore_threshold}{numeric For peaks, value between 0.0 and 1.0
-indicating the relative size of peaks compared to tallest peak threshold
-below which peaks will be ignored, while negative values between 0.0 and
--1.0 set a threshold so that the tallest peaks are ignored, instead of the
-shortest. For valleys, value between 0.0 and 1.0 indicating the relative
-depth of valleys below which valleys will be ignored, while negative values
-between 0.0 and -1.0 set a threshold so that the deeper valleys are
-ignored, instead of the shallower ones.}
+\item{ignore_threshold}{Deprecated synonym for \code{global.threshold}.}
 
-\item{strict}{logical If \code{TRUE}, an element must be strictly greater
-than all other values in its window to be considered a peak.}
+\item{global.threshold}{numeric A value belonging to class
+\code{"AsIs"} is interpreted as an absolute minimum height or depth
+expressed in data units. A bare \code{numeric} value (normally between 0.0
+and 1.0), is interpreted as relative to the range of the data. In both
+cases it sets a \emph{global} height (depth) threshold below which peaks
+(valleys) are ignored. A bare negative \code{numeric} value indicates the
+\emph{global} height (depth) threshold below which peaks (valleys) are be
+ignored. If \code{global.threshold = NULL}, no threshold is applied and all
+peaks are returned.}
+
+\item{local.threshold}{numeric A value belonging to class \code{"AsIs"} is
+interpreted as an absolute minimum height (depth) expressed in data units
+relative to the within-window computed minimum (maximum) value. A bare
+\code{numeric} value (normally between 0.0 and 1.0), is interpreted as
+expressed in units relative to the range of the data. In both cases
+\code{local.threshold} sets a \emph{local} height (depth) threshold below
+which peaks (valleys) are ignored. If \code{local.threshold = NULL} or if
+\code{span} spans the whole of \code{x}, no threshold is applied.}
+
+\item{local.reference}{character One of \code{"minimum"}/\code{maximum} or
+\code{"median"}. The reference used to assess the height of the peak,
+either the minimum value within the window or the median of all values in
+the window.}
+
+\item{strict}{logical flag: if \code{TRUE}, an element must be strictly
+greater than all other values in its window to be considered a peak.}
 
 \item{refine.wl}{logical Flag indicating if peak or valleys locations should
 be refined by fitting a function.}
@@ -116,7 +148,10 @@ the default plot specification, e.g. \code{\link[ggplot2]{borders}}.}
 }
 \value{
 A data frame with one row for each peak (or valley) found in the
-  data.
+  data. If \code{refine.wl = FALSE}, the returned rows have \code{x} and
+  \code{y} matching those in a row in the input \code{data}. If
+  \code{refine.wl = TRUE}, interpolation based on a fitted spline is used to
+  compute new \code{x} and \code{y} values.
 }
 \description{
 \code{stat_peaks} finds at which x positions local maxima are located. If
@@ -130,6 +165,21 @@ These stats use \code{geom_point} by default as it is the geom most
   \code{geom_text}, \code{geom_label}, \code{geom_line}, \code{geom_rug},
   \code{geom_hline} and \code{geom_vline}. The formatting of the labels
   returned can be controlled by the user.
+
+  Two tests make it possible to ignore irrelevant peaks or valleys. One test
+  controlled by (\code{global.threshold}) is based on the absolute
+  height/depth  of peaks/valleys and can be used in all cases to ignore
+  globally low peaks and shallow valleys. A second test controlled by
+  (\code{local.threshold}) is available when the window defined by `span`
+  does not include all observations and can be used to ignore peaks/valleys
+  that are not locally prominent. In this second approach the height/depth of
+  each peak/valley is compared to a summary computed from other values within
+  the window where it was found. In this second case, the reference value
+  used is the summary indicated by \code{local.reference}. The values
+  \code{global.threshold} and \code{local.threshold} if bare numeric are
+  relative to the range of \emph{y}. Thresholds for ignoring too small peaks
+  are applied after peaks are searched for, and threshold values can in some
+  cases result in no peaks being displayed.
 }
 \note{
 These stats work nicely together with geoms
@@ -143,7 +193,7 @@ These stats work nicely together with geoms
  (e.g. into expressions containing greek letters or super or subscripts) can
  be also easily obtained.
 }
-\section{Computed variables}{
+\section{Computed and copied variables in the returned data frame}{
 
 \describe{
   \item{x}{x-value at the peak (or valley) as numeric}
@@ -178,22 +228,72 @@ Required by the statistic and need to be set with \code{aes()}.
 }
 
 \examples{
-
 # ggplot() methods for spectral objects set a default mapping for x and y.
+
+# PEAKS
+
 ggplot(sun.spct) +
   geom_line() +
   stat_peaks()
+
+# threshold relative to data range [0..1]
+ggplot(sun.spct) +
+  geom_line() +
+  stat_peaks(global.threshold = 0.6) # 0.6 * range of data
+
+# threshold in data units
+ggplot(sun.spct) +
+  geom_line() +
+  stat_peaks(global.threshold = I(0.4))
+
+# threshold in data units
+ggplot(sun.spct, unit.out = "photon") +
+  geom_line() +
+  stat_peaks(global.threshold = I(2e-6)) # Q in mol m-2 s-1
+
+# VALLEYS
 
 ggplot(sun.spct) +
   geom_line() +
   stat_valleys()
 
+# discard multiple maxima or minima
+ggplot(sun.spct) +
+  geom_line() +
+  stat_valleys(strict = TRUE)
+
+# threshold relative to data range [0..1]
+ggplot(sun.spct) +
+  geom_line() +
+  stat_valleys(global.threshold = 0.6)
+
+# reverse threshold relative to data range [-1..0]
+ggplot(sun.spct) +
+  geom_line() +
+  stat_valleys(global.threshold = -0.9)
+
+# threshold in data units using I()
+ggplot(sun.spct) +
+  geom_line() +
+  stat_valleys(global.threshold = I(0.6), strict = TRUE)
+
+# USING OTHER COMPUTED VALUES
+
+# colours matching the wavelength at peaks
+ggplot(sun.spct) +
+  geom_line() +
+  stat_peaks(span = 51, size = 2.7,
+             mapping = aes(colour = after_stat(wl.colour))) +
+  scale_color_identity()
+
+# labels for local maxima
 ggplot(sun.spct) +
   geom_line() +
   stat_peaks(span = 51, geom = "point", colour = "red") +
   stat_peaks(span = 51, geom = "text", colour = "red",
              vjust = -0.4, label.fmt = "\%3.2f nm")
 
+# labels for local fitted peaks
 ggplot(sun.spct) +
   geom_line() +
   stat_peaks(span = 51, geom = "point", colour = "red", refine.wl = TRUE) +
@@ -201,17 +301,18 @@ ggplot(sun.spct) +
              vjust = -0.4, label.fmt = "\%3.2f nm",
              refine.wl = TRUE)
 
+# fitted peaks and valleys
 ggplot(sun.spct) +
   geom_line() +
-  stat_peaks(span = 51, geom = "point", colour = "red", refine.wl = TRUE) +
+  stat_peaks(span = 31, geom = "point", colour = "red", refine.wl = TRUE) +
   stat_peaks(mapping = aes(fill = after_stat(wl.colour), color = after_stat(BW.colour)),
-             span = 51, geom = "label",
-             size = 3, vjust = -0.2, label.fmt = "\%.3g nm",
+             span = 31, geom = "label",
+             size = 3, vjust = -0.2, label.fmt = "\%.4g nm",
              refine.wl = TRUE) +
-  stat_valleys(span = 71, geom = "point", colour = "blue", refine.wl = TRUE) +
+  stat_valleys(span = 51, geom = "point", colour = "blue", refine.wl = TRUE) +
   stat_valleys(mapping = aes(fill = after_stat(wl.colour), color = after_stat(BW.colour)),
-               span = 71, geom = "label",
-               size = 3, vjust = 1.2, label.fmt = "\%.3g nm",
+               span = 51, geom = "label",
+               size = 3, vjust = 1.2, label.fmt = "\%.4g nm",
                refine.wl = TRUE) +
   expand_limits(y = 0.85) + # make room for label
   scale_fill_identity() +

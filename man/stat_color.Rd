@@ -11,7 +11,9 @@ stat_color(
   position = "identity",
   ...,
   chroma.type = "CMF",
-  x.colour.transform = I,
+  x.colour.transform = function(x) {
+     x
+ },
   na.rm = FALSE,
   show.legend = FALSE,
   inherit.aes = TRUE
@@ -76,8 +78,8 @@ For each row in \code{data} a colour definition is computed assuming
 
 Set by the statistic and available to geoms.
 \describe{
-  \item{color}{..wl.color..}
-  \item{fill}{..wl.color..}
+  \item{color}{after_stat(wl.color)}
+  \item{fill}{after_stat(wl.color)}
 }
 }
 

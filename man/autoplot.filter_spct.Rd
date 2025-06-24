@@ -18,6 +18,7 @@
   span = NULL,
   wls.target = "HM",
   annotations = NULL,
+  by.group = FALSE,
   geom = "line",
   time.format = "",
   tz = "UTC",
@@ -38,6 +39,7 @@
   norm = NA,
   plot.qty = getOption("photobiology.filter.qty", default = "transmittance"),
   pc.out = getOption("ggspectra.pc.out", default = FALSE),
+  by.group = FALSE,
   plot.data = "as.is",
   idfactor = TRUE,
   facets = FALSE,
@@ -81,6 +83,10 @@ also accepted as arguments. A list with \code{numeric} and/or
 
 \item{annotations}{a character vector. For details please see sections Plot
 \strong{Annotations} and \strong{Title Annotations}.}
+
+\item{by.group}{logical flag If TRUE repeated identical annotation layers are
+added for each group within a plot panel as needed for animation. If
+\code{FALSE}, the default, single layers are added per panel.}
 
 \item{geom}{character The name of a ggplot geometry, currently only
 \code{"area"}, \code{"spct"} and \code{"line"}. The default \code{NULL}
@@ -128,7 +134,9 @@ contained in a \code{filter_spct} or a \code{filter_mspct} object. Data can
 be expressed as absorbance, absorptance or transmittance.
 }
 \details{
-The plot object returned is a ggplot (an object of class
+The \code{autoplot()} methods  from 'ggspectra' are convenience wrapper functions that easy the creation
+  of plots from spectral objects at the cost of lacking the flexibility of the
+  grammar of graphics. The plot object returned is a ggplot (an object of class
   \code{"gg"}) and it can be added to or modified as any other ggplot. The
   axis labels are encoded as \emph{plotmath} expressions as they contain
   superscripts and special characters. In 'ggplot2', plotmath expressions do
@@ -192,6 +200,18 @@ The plotting of absorbance is an exception to scale limits as the
   \code{c("=", "")} as argument. Adding a variation of an annotation already
   present, replaces the existing one automatically: e.g., adding
   \code{"peak.labels"} replaces\code{"peaks"} if present.
+
+  The annotation layers are added to the plot using statistics defined in 'ggspectra':
+  \code{\link{stat_peaks}}, \code{\link{stat_valleys}},
+  \code{\link{stat_label_peaks}}, \code{\link{stat_label_valleys}},
+  \code{\link{stat_find_wls}}, \code{\link{stat_spikes}},
+  \code{\link{stat_wb_total}}, \code{\link{stat_wb_mean}},
+  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_sirrad}},
+  \code{\link{stat_wb_contribution}}, \code{\link{stat_wb_relative}},
+  and \code{\link{stat_wl_strip}}. However, only some of their parameters
+  can be passed arguments through \code{autoplot} methods. In some cases
+  the defaults used by \code{autoplot} methods are not the defaults of the
+  statistics.
 }
 
 \section{Title Annotations}{
@@ -245,7 +265,6 @@ Other autoplot methods:
 \code{\link{autoplot.reflector_spct}()},
 \code{\link{autoplot.response_spct}()},
 \code{\link{autoplot.source_spct}()},
-\code{\link{autoplot.waveband}()},
-\code{\link{set_annotations_default}()}
+\code{\link{autoplot.waveband}()}
 }
 \concept{autoplot methods}

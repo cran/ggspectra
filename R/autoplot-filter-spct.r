@@ -19,6 +19,9 @@
 #'   as arguments. A list with \code{numeric} and/or \code{character} values is
 #'   also accepted.
 #' @param annotations a character vector.
+#' @param by.group logical flag If TRUE repeated identical annotation layers are
+#'   added for each group within a plot panel as needed for animation. If
+#'   \code{FALSE}, the default, single layers are added per panel.
 #' @param geom character.
 #' @param text.size numeric size of text in the plot decorations.
 #' @param chroma.type character one of "CMF" (color matching function) or "CC"
@@ -49,6 +52,7 @@ Afr_plot <- function(spct,
                      span,
                      wls.target,
                      annotations,
+                     by.group,
                      geom,
                      text.size,
                      chroma.type,
@@ -80,7 +84,7 @@ Afr_plot <- function(spct,
       pc.out <- FALSE
     }
     scale.factor <- 1
-    s.Afr.label <- expression(Spectral~~absorptance~~italic(A)[lambda]~~("rel."))
+    s.Afr.label <- bquote(Spectral~~absorptance~~italic(A)[lambda]~~("rel."))
     Afr.label.total  <- "atop(italic(A), (rel))"
     Afr.label.avg  <- "atop(bar(italic(A)[lambda]), (rel))"
   } else if (photobiology::is_normalized(spct)) {
@@ -88,12 +92,12 @@ Afr_plot <- function(spct,
     return(ggplot2::ggplot())
   } else if (pc.out) {
     scale.factor <- 100
-    s.Afr.label <- expression(Spectral~~absorptance~~italic(A)[lambda]~~("%"))
+    s.Afr.label <- bquote(Spectral~~absorptance~~italic(A)[lambda]~~("%"))
     Afr.label.total  <- "atop(italic(A), (total %*% 100))"
     Afr.label.avg  <- "atop(bar(italic(A)[lambda]), (\"%\"))"
   } else {
     scale.factor <- 1
-    s.Afr.label <- expression(Spectral~~absorptance~~italic(A)[lambda]~~("/1"))
+    s.Afr.label <- bquote(Spectral~~absorptance~~italic(A)[lambda]~~("/1"))
     Afr.label.total  <- "atop(italic(A), (\"/1\"))"
     Afr.label.avg  <- "atop(bar(italic(A)[lambda]), (\"/1\"))"
   }
@@ -143,6 +147,7 @@ Afr_plot <- function(spct,
   temp <- find_idfactor(spct = spct,
                         idfactor = idfactor,
                         facets = facets,
+                        map.linetype = !facets && !by.group,
                         annotations = annotations)
   plot <- plot + temp[["ggplot_comp"]]
   annotations <- temp[["annotations"]]
@@ -176,7 +181,7 @@ Afr_plot <- function(spct,
   plot <-
     plot + ggplot2::geom_line(na.rm = na.rm)
   plot <-
-    plot + ggplot2::labs(x = expression("Wavelength, "*lambda~(nm)),
+    plot + ggplot2::labs(x = bquote("Wavelength, "*lambda~(nm)),
                          y = s.Afr.label)
 
   if (length(annotations) == 1 && annotations == "") {
@@ -193,6 +198,7 @@ Afr_plot <- function(spct,
                             x.max = photobiology::wl_max(spct),
                             x.min = photobiology::wl_min(spct),
                             annotations = annotations,
+                            by.group = by.group,
                             label.qty = label.qty,
                             span = span,
                             wls.target = wls.target,
@@ -252,6 +258,9 @@ Afr_plot <- function(spct,
 #'   as arguments. A list with \code{numeric} and/or \code{character} values is
 #'   also accepted.
 #' @param annotations a character vector.
+#' @param by.group logical flag If TRUE repeated identical annotation layers are
+#'   added for each group within a plot panel as needed for animation. If
+#'   \code{FALSE}, the default, single layers are added per panel.
 #' @param geom character.
 #' @param text.size numeric size of text in the plot decorations.
 #' @param chroma.type character one of "CMF" (color matching function) or "CC"
@@ -282,6 +291,7 @@ T_plot <- function(spct,
                    span,
                    wls.target,
                    annotations,
+                   by.group,
                    geom,
                    text.size,
                    chroma.type,
@@ -403,6 +413,7 @@ T_plot <- function(spct,
   temp <- find_idfactor(spct = spct,
                         idfactor = idfactor,
                         facets = facets,
+                        map.linetype = !facets && !by.group,
                         annotations = annotations)
   plot <- plot + temp[["ggplot_comp"]]
   annotations <- temp[["annotations"]]
@@ -433,7 +444,7 @@ T_plot <- function(spct,
     plot <- plot + geom_spct(fill = "black", colour = NA, alpha = 0.2)
   }
   plot <- plot + ggplot2::geom_line(na.rm = na.rm)
-  plot <- plot + labs(x = expression("Wavelength, "*lambda~(nm)), y = s.Tfr.label)
+  plot <- plot + labs(x = bquote("Wavelength, "*lambda~(nm)), y = s.Tfr.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -449,6 +460,7 @@ T_plot <- function(spct,
                             x.max = photobiology::wl_max(spct),
                             x.min = photobiology::wl_min(spct),
                             annotations = annotations,
+                            by.group = by.group,
                             label.qty = label.qty,
                             span = span,
                             wls.target = wls.target,
@@ -504,6 +516,9 @@ T_plot <- function(spct,
 #'   as arguments. A list with \code{numeric} and/or \code{character} values is
 #'   also accepted.
 #' @param annotations a character vector.
+#' @param by.group logical flag If TRUE repeated identical annotation layers are
+#'   added for each group within a plot panel as needed for animation. If
+#'   \code{FALSE}, the default, single layers are added per panel.
 #' @param geom character.
 #' @param text.size numeric size of text in the plot decorations.
 #' @param chroma.type character one of "CMF" (color matching function) or "CC"
@@ -533,6 +548,7 @@ A_plot <- function(spct,
                    span,
                    wls.target,
                    annotations,
+                   by.group,
                    geom,
                    text.size,
                    chroma.type,
@@ -633,6 +649,7 @@ A_plot <- function(spct,
   temp <- find_idfactor(spct = spct,
                         idfactor = idfactor,
                         facets = facets,
+                        map.linetype = !facets && !by.group,
                         annotations = annotations)
   plot <- plot + temp[["ggplot_comp"]]
   annotations <- temp[["annotations"]]
@@ -659,7 +676,7 @@ A_plot <- function(spct,
     plot <- plot + geom_spct(fill = "black", colour = NA, alpha = 0.2)
   }
   plot <- plot + geom_line(na.rm = na.rm)
-  plot <- plot + labs(x = expression("Wavelength, "*lambda~(nm)), y = s.A.label)
+  plot <- plot + labs(x = bquote("Wavelength, "*lambda~(nm)), y = s.A.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -674,6 +691,7 @@ A_plot <- function(spct,
                             x.max = photobiology::wl_max(spct),
                             x.min = photobiology::wl_min(spct),
                             annotations = annotations,
+                            by.group = by.group,
                             label.qty = label.qty,
                             span = span,
                             wls.target = wls.target,
@@ -721,6 +739,9 @@ A_plot <- function(spct,
 #'   as arguments. A list with \code{numeric} and/or \code{character} values is
 #'   also accepted.
 #' @param annotations a character vector.
+#' @param by.group logical flag If TRUE repeated identical annotation layers are
+#'   added for each group within a plot panel as needed for animation. If
+#'   \code{FALSE}, the default, single layers are added per panel.
 #' @param geom character.
 #' @param text.size numeric size of text in the plot decorations.
 #' @param chroma.type character one of "CMF" (color matching function) or "CC"
@@ -751,6 +772,7 @@ R_plot <- function(spct,
                    span,
                    wls.target,
                    annotations,
+                   by.group,
                    geom,
                    text.size,
                    chroma.type,
@@ -865,6 +887,7 @@ R_plot <- function(spct,
   temp <- find_idfactor(spct = spct,
                         idfactor = idfactor,
                         facets = facets,
+                        map.linetype = !facets && !by.group,
                         annotations = annotations)
   plot <- plot + temp[["ggplot_comp"]]
   annotations <- temp[["annotations"]]
@@ -895,7 +918,7 @@ R_plot <- function(spct,
     plot <- plot + geom_spct(fill = "black", colour = NA, alpha = 0.2)
   }
   plot <- plot + ggplot2::geom_line(na.rm = na.rm)
-  plot <- plot + labs(x = expression("Wavelength, "*lambda~(nm)),
+  plot <- plot + labs(x = bquote("Wavelength, "*lambda~(nm)),
                       y = s.Rfr.label)
 
   if (length(annotations) == 1 && annotations == "") {
@@ -911,6 +934,7 @@ R_plot <- function(spct,
                             x.max = photobiology::wl_max(spct),
                             x.min = photobiology::wl_min(spct),
                             annotations = annotations,
+                            by.group = by.group,
                             label.qty = label.qty,
                             span = span,
                             wls.target = wls.target,
@@ -966,6 +990,9 @@ R_plot <- function(spct,
 #'   as arguments. A list with \code{numeric} and/or \code{character} values is
 #'   also accepted.
 #' @param annotations a character vector.
+#' @param by.group logical flag If TRUE repeated identical annotation layers are
+#'   added for each group within a plot panel as needed for animation. If
+#'   \code{FALSE}, the default, single layers are added per panel.
 #' @param geom character.
 #' @param stacked logical.
 #' @param text.size numeric size of text in the plot decorations.
@@ -986,6 +1013,7 @@ O_plot <- function(spct,
                    span,
                    wls.target,
                    annotations,
+                   by.group,
                    geom,
                    stacked,
                    text.size,
@@ -1038,7 +1066,7 @@ O_plot <- function(spct,
 #    warning("Internal transmittance converted to total transmittance")
     spct <- photobiology::convertTfrType(spct, Tfr.type = "total")
   }
-  s.Rfr.label <- expression(atop(Spectral~~reflectance~R[lambda]~~absorptance~~A[lambda], and~~transmittance~T[lambda]))
+  s.Rfr.label <- bquote(atop(Spectral~~reflectance~R[lambda]~~absorptance~~A[lambda], and~~transmittance~T[lambda]))
   spct[["Afr"]] <- 1.0 - spct[["Tfr"]] - spct[["Rfr"]]
   if (any((spct[["Afr"]]) < -0.01)) {
     message("Bad data or fluorescence.")
@@ -1110,9 +1138,9 @@ O_plot <- function(spct,
                                                Rfr = 0.25,
                                                Afr = 0.55),
                                     breaks = c("Rfr", "Afr", "Tfr"),
-                                    labels = c(Tfr = expression(T[lambda]),
-                                               Afr = expression(A[lambda]),
-                                               Rfr = expression(R[lambda])),
+                                    labels = c(Tfr = bquote(T[lambda]),
+                                               Afr = bquote(A[lambda]),
+                                               Rfr = bquote(R[lambda])),
                                     guide = guide_legend(title = NULL))
     } else {
       plot <-
@@ -1120,24 +1148,26 @@ O_plot <- function(spct,
                                   position = ggplot2::position_stack())
       plot <-
         plot +
-        ggplot2::scale_linetype(labels = c(Tfr = expression(T[lambda]),
-                                           Afr = expression(A[lambda]),
-                                           Rfr = expression(R[lambda])),
+        ggplot2::scale_linetype(labels = c(Tfr = bquote(T[lambda]),
+                                           Afr = bquote(A[lambda]),
+                                           Rfr = bquote(R[lambda])),
                                 guide = guide_legend(title = NULL))
     }
   } else {
+    # grouping as plot default
+    plot <- plot + aes(group = .data[["variable"]])
     if (!is.null(geom) && geom %in% c("spct", "area")) {
-      plot <- plot + geom_spct(aes(group = .data[["variable"]]),
-                               fill = "black", colour = NA, alpha = 0.2)
+      plot <- plot +
+        geom_spct(fill = "black", colour = NA, alpha = 0.2)
     }
     plot <-
       plot +
       ggplot2::geom_line(aes(linetype = .data[["variable"]]))
     plot <-
       plot +
-      ggplot2::scale_linetype(labels = c(Tfr = expression(T[lambda]),
-                                         Afr = expression(A[lambda]),
-                                         Rfr = expression(R[lambda])),
+      ggplot2::scale_linetype(labels = c(Tfr = bquote(T[lambda]),
+                                         Afr = bquote(A[lambda]),
+                                         Rfr = bquote(R[lambda])),
                               guide = ggplot2::guide_legend(title = NULL))
   }
   if (is.numeric(facets)) {
@@ -1149,7 +1179,7 @@ O_plot <- function(spct,
       ggplot2::facet_wrap(facets = vars(.data[[idfactor]]))
   }
   plot <-
-    plot + ggplot2::labs(x = expression("Wavelength, "*lambda~(nm)), y = s.Rfr.label)
+    plot + ggplot2::labs(x = bquote("Wavelength, "*lambda~(nm)), y = s.Rfr.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -1170,6 +1200,7 @@ O_plot <- function(spct,
                             x.max = photobiology::wl_max(spct),
                             x.min = photobiology::wl_min(spct),
                             annotations = annotations,
+                            by.group = by.group,
                             label.qty = label.qty,
                             span = span,
                             wls.target = wls.target,
@@ -1275,6 +1306,7 @@ autoplot.filter_spct <-
            span = NULL,
            wls.target = "HM",
            annotations = NULL,
+           by.group = FALSE,
            geom = "line",
            time.format = "",
            tz = "UTC",
@@ -1303,6 +1335,7 @@ autoplot.filter_spct <-
                  span = span,
                  wls.target = wls.target,
                  annotations = annotations,
+                 by.group = by.group,
                  geom = geom,
                  time.format = time.format,
                  tz = tz,
@@ -1349,6 +1382,7 @@ autoplot.filter_spct <-
                            span = span,
                            wls.target = wls.target,
                            annotations = annotations,
+                           by.group = by.group,
                            geom = geom,
                            text.size = text.size,
                            chroma.type = chroma.type,
@@ -1364,6 +1398,7 @@ autoplot.filter_spct <-
                            span = span,
                            wls.target = wls.target,
                            annotations = annotations,
+                           by.group = by.group,
                            geom = geom,
                            text.size = text.size,
                            chroma.type = chroma.type,
@@ -1380,6 +1415,7 @@ autoplot.filter_spct <-
                              span = span,
                              wls.target = wls.target,
                              annotations = annotations,
+                             by.group = by.group,
                              geom = geom,
                              text.size = text.size,
                              chroma.type = chroma.type,
@@ -1411,6 +1447,7 @@ autoplot.filter_mspct <-
                                 default = "transmittance"),
            pc.out = getOption("ggspectra.pc.out",
                               default = FALSE),
+           by.group = FALSE,
            plot.data = "as.is",
            idfactor = TRUE,
            facets = FALSE,
@@ -1452,6 +1489,7 @@ autoplot.filter_mspct <-
                plot.qty = plot.qty,
                pc.out = pc.out,
                idfactor = NULL, # use idfactor already set in z
+               by.group = by.group,
                facets = facets,
                object.label = object.label,
                na.rm = na.rm,
@@ -1464,6 +1502,7 @@ autoplot.filter_mspct <-
                range = NULL, # trimmed above
                pc.out = pc.out,
                idfactor = NULL, # use idfactor already set in z
+               by.group = by.group,
                facets = facets,
                object.label = object.label,
                na.rm = na.rm,
@@ -1520,6 +1559,7 @@ autoplot.reflector_spct <-
            span = NULL,
            wls.target = "HM",
            annotations = NULL,
+           by.group = FALSE,
            geom = "line",
            time.format = "",
            tz = "UTC",
@@ -1548,6 +1588,7 @@ autoplot.reflector_spct <-
                  span = span,
                  wls.target = wls.target,
                  annotations = annotations,
+                 by.group = by.group,
                  geom = geom,
                  time.format = time.format,
                  tz = tz,
@@ -1594,6 +1635,7 @@ autoplot.reflector_spct <-
                            span = span,
                            wls.target = wls.target,
                            annotations = annotations,
+                           by.group = by.group,
                            text.size = text.size,
                            geom = geom,
                            chroma.type = chroma.type,
@@ -1626,6 +1668,7 @@ autoplot.reflector_mspct <-
                                 default = "reflectance"),
            pc.out = getOption("ggspectra.pc.out",
                               default = FALSE),
+           by.group = FALSE,
            plot.data = "as.is",
            idfactor = TRUE,
            facets = FALSE,
@@ -1661,6 +1704,7 @@ autoplot.reflector_mspct <-
                range = NULL, # trimmed above
                plot.qty = plot.qty,
                pc.out = pc.out,
+               by.group = by.group,
                idfactor = NULL, # use idfactor already set in z
                facets = facets,
                object.label = object.label,
@@ -1672,6 +1716,7 @@ autoplot.reflector_mspct <-
                y.name = paste("Rfr", plot.data, sep = "."),
                range = NULL, # trimmed above
                pc.out = pc.out,
+               by.group = by.group,
                idfactor = NULL, # use idfactor already set in z
                facets = facets,
                object.label = object.label,
@@ -1750,6 +1795,7 @@ autoplot.object_spct <-
            span = NULL,
            wls.target = "HM",
            annotations = NULL,
+           by.group = FALSE,
            geom = NULL,
            time.format = "",
            tz = "UTC",
@@ -1779,6 +1825,7 @@ autoplot.object_spct <-
                  span = span,
                  wls.target = wls.target,
                  annotations = annotations,
+                 by.group = by.group,
                  geom = geom,
                  time.format = time.format,
                  tz = tz,
@@ -1833,6 +1880,7 @@ autoplot.object_spct <-
                            span = span,
                            wls.target = wls.target,
                            annotations = annotations,
+                           by.group = by.group,
                            geom = geom,
                            stacked = stacked,
                            text.size = text.size,
@@ -1865,6 +1913,7 @@ autoplot.object_spct <-
                span = span,
                wls.target = wls.target,
                annotations = annotations,
+               by.group = by.group,
                geom = geom,
                time.format = time.format,
                tz = tz,
@@ -1891,6 +1940,7 @@ autoplot.object_mspct <-
                                 default = "all"),
            pc.out = getOption("ggspectra.pc.out",
                               default = FALSE),
+           by.group = FALSE,
            plot.data = "as.is",
            idfactor = TRUE,
            facets = plot.qty == "all",
@@ -1935,6 +1985,7 @@ autoplot.object_mspct <-
                range = NULL, # trimmed above
                plot.qty = plot.qty,
                pc.out = pc.out,
+               by.group = by.group,
                idfactor = NULL, # use idfactor already set in z
                facets = facets,
                object.label = object.label,
@@ -1946,6 +1997,7 @@ autoplot.object_mspct <-
                y.name = paste(col.name[plot.qty], plot.data, sep = "."),
                range = NULL, # trimmed above
                pc.out = pc.out,
+               by.group = by.group,
                idfactor = NULL, # use idfactor already set in z
                facets = facets,
                object.label = object.label,
@@ -1957,6 +2009,7 @@ autoplot.object_mspct <-
                y.name = paste("Rfr", plot.data, sep = "."),
                range = NULL, # trimmed above
                pc.out = pc.out,
+               by.group = by.group,
                idfactor = NULL, # use idfactor already set in z
                facets = facets,
                object.label = object.label,

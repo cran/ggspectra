@@ -6,8 +6,20 @@ editor_options:
 
 # ggspectra 0.3.16
 
+Track new features available and other changes in 'photobiology' (>= 0.13.1),
+which is now required. Improved compatibility with package 'gganimate' makes
+possible to create some animated plots using `autoplot()` methods or `ggplot()`
+together with layer functions from 'ggspectra'. See article
+[Animated plots of spectral data](https://docs.r4photobiology.info/ggspectra/articles/animated-plots.html)
+for up-to-date examples.
+
 - Update, mostly of internal code, to make available features from 
-'photobiology' (>= 0.12.0), which is recommended but not required.
+'photobiology' (>= 0.13.1), which is required.
+- `stat_peaks()` and `stat_valleys()` gain the new local and global threshold
+features from `find_peaks()` and `find_valleys()` from 'photobiology' 
+(>= 0.13.1).
+- Breaking: Changed defaults into `strict = FALSE` and `global.threshold = 0.01` 
+in `stat_peaks()` and `stat_valleys()`.
 - The argument passed to `idfactor` when plotting multiple spectra stored in
 long form can now be used to rename the existing `idfactor` and, thus, change
 the plot guide title.
@@ -15,6 +27,20 @@ the plot guide title.
 parameter `normalized`, character values are used as subscript to the symbol for
 the denominator, typically indicating type of normalization, such as `"max"`. In
 the case of logical `TRUE`, `"norm"` is used as subscript.
+- Use `bquote()` and `str2lang()` instead of `expression()` and
+`parse()` to allow animations with R package 'gganimate'.
+- Statistics that add a single layer per plot panel are not compatible with
+'gganimate'. The statistics affected are `stat_wb_box()`, `stat_wb_label()` and
+`stat_wl_strip()`. These stats gain parameter `by.group` controlling the
+addition of a plot layer for each group. The default behaviour remains unchanged.
+- `autoplot()` methods also gain parameter `by.group` passed to the statistics,
+enabling compatibility with 'gganimate'. **Changing default arguments using R 
+options is not supported and `by.group = TRUE` is supported only for animated
+plots.**
+- Bug fix: `aoutoplot()` method for `object_spct` with `stacked = FALSE` did 
+not group correctly by variable. Notably some peaks and valleys were missing.
+- Check compatibility with upcoming 'ggplot2' 4.0.0.
+- Articles added or updated in the on-line documentation.
 
 # ggspectra 0.3.15
 

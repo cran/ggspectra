@@ -5,20 +5,29 @@
 #' different types of spectra but as it may change in the future it is not
 #' exported.
 #'
-#' @param w.band waveband object or list of waveband objects
-#' @param y.max,y.min,x.max,x.min,x.expanse,y.expanse numeric
-#' @param annotations character vector
-#' @param span numeric
-#' @param strict logical
-#' @param wls.target numeric or character vector
-#' @param label.qty character
-#' @param summary.label character
-#' @param text.size numeric
+#' @param w.band waveband object or list of waveband objects passed to
+#'   statistics as argument to their \code{w.band} formal parameter.
+#' @param y.max,y.min,x.max,x.min,x.expanse,y.expanse numeric. Used to compute
+#'   the positions of annotations.
+#' @param annotations character vector with names of annotations.
+#' @param span numeric passed to \code{stat_peaks()} and \code{stat_valleys()}.
+#' @param strict logical passed to \code{stat_peaks()} and \code{stat_valleys()}.
+#' @param wls.target numeric or character vector passed to \code{stat_find_wls()}
+#' @param label.qty character the quantity for \code{"summaries"} annotaion,
+#'   affecting the statistic called or the arguments passed to it.
+#' @param summary.label character the name of the quantity to be parsed into a
+#'   plotmath expression.
+#' @param text.size numeric giving the size of text for \code{"labels"} and
+#'   \code{"summaries"}.
 #' @param label.color color definition or name
 #' @param chroma.type character one of "CMF" (color matching function) or "CC"
 #'   (color coordinates) or a \code{\link[photobiology]{chroma_spct}} object.
-#' @param pos.shift numeric
-#' @param na.rm logical
+#'   Used to generate colour definitions from wavelengths.
+#' @param pos.shift numeric Shift the position of the annotations.
+#' @param by.group logical flag If TRUE repeated identical annotation layers are
+#'   added for each group within a plot panel as needed for animation. If
+#'   \code{FALSE}, the default, single layers are added per panel.
+#' @param na.rm logical Passed to all statistics and geometries.
 #'
 #' @return A list of ggplot "components" that can be added to a ggplot object
 #'   with operator \code{+}. The length of the list depends on the value of argument
@@ -40,6 +49,18 @@
 #'   \code{c("=", "")} as argument. Adding a variation of an annotation already
 #'   present, replaces the existing one automatically: e.g., adding
 #'   \code{"peak.labels"} replaces\code{"peaks"} if present.
+#'
+#'   The annotation layers are added to the plot using statistics defined in 'ggspectra':
+#'   \code{\link{stat_peaks}}, \code{\link{stat_valleys}},
+#'   \code{\link{stat_label_peaks}}, \code{\link{stat_label_valleys}},
+#'   \code{\link{stat_find_wls}}, \code{\link{stat_spikes}},
+#'   \code{\link{stat_wb_total}}, \code{\link{stat_wb_mean}},
+#'   \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_sirrad}},
+#'   \code{\link{stat_wb_contribution}}, \code{\link{stat_wb_relative}},
+#'   and \code{\link{stat_wl_strip}}. However, only some of their parameters
+#'   can be passed arguments through \code{autoplot} methods. In some cases
+#'   the defaults used by \code{autoplot} methods are not the defaults of the
+#'   statistics.
 #'
 #' @details Vectors of character strings passed as argument to
 #' \code{annotations} are parsed so that if the first member string is
@@ -68,7 +89,7 @@ decoration <- function(w.band,
                        y.expanse = y.max - y.min,
                        annotations,
                        span,
-                       strict = is.null(span),
+                       strict = FALSE,
                        wls.target = "HM",
                        label.qty,
                        label.mult = 1,
@@ -79,11 +100,16 @@ decoration <- function(w.band,
                        label.color = NULL,
                        chroma.type = "CMF",
                        pos.shift = 0,
+                       by.group = FALSE,
                        na.rm = TRUE) {
   if (grepl(".pc", label.qty, fixed = TRUE)) {
-    label.mult = 100
     label.qty <- sub(".pc", "", label.qty, fixed = TRUE)
-  }
+    if (label.qty %in% c("contribution", "relative")) {
+      label.mult <- label.mult * 100
+    } else {
+      warning("Using 'label.qty = \"", label.qty, "\"', invalid \".pc\" ending discarded")
+    }
+   }
   if (!"summaries" %in% annotations) {
     label.qty <- "none"
   }
@@ -95,8 +121,8 @@ decoration <- function(w.band,
                             sirrad = stat_wb_sirrad,
                             contribution = stat_wb_contribution,
                             relative = stat_wb_relative,
-                            none = stat_wb_label,
-                            function(...) {NA_real_},
+                            none = ,
+                            function(...) {NULL}, # default if no match
                             na.rm = na.rm)
   z <- list()
   if ("peaks" %in% annotations) {
@@ -127,7 +153,7 @@ decoration <- function(w.band,
     nudge.y <- 0.04 * y.expanse
     z <- c(z,
            stat_label_peaks(geom = "label_repel",
-                            mapping = ggplot2::aes(color = after_stat(BW.color)),
+                            mapping = ggplot2::aes(color = ggplot2::after_stat(BW.color)),
                             span = span,
                             ignore_threshold = 0.02,
                             strict = strict,
@@ -138,7 +164,7 @@ decoration <- function(w.band,
                             max.overlaps = Inf,
                             segment.colour = "black",
                             min.segment.length = 0,
-                            box.padding = unit(0.1, "lines"),
+                            box.padding = grid::unit(0.1, "lines"),
                             direction = "both",
                             force = 1,
                             force_pull = 0.1,
@@ -180,7 +206,7 @@ decoration <- function(w.band,
     nudge.y <- -0.04 * y.expanse
     z <- c(z,
            stat_label_valleys(geom = "label_repel",
-                              mapping = ggplot2::aes(color = after_stat(BW.color)),
+                              mapping = ggplot2::aes(color = ggplot2::after_stat(BW.color)),
                               span = span,
                               ignore_threshold = -0.02,
                               strict = strict,
@@ -230,7 +256,7 @@ decoration <- function(w.band,
     nudge.x <- 0.03 * x.expanse
     z <- c(z,
            stat_find_wls(geom = "label_repel",
-                         mapping = ggplot2::aes(color = after_stat(BW.color)),
+                         mapping = ggplot2::aes(color = ggplot2::after_stat(BW.color)),
                          target = wls.target,
                          interpolate = TRUE,
                          chroma.type = chroma.type,
@@ -257,6 +283,7 @@ decoration <- function(w.band,
   if ("colour.guide" %in% annotations) {
     z <- c(z,
            stat_wl_strip(chroma.type = chroma.type,
+                         by.group = by.group,
                          ymax = y.min + y.expanse * 1.26,
                          ymin = y.min + y.expanse * 1.22,
                          na.rm = na.rm,
@@ -266,6 +293,7 @@ decoration <- function(w.band,
     z <- c(z,
            stat_wl_strip(w.band = w.band,
                          chroma.type = chroma.type,
+                         by.group = by.group,
                          ymax = y.min + y.expanse * 1.20,
                          ymin = y.min + y.expanse * 1.08,
                          color = "white",
@@ -281,6 +309,7 @@ decoration <- function(w.band,
     z <- c(z,
            stat_wl_strip(w.band = w.band,
                          chroma.type = chroma.type,
+                         by.group = by.group,
                          ymax = y.min + y.expanse * 1.10,
                          ymin = y.min + y.expanse * 1.07,
                          color = "white",
@@ -293,12 +322,12 @@ decoration <- function(w.band,
   if ("labels" %in% annotations || "summaries" %in% annotations) {
 
     if ("labels" %in% annotations && "summaries" %in% annotations) {
-      mapping <- ggplot2::aes(label = paste(after_stat(wb.name), after_stat(y.label), sep = "\n"),
-                      color = after_stat(BW.color))
+      mapping <- ggplot2::aes(label = paste(ggplot2::after_stat(wb.name), ggplot2::after_stat(y.label), sep = "\n"),
+                      color = ggplot2::after_stat(BW.color))
     } else if ("labels" %in% annotations) {
-      mapping <- ggplot2::aes(label = after_stat(wb.name), color = after_stat(BW.color))
+      mapping <- ggplot2::aes(label = ggplot2::after_stat(wb.name), color = ggplot2::after_stat(BW.color))
     } else if ("summaries" %in% annotations) {
-      mapping <- ggplot2::aes(label = after_stat(y.label), color = after_stat(BW.color))
+      mapping <- ggplot2::aes(label = ggplot2::after_stat(y.label), color = ggplot2::after_stat(BW.color))
     }
 
     if ("summaries" %in% annotations) {
@@ -360,9 +389,10 @@ decoration <- function(w.band,
     } else {
       if (is.null(label.color)) {
         z <- c(z,
-               stat_wb_label(mapping = ggplot2::aes(color = after_stat(BW.color)),
+               stat_wb_label(mapping = ggplot2::aes(color = ggplot2::after_stat(BW.color)),
                              w.band = w.band,
                              chroma.type = chroma.type,
+                             by.group = by.group,
                              ypos.fixed = y.min + y.expanse * (1.143 + pos.shift),
                              size = text.size,
                              na.rm = na.rm))
@@ -372,6 +402,7 @@ decoration <- function(w.band,
                              ypos.fixed = y.min + y.expanse * (1.143 + pos.shift),
                              color = label.color,
                              chroma.type = chroma.type,
+                             by.group = by.group,
                              size = text.size,
                              na.rm = na.rm))
       }
@@ -475,65 +506,3 @@ decode_annotations <- function(annotations,
   unique(z) # remove duplicates for tidiness
 }
 
-# photobiology.plot.annotations -----------------------------------------------------
-
-#' @title Set defaults for autoplot annotations
-#'
-#' @description Set R options used when plotting spectra. Option
-#'   "photobiology.plot.annotations" is used as default argument to formal
-#'   parameter \code{annotations} and option "photobiology.plot.bands" is used
-#'   as default argument to formal parameter \code{w.band} in all the
-#'   \code{autoplot()} methods exported from package 'ggspectra'. These
-#'   convenience functions make it easier to edit these two option which are
-#'   stored as a vector of characters strings and a list of waveband objects,
-#'   respectively.
-#'
-#' @inheritSection decoration Plot Annotations
-#' @inheritSection autotitle Title Annotations
-#'
-#' @param annotations character vector Annotations to add or remove from
-#'   defaults used by the \code{autoplot()} methods defined in this package..
-#'
-#' @note The syntax used and behaviour are the same as for the
-#'   \code{annotations} parameter of the \code{autoplot()} methods for spectra,
-#'   but instead of affecting a single plot, \code{set_annotations_default()}
-#'   changes the default used for subsequent calls to \code{autoplot()}.
-#'
-#' @return Previous value of option "photobiology.plot.annotations", returned
-#'   invisibly.
-#'
-#' @family autoplot methods
-#'
-#' @export
-#'
-set_annotations_default <- function(annotations = NULL) {
-  if (!is.null(annotations)) {
-    annotations.default <-
-      getOption("photobiology.plot.annotations",
-                default =
-                  c("boxes", "labels", "summaries", "colour.guide", "peaks"))
-    annotations <- decode_annotations(annotations = annotations,
-                                      annotations.default = annotations.default)
-  }
-  options(photobiology.plot.annotations = annotations)
-}
-
-#' @rdname set_annotations_default
-#'
-#' @param w.band a single waveband object or a list of waveband objects.
-#'
-#' @export
-#'
-set_w.band_default <- function(w.band = NULL) {
-  if (!is.null(w.band)) {
-    # validation to avoid delayed errors
-    if (photobiology::is.waveband(w.band)) {
-      w.band <- list(w.band) # optimization: avoid repeating this step
-    }
-    if (!all(sapply(w.band, is.waveband))) {
-      warning("Bad 'w.band' argument, default not changed.")
-      return(getOption("photobiology.plot.bands"))
-    }
-  }
-  options(photobiology.plot.bands = w.band)
-}

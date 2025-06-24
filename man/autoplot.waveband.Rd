@@ -15,6 +15,7 @@
   unit.in = getOption("photobiology.radiation.unit", default = "energy"),
   unit.out = unit.in,
   annotations = NULL,
+  by.group = FALSE,
   geom = "line",
   wb.trim = TRUE,
   norm = NA,
@@ -53,6 +54,10 @@ response plotted.}
 
 \item{annotations}{a character vector. For details please see section Plot
 Annotations.}
+
+\item{by.group}{logical flag If TRUE repeated identical annotation layers are
+added for each group within a plot panel as needed for animation. If
+\code{FALSE}, the default, single layers are added per panel.}
 
 \item{geom}{character The name of a ggplot geometry, currently only
 \code{"area"}, \code{"spct"} and \code{"line"}.}
@@ -114,6 +119,18 @@ A \code{response_spct} object is created based on the
   \code{c("=", "")} as argument. Adding a variation of an annotation already
   present, replaces the existing one automatically: e.g., adding
   \code{"peak.labels"} replaces\code{"peaks"} if present.
+
+  The annotation layers are added to the plot using statistics defined in 'ggspectra':
+  \code{\link{stat_peaks}}, \code{\link{stat_valleys}},
+  \code{\link{stat_label_peaks}}, \code{\link{stat_label_valleys}},
+  \code{\link{stat_find_wls}}, \code{\link{stat_spikes}},
+  \code{\link{stat_wb_total}}, \code{\link{stat_wb_mean}},
+  \code{\link{stat_wb_irrad}}, \code{\link{stat_wb_sirrad}},
+  \code{\link{stat_wb_contribution}}, \code{\link{stat_wb_relative}},
+  and \code{\link{stat_wl_strip}}. However, only some of their parameters
+  can be passed arguments through \code{autoplot} methods. In some cases
+  the defaults used by \code{autoplot} methods are not the defaults of the
+  statistics.
 }
 
 \examples{
@@ -134,7 +151,6 @@ Other autoplot methods:
 \code{\link{autoplot.raw_spct}()},
 \code{\link{autoplot.reflector_spct}()},
 \code{\link{autoplot.response_spct}()},
-\code{\link{autoplot.source_spct}()},
-\code{\link{set_annotations_default}()}
+\code{\link{autoplot.source_spct}()}
 }
 \concept{autoplot methods}

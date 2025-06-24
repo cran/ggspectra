@@ -23,6 +23,9 @@
 #'   as arguments. A list with \code{numeric} and/or \code{character} values is
 #'   also accepted.
 #' @param annotations a character vector.
+#' @param by.group logical flag If TRUE repeated identical annotation layers are
+#'   added for each group within a plot panel as needed for animation. If
+#'   \code{FALSE}, the default, single layers are added per panel.
 #' @param geom character The name of a ggplot geometry, currently only
 #'   \code{"area"}, \code{"spct"} and \code{"line"}. The default \code{NULL}
 #'   selects between them based on \code{stacked}.
@@ -54,6 +57,7 @@ e_plot <- function(spct,
                    span,
                    wls.target,
                    annotations,
+                   by.group,
                    geom,
                    text.size,
                    chroma.type,
@@ -165,7 +169,9 @@ e_plot <- function(spct,
     irrad.label.total <- sub("E", "E^{eff}", irrad.label.total, fixed = TRUE)
     irrad.label.avg <- sub("E[lambda]", "E[lambda]^{eff}", irrad.label.avg, fixed = TRUE)
   }
-  s.irrad.label <- parse(text = s.irrad.label)
+  if (is.character(s.irrad.label)) {
+    s.irrad.label <- str2lang(s = s.irrad.label)
+  }
   spct[["s.e.irrad"]] <- spct[["s.e.irrad"]] * scale.factor
 
   if (!is.na(ylim[1])) {
@@ -192,6 +198,7 @@ e_plot <- function(spct,
   temp <- find_idfactor(spct = spct,
                         idfactor = idfactor,
                         facets = facets,
+                        map.linetype = !facets && !by.group,
                         annotations = annotations)
   plot <- plot + temp$ggplot_comp
   annotations <- temp$annotations
@@ -211,7 +218,7 @@ e_plot <- function(spct,
     plot <- plot + geom_spct(fill = "black", colour = NA, alpha = 0.2)
   }
   plot <- plot + ggplot2::geom_line(na.rm = na.rm)
-  plot <- plot + ggplot2::labs(x = expression("Wavelength, "*lambda~(nm)), y = s.irrad.label)
+  plot <- plot + ggplot2::labs(x = bquote("Wavelength, "*lambda~(nm)), y = s.irrad.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -233,7 +240,9 @@ e_plot <- function(spct,
                             x.max = max(spct),
                             x.min = min(spct),
                             annotations = annotations,
+                            by.group = by.group,
                             label.qty = label.qty,
+                            label.mult = 1, # W no scale change
                             span = span,
                             wls.target = wls.target,
                             summary.label = irrad.label,
@@ -317,6 +326,9 @@ e_plot <- function(spct,
 #'   as arguments. A list with \code{numeric} and/or \code{character} values is
 #'   also accepted.
 #' @param annotations a character vector
+#' @param by.group logical flag If TRUE repeated identical annotation layers are
+#'   added for each group within a plot panel as needed for animation. If
+#'   \code{FALSE}, the default, single layers are added per panel.
 #' @param geom character The name of a ggplot geometry, currently only
 #'   \code{"area"}, \code{"spct"} and \code{"line"}. The default \code{NULL}
 #'   selects between them based on \code{stacked}.
@@ -348,6 +360,7 @@ q_plot <- function(spct,
                    span,
                    wls.target,
                    annotations,
+                   by.group,
                    geom,
                    text.size,
                    chroma.type,
@@ -460,7 +473,9 @@ q_plot <- function(spct,
     irrad.label.total <- sub("Q", "Q^{eff}", irrad.label.total, fixed = TRUE)
     irrad.label.avg <- sub("Q[lambda]", "Q[lambda]^{eff}", irrad.label.avg, fixed = TRUE)
   }
-  s.irrad.label <- parse(text = s.irrad.label)
+  if (is.character(s.irrad.label)) {
+    s.irrad.label <- str2lang(s = s.irrad.label)
+  }
   spct[["s.q.irrad"]] <- spct[["s.q.irrad"]] * scale.factor
 
   if (!is.na(ylim[1])) {
@@ -488,6 +503,7 @@ q_plot <- function(spct,
   temp <- find_idfactor(spct = spct,
                         idfactor = idfactor,
                         facets = facets,
+                        map.linetype = !facets && !by.group,
                         annotations = annotations)
   plot <- plot + temp$ggplot_comp
   annotations <- temp$annotations
@@ -508,7 +524,7 @@ q_plot <- function(spct,
   }
   plot <- plot + ggplot2::geom_line(na.rm = na.rm)
   plot <- plot +
-    ggplot2::labs(x = expression("Wavelength, "*lambda~(nm)), y = s.irrad.label)
+    ggplot2::labs(x = bquote("Wavelength, "*lambda~(nm)), y = s.irrad.label)
 
   if (length(annotations) == 1 && annotations == "") {
     return(plot)
@@ -531,7 +547,9 @@ q_plot <- function(spct,
                             x.max = max(spct),
                             x.min = min(spct),
                             annotations = annotations,
+                            by.group = by.group,
                             label.qty = label.qty,
+                            label.mult = 1, # umol -> umol (scale.factor applied)
                             span = span,
                             wls.target = wls.target,
                             summary.label = irrad.label,
@@ -624,6 +642,9 @@ q_plot <- function(spct,
 #'   \code{character} values is also accepted.
 #' @param annotations a character vector. For details please see sections Plot
 #'   \strong{Annotations} and \strong{Title Annotations}.
+#' @param by.group logical flag If TRUE repeated identical annotation layers are
+#'   added for each group within a plot panel as needed for animation. If
+#'   \code{FALSE}, the default, single layers are added per panel.
 #' @param geom character The name of a ggplot geometry, currently only
 #'   \code{"area"}, \code{"spct"} and \code{"line"}. The default \code{NULL}
 #'   selects between them based on \code{stacked}.
@@ -649,7 +670,9 @@ q_plot <- function(spct,
 #' @param object.label character The name of the object being plotted.
 #' @param na.rm logical.
 #'
-#' @details The plot object returned is a ggplot (an object of class
+#' @details The \code{autoplot()} methods  from 'ggspectra' are convenience wrapper functions that easy the creation
+#'   of plots from spectral objects at the cost of lacking the flexibility of the
+#'   grammar of graphics. The plot object returned is a ggplot (an object of class
 #'   \code{"gg"}) and it can be added to or modified as any other ggplot. The
 #'   axis labels are encoded as \emph{plotmath} expressions as they contain
 #'   superscripts and special characters. In 'ggplot2', plotmath expressions do
@@ -698,8 +721,6 @@ q_plot <- function(spct,
 #' autoplot(sun.spct)
 #' autoplot(sun.spct, geom = "spct")
 #' autoplot(sun.spct, unit.out = "photon")
-#' autoplot(normalize(sun.spct))
-#' autoplot(normalize(sun.spct), pc.out = TRUE)
 #'
 #' # multiple spectra in long form
 #' autoplot(sun_evening.spct)
@@ -710,15 +731,13 @@ q_plot <- function(spct,
 #'
 #' # multiple spectra as a collection
 #' autoplot(sun_evening.mspct)
-#' autoplot(sun_evening.mspct, facets = 1) # one column
-#' autoplot(sun_evening.mspct, facets = 2) # two columns
-#' autoplot(sun_evening.mspct, plot.data = "mean")
-#' autoplot(sun_evening.mspct, idfactor = "Time")
+#' # other examples above using .mspct instead of .spct
 #'
 #' @family autoplot methods
 #'
 autoplot.source_spct <-
-  function(object, ...,
+  function(object,
+           ...,
            w.band = getOption("photobiology.plot.bands",
                               default = list(photobiologyWavebands::UVC(),
                                              photobiologyWavebands::UVB(),
@@ -733,6 +752,7 @@ autoplot.source_spct <-
            span = NULL,
            wls.target = "HM",
            annotations = NULL,
+           by.group = FALSE,
            geom = "line",
            time.format = "",
            tz = "UTC",
@@ -745,6 +765,8 @@ autoplot.source_spct <-
            object.label = deparse(substitute(object)),
            na.rm = TRUE) {
 
+    stopifnot("Bad 'unit.out' argument" =
+                unit.out %in% c("energy", "photon"))
     force(object.label)
     object <- apply_normalization(object, norm)
     idfactor <- check_idfactor_arg(object, idfactor)
@@ -761,6 +783,7 @@ autoplot.source_spct <-
                           span = span,
                           wls.target = wls.target,
                           annotations = annotations,
+                          by.group = by.group,
                           geom = geom,
                           time.format = time.format,
                           tz = tz,
@@ -825,6 +848,7 @@ autoplot.source_spct <-
                            span = span,
                            wls.target = wls.target,
                            annotations = annotations,
+                           by.group = by.group,
                            geom = geom,
                            text.size = text.size,
                            chroma.type = chroma.type,
@@ -841,6 +865,7 @@ autoplot.source_spct <-
                            span = span,
                            wls.target = wls.target,
                            annotations = annotations,
+                           by.group = by.group,
                            geom = geom,
                            text.size = text.size,
                            chroma.type = chroma.type,
@@ -871,12 +896,15 @@ autoplot.source_mspct <-
            unit.out = getOption("photobiology.radiation.unit",
                                 default = "energy"),
            pc.out = getOption("ggspectra.pc.out", default = FALSE),
+           by.group = FALSE,
            idfactor = TRUE,
            facets = FALSE,
            plot.data = "as.is",
            object.label = deparse(substitute(object)),
            na.rm = TRUE) {
 
+    stopifnot("Bad 'unit.out' argument" =
+                unit.out %in% c("energy", "photon"))
     force(object.label)
     object <- apply_normalization(object, norm)
     idfactor <- check_idfactor_arg(object, idfactor = idfactor, default = TRUE)
@@ -912,6 +940,7 @@ autoplot.source_mspct <-
                         unit.out = unit.out,
                         pc.out = pc.out,
                         idfactor = NULL, # use idfactor already set in z
+                        by.group = by.group,
                         facets = facets,
                         object.label = object.label,
                         na.rm = na.rm,
@@ -923,6 +952,7 @@ autoplot.source_mspct <-
                         range = NULL, # trimmed above
                         pc.out = pc.out,
                         idfactor = NULL, # use idfactor already set in z
+                        by.group = by.group,
                         facets = facets,
                         object.label = object.label,
                         na.rm = na.rm,
