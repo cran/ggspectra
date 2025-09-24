@@ -74,8 +74,25 @@ Afr_plot <- function(spct,
     spct <- photobiology::trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    w.band <-
-      photobiology::trim_wl(w.band, range = photobiology::wl_range(spct))
+    if ("summaries" %in% annotations) {
+      # boxes or segments display summarised wavelengths
+      w.band <- photobiology::trim_wl(w.band,
+                                      range = photobiology::wl_range(spct))
+    } else {
+      # boxes and segments display wavebands' definitions if they fit in plot
+      w.band <- photobiology::trim_wl(w.band, range = range)
+    }
+  }
+  # replace NULL and NAs in range
+  if (is.null(range)) {
+    range <- range(spct[["w.length"]], na.rm = TRUE)
+  } else {
+    if (is.na(range[1])) {
+      range[1] <- min(spct[["w.length"]], na.rm = TRUE)
+    }
+    if (is.na(range[2])) {
+      range[2] <- max(spct[["w.length"]], na.rm = TRUE)
+    }
   }
 
   if (photobiology::is_scaled(spct)) {
@@ -195,8 +212,8 @@ Afr_plot <- function(spct,
                             label.mult = scale.factor,
                             y.max = y.max,
                             y.min = y.min,
-                            x.max = photobiology::wl_max(spct),
-                            x.min = photobiology::wl_min(spct),
+                            x.max = range[2],
+                            x.min = range[1],
                             annotations = annotations,
                             by.group = by.group,
                             label.qty = label.qty,
@@ -211,11 +228,12 @@ Afr_plot <- function(spct,
       length(intersect(c("labels", "summaries", "colour.guide", "reserve.space"),
                        annotations)) > 0L) {
     y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
-    x.limits <- c(photobiology::wl_min(spct) -
-                    photobiology::wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - photobiology::wl_expanse(spct) * 0.025,
+                  max(spct$w.length, range, na.rm = TRUE) + 1) # +1 needed because of rounding errors
   } else {
-    y.limits <- c(y.min, y.max)
-    x.limits <- photobiology::wl_range(spct)
+    y.limits <- c(y.min, y.max * 1.05)
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - 1,
+                  max(spct$w.length, range, na.rm = TRUE) + 1)
   }
 
   if (pc.out) {
@@ -317,8 +335,27 @@ T_plot <- function(spct,
   }
   Tfr.type <- photobiology::getTfrType(spct)
   if (!is.null(w.band)) {
-    w.band <- trim_wl(w.band, range = photobiology::wl_range(spct))
+    if ("summaries" %in% annotations) {
+      # boxes or segments display summarised wavelengths
+      w.band <- photobiology::trim_wl(w.band,
+                                      range = photobiology::wl_range(spct))
+    } else {
+      # boxes and segments display wavebands' definitions if they fit in plot
+      w.band <- photobiology::trim_wl(w.band, range = range)
+    }
   }
+  # replace NULL and NAs in range
+  if (is.null(range)) {
+    range <- range(spct[["w.length"]], na.rm = TRUE)
+  } else {
+    if (is.na(range[1])) {
+      range[1] <- min(spct[["w.length"]], na.rm = TRUE)
+    }
+    if (is.na(range[2])) {
+      range[2] <- max(spct[["w.length"]], na.rm = TRUE)
+    }
+  }
+
   if (!length(Tfr.type)) {
     Tfr.type <- "unknown"
   }
@@ -348,7 +385,8 @@ T_plot <- function(spct,
       pc.out <- FALSE
     }
     scale.factor <- 1
-    norm <- round(photobiology::getNormalization(spct)[["norm.wl"]], 1)
+#    norm <- round(photobiology::getNormalization(spct)[["norm.wl"]], 1)
+    norm <- normalization_label(spct, digits = 1)
     s.Tfr.label <- bquote(.(Tfr.name)~~spectral~~transmittance~~T[lambda]^{.(Tfr.tag)}/T[lambda==.(norm)]^{.(Tfr.tag)}~~("rel."))
     Tfr.label.total  <- paste("atop(T^{", Tfr.tag,
                               "}, T[lambda == ", norm, "]^{", Tfr.tag, "}",
@@ -457,8 +495,8 @@ T_plot <- function(spct,
                             label.mult = scale.factor,
                             y.max = y.max,
                             y.min = y.min,
-                            x.max = photobiology::wl_max(spct),
-                            x.min = photobiology::wl_min(spct),
+                            x.max = range[2],
+                            x.min = range[1],
                             annotations = annotations,
                             by.group = by.group,
                             label.qty = label.qty,
@@ -472,10 +510,12 @@ T_plot <- function(spct,
   if (!is.null(annotations) &&
       length(intersect(c("labels", "summaries", "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
-    x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - photobiology::wl_expanse(spct) * 0.025,
+                  max(spct$w.length, range, na.rm = TRUE) + 1) # +1 needed because of rounding errors
   } else {
-    y.limits <- c(y.min, y.max)
-    x.limits <- range(spct)
+    y.limits <- c(y.min, y.max * 1.05)
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - 1,
+                  max(spct$w.length, range, na.rm = TRUE) + 1)
   }
   if (pc.out) {
     plot <-
@@ -572,12 +612,31 @@ A_plot <- function(spct,
     spct <- photobiology::trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    w.band <- photobiology::trim_wl(w.band, range = photobiology::wl_range(spct))
+    if ("summaries" %in% annotations) {
+      # boxes or segments display summarised wavelengths
+      w.band <- photobiology::trim_wl(w.band,
+                                      range = photobiology::wl_range(spct))
+    } else {
+      # boxes and segments display wavebands' definitions if they fit in plot
+      w.band <- photobiology::trim_wl(w.band, range = range)
+    }
   }
   Tfr.type <- photobiology::getTfrType(spct)
   if (!length(Tfr.type)) {
     Tfr.type <- "unknown"
   }
+  # replace NULL and NAs in range
+  if (is.null(range)) {
+    range <- range(spct[["w.length"]], na.rm = TRUE)
+  } else {
+    if (is.na(range[1])) {
+      range[1] <- min(spct[["w.length"]], na.rm = TRUE)
+    }
+    if (is.na(range[2])) {
+      range[2] <- max(spct[["w.length"]], na.rm = TRUE)
+    }
+  }
+
   Tfr.tag <- switch(Tfr.type,
                     internal = "int",
                     total = "tot",
@@ -593,13 +652,14 @@ A_plot <- function(spct,
     A.label.total  <- paste("k %*% A^{", Tfr.tag, "}", sep = "")
     A.label.avg  <- paste("bar(k %*% A[lambda]^{", Tfr.tag, "})", sep = "")
   } else if (photobiology::is_normalized(spct)) {
-    norm <- round(getNormalization(spct)[["norm.wl"]], 1)
-    s.A.label <- bquote(.(Tfr.name)~~spectral~~absorbance~~A[lambda]^{.(Tfr.tag)}/A[lambda==.(norm)]^{.(Tfr.tag)}~~("rel."))
+#    norm <- round(getNormalization(spct)[["norm.wl"]], 1)
+    norm.wl <- normalization_label(spct, digits = 1)
+    s.A.label <- bquote(.(Tfr.name)~~spectral~~absorbance~~A[lambda]^{.(Tfr.tag)}/A[lambda==.(norm.wl)]^{.(Tfr.tag)}~~("rel."))
     A.label.total  <- paste("atop(A^{", Tfr.tag,
-                              "}, A[lambda == ", norm, "]^{", Tfr.tag, "}",
+                              "}, A[lambda == ", norm.wl, "]^{", Tfr.tag, "}",
                               sep = "")
     A.label.avg  <- paste("atop(bar(A[lambda]^{", Tfr.tag,
-                            "}), A[lambda == ", norm, "]^{", Tfr.tag, "}",
+                            "}), A[lambda == ", norm.wl, "]^{", Tfr.tag, "}",
                             sep = "")
   } else {
     s.A.label <- bquote(.(Tfr.name)~~spectral~~absorbance~~A[lambda]^{.(Tfr.tag)}~~(AU))
@@ -688,8 +748,8 @@ A_plot <- function(spct,
   plot <- plot + decoration(w.band = w.band,
                             y.max = min(y.max, 6),
                             y.min = y.min,
-                            x.max = photobiology::wl_max(spct),
-                            x.min = photobiology::wl_min(spct),
+                            x.max = range[2],
+                            x.min = range[1],
                             annotations = annotations,
                             by.group = by.group,
                             label.qty = label.qty,
@@ -703,12 +763,15 @@ A_plot <- function(spct,
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
-    y.limits <- c(y.min, min(y.max, 6) * 1.25)
-    x.limits <- c(min(spct) - photobiology::wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
+    y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - photobiology::wl_expanse(spct) * 0.025,
+                  max(spct$w.length, range, na.rm = TRUE) + 1) # +1 needed because of rounding errors
   } else {
-    y.limits <- c(y.min, min(y.max, 6))
-    x.limits <- range(spct)
+    y.limits <- c(y.min, y.max * 1.05)
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - 1,
+                  max(spct$w.length, range, na.rm = TRUE) + 1)
   }
+
   plot <- plot + ggplot2::scale_y_continuous(limits = y.limits)
   plot + ggplot2::scale_x_continuous(limits = x.limits,
                                      breaks = scales::pretty_breaks(n = 7))
@@ -800,8 +863,27 @@ R_plot <- function(spct,
     spct <- photobiology::trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    w.band <- photobiology::trim_wl(w.band, range = range(spct))
+    if ("summaries" %in% annotations) {
+      # boxes or segments display summarised wavelengths
+      w.band <- photobiology::trim_wl(w.band,
+                                      range = photobiology::wl_range(spct))
+    } else {
+      # boxes and segments display wavebands' definitions if they fit in plot
+      w.band <- photobiology::trim_wl(w.band, range = range)
+    }
   }
+  # replace NULL and NAs in range
+  if (is.null(range)) {
+    range <- range(spct[["w.length"]], na.rm = TRUE)
+  } else {
+    if (is.na(range[1])) {
+      range[1] <- min(spct[["w.length"]], na.rm = TRUE)
+    }
+    if (is.na(range[2])) {
+      range[2] <- max(spct[["w.length"]], na.rm = TRUE)
+    }
+  }
+
   Rfr.type <- photobiology::getRfrType(spct)
   if (length(Rfr.type) == 0) {
     Rfr.type <- "unknown"
@@ -824,13 +906,14 @@ R_plot <- function(spct,
     Rfr.label.total  <- paste("k %*% R^{", Rfr.tag, "}", sep = "")
     Rfr.label.avg  <- paste("bar(k %*% R[lambda]^{", Rfr.tag, "})", sep = "")
   } else if (photobiology::is_normalized(spct)) {
-    norm <- round(photobiology::getNormalization(spct)[["norm.wl"]], 1)
-    s.Rfr.label <- bquote(.(Rfr.name)~~spectral~~reflectance~~R[lambda]^{.(Rfr.tag)}/R[lambda==.(norm)]^{.(Rfr.tag)}~~("rel."))
+#    norm <- round(photobiology::getNormalization(spct)[["norm.wl"]], 1)
+    norm.wl <- normalization_label(spct, digits = 1)
+    s.Rfr.label <- bquote(.(Rfr.name)~~spectral~~reflectance~~R[lambda]^{.(Rfr.tag)}/R[lambda==.(norm.wl)]^{.(Rfr.tag)}~~("rel."))
     Rfr.label.total  <- paste("atop(R^{", Rfr.tag,
-                            "}, R[lambda == ", norm, "]^{", Rfr.tag, "})",
+                            "}, R[lambda == ", norm.wl, "]^{", Rfr.tag, "})",
                             sep = "")
     Rfr.label.avg  <- paste("atop(bar(R[lambda]^{", Rfr.tag,
-                          "}), R[lambda == ", norm, "]^{", Rfr.tag, "})",
+                          "}), R[lambda == ", norm.wl, "]^{", Rfr.tag, "})",
                           sep = "")
   } else  if (!pc.out) {
     scale.factor <- 1
@@ -931,8 +1014,8 @@ R_plot <- function(spct,
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
                             y.min = y.min,
-                            x.max = photobiology::wl_max(spct),
-                            x.min = photobiology::wl_min(spct),
+                            x.max = range[2],
+                            x.min = range[1],
                             annotations = annotations,
                             by.group = by.group,
                             label.qty = label.qty,
@@ -946,10 +1029,12 @@ R_plot <- function(spct,
   if (!is.null(annotations) &&
       length(intersect(c("labels", "summaries", "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
-    x.limits <- c(min(spct) - photobiology::wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - photobiology::wl_expanse(spct) * 0.025,
+                  max(spct$w.length, range, na.rm = TRUE) + 1) # +1 needed because of rounding errors
   } else {
-    y.limits <- c(y.min, y.max)
-    x.limits <- photobiology::wl_range(spct)
+    y.limits <- c(y.min, y.max * 1.05)
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - 1,
+                  max(spct$w.length, range, na.rm = TRUE) + 1)
   }
   if (pc.out) {
     plot <-
@@ -1048,9 +1133,27 @@ O_plot <- function(spct,
     spct <- photobiology::trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    w.band <- photobiology::trim_wl(w.band,
-                                    range = photobiology::wl_range(spct))
+    if ("summaries" %in% annotations) {
+      # boxes or segments display summarised wavelengths
+      w.band <- photobiology::trim_wl(w.band,
+                                      range = photobiology::wl_range(spct))
+    } else {
+      # boxes and segments display wavebands' definitions if they fit in plot
+      w.band <- photobiology::trim_wl(w.band, range = range)
+    }
   }
+  # replace NULL and NAs in range
+  if (is.null(range)) {
+    range <- range(spct[["w.length"]], na.rm = TRUE)
+  } else {
+    if (is.na(range[1])) {
+      range[1] <- min(spct[["w.length"]], na.rm = TRUE)
+    }
+    if (is.na(range[2])) {
+      range[2] <- max(spct[["w.length"]], na.rm = TRUE)
+    }
+  }
+
   Rfr.type <- getRfrType(spct)
   if (length(Rfr.type) == 0) {
     Rfr.type <- "unknown"
@@ -1197,8 +1300,8 @@ O_plot <- function(spct,
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
                             y.min = y.min,
-                            x.max = photobiology::wl_max(spct),
-                            x.min = photobiology::wl_min(spct),
+                            x.max = range[2],
+                            x.min = range[1],
                             annotations = annotations,
                             by.group = by.group,
                             label.qty = label.qty,
@@ -1210,14 +1313,15 @@ O_plot <- function(spct,
                             na.rm = TRUE)
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "colour.guide", "reserve.space"), annotations)) > 0L) {
-    y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
-    x.limits <-
-      c(photobiology::wl_min(spct) - photobiology::wl_expanse(spct) * 0.025, NA)
-  } else {
-    y.limits <- c(y.min, y.max)
-    x.limits <- photobiology::wl_range(spct)
-  }
-  if (pc.out) {
+  y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
+  x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - photobiology::wl_expanse(spct) * 0.025,
+                max(spct$w.length, range, na.rm = TRUE) + 1) # +1 needed because of rounding errors
+} else {
+  y.limits <- c(y.min, y.max * 1.05)
+  x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - 1,
+                max(spct$w.length, range, na.rm = TRUE) + 1)
+}
+if (pc.out) {
     plot <- plot +
       scale_y_continuous(labels = scales::percent,
                          breaks = y.breaks,
@@ -1324,37 +1428,47 @@ autoplot.filter_spct <-
     idfactor <- check_idfactor_arg(object, idfactor)
     object <- rename_idfactor(object, idfactor)
 
-    if (plot.data != "as.is") {
-      return(
-        autoplot(object = photobiology::subset2mspct(object),
-                 w.band = w.band,
-                 range = range,
-                 plot.qty = plot.qty,
-                 pc.out = pc.out,
-                 label.qty = label.qty,
-                 span = span,
-                 wls.target = wls.target,
-                 annotations = annotations,
-                 by.group = by.group,
-                 geom = geom,
-                 time.format = time.format,
-                 tz = tz,
-                 text.size = text.size,
-                 chroma.type = chroma.type,
-                 idfactor = idfactor,
-                 facets = facets,
-                 plot.data = plot.data,
-                 ylim = ylim,
-                 object.label = object.label,
-                 na.rm = na.rm)
-      )
-    }
-
     annotations.default <-
       getOption("photobiology.plot.annotations",
-                default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
+                default =
+                  c("boxes", "labels", "summaries", "colour.guide", "peaks"))
     annotations <- decode_annotations(annotations,
                                       annotations.default)
+
+    if (photobiology::getMultipleWl(object) > 1L) {
+      if (plot.data == "as.is") {
+        if (!facets) {
+          # with a multiple spectra per panel do not include summaries
+          annotations <-
+            decode_annotations(c("-", "summaries"), annotations)
+        }
+      } else {
+        return(
+          autoplot(object = photobiology::subset2mspct(object),
+                   w.band = w.band,
+                   range = range,
+                   plot.qty = plot.qty,
+                   pc.out = pc.out,
+                   label.qty = label.qty,
+                   span = span,
+                   wls.target = wls.target,
+                   annotations = annotations,
+                   by.group = by.group,
+                   geom = geom,
+                   time.format = time.format,
+                   tz = tz,
+                   text.size = text.size,
+                   chroma.type = chroma.type,
+                   idfactor = idfactor,
+                   facets = facets,
+                   plot.data = plot.data,
+                   ylim = ylim,
+                   object.label = object.label,
+                   na.rm = na.rm)
+        )
+      }
+    }
+
     if (is.null(label.qty)) {
       if (photobiology::is_normalized(object) ||
           photobiology::is_scaled(object)) {
@@ -1363,6 +1477,7 @@ autoplot.filter_spct <-
         label.qty = "average"
       }
     }
+
     if (length(w.band) == 0) {
       if (is.null(range)) {
         w.band <- photobiology::waveband(object)
@@ -1371,6 +1486,19 @@ autoplot.filter_spct <-
       } else {
         w.band <-  photobiology::waveband(range, wb.name = "Total")
       }
+    }
+    if (is.null(range)) {
+      range <- rep(NA_real_, 2)
+    } else if (photobiology::is.waveband(range) ||
+               photobiology::is.any_spct(range)) {
+      range <- photobiology::wl_range(range)
+    } else if (is.numeric(range) &&
+               (length(range) > 2L || !anyNA(range))) {
+      range <- range(range, na.rm = TRUE)
+    }
+    if (!length(range) == 2L || !is.numeric(range)) {
+      warning("Ignoring bad 'range' argument")
+      range <- rep(NA_real_, 2)
     }
 
     if (plot.qty == "transmittance") {
@@ -1485,7 +1613,7 @@ autoplot.filter_mspct <-
     col.name <- c(transmittance = "Tfr", absorptance = "Afr", absorbance = "A")
     if (photobiology::is.filter_spct(z) && col.name[plot.qty] %in% names(z)) {
       autoplot(object = z,
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
                plot.qty = plot.qty,
                pc.out = pc.out,
                idfactor = NULL, # use idfactor already set in z
@@ -1499,7 +1627,7 @@ autoplot.filter_mspct <-
       z <- as.generic_spct(z)
       autoplot(object = z,
                y.name = paste(col.name[plot.qty], plot.data, sep = "."),
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
                pc.out = pc.out,
                idfactor = NULL, # use idfactor already set in z
                by.group = by.group,
@@ -1577,37 +1705,45 @@ autoplot.reflector_spct <-
     idfactor <- check_idfactor_arg(object, idfactor)
     object <- rename_idfactor(object, idfactor)
 
-    if (plot.data != "as.is") {
-      return(
-        autoplot(object = photobiology::subset2mspct(object),
-                 w.band = w.band,
-                 range = range,
-                 plot.qty = plot.qty,
-                 pc.out = pc.out,
-                 label.qty = label.qty,
-                 span = span,
-                 wls.target = wls.target,
-                 annotations = annotations,
-                 by.group = by.group,
-                 geom = geom,
-                 time.format = time.format,
-                 tz = tz,
-                 text.size = text.size,
-                 chroma.type = chroma.type,
-                 idfactor = idfactor,
-                 facets = facets,
-                 plot.data = plot.data,
-                 ylim = ylim,
-                 object.label = object.label,
-                 na.rm = na.rm)
-      )
-    }
-
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
     annotations <- decode_annotations(annotations,
                                       annotations.default)
+
+    if (photobiology::getMultipleWl(object) > 1L) {
+      if (plot.data == "as.is") {
+        if (!facets) {
+          # with a multiple spectra per panel do not include summaries
+          annotations <-
+            decode_annotations(c("-", "summaries"), annotations)
+        }
+      } else {
+        return(
+          autoplot(object = photobiology::subset2mspct(object),
+                   w.band = w.band,
+                   range = range,
+                   plot.qty = plot.qty,
+                   pc.out = pc.out,
+                   label.qty = label.qty,
+                   span = span,
+                   wls.target = wls.target,
+                   annotations = annotations,
+                   by.group = by.group,
+                   geom = geom,
+                   time.format = time.format,
+                   tz = tz,
+                   text.size = text.size,
+                   chroma.type = chroma.type,
+                   idfactor = idfactor,
+                   facets = facets,
+                   plot.data = plot.data,
+                   ylim = ylim,
+                   object.label = object.label,
+                   na.rm = na.rm)
+        )
+      }
+    }
 
     if (is.null(label.qty)) {
       if (photobiology::is_normalized(object) ||
@@ -1626,6 +1762,20 @@ autoplot.reflector_spct <-
         w.band <-  photobiology::waveband(range, wb.name = "Total")
       }
     }
+    if (is.null(range)) {
+      range <- rep(NA_real_, 2)
+    } else if (photobiology::is.waveband(range) ||
+               photobiology::is.any_spct(range)) {
+      range <- photobiology::wl_range(range)
+    } else if (is.numeric(range) &&
+               (length(range) > 2L || !anyNA(range))) {
+      range <- range(range, na.rm = TRUE)
+    }
+    if (!length(range) == 2L || !is.numeric(range)) {
+      warning("Ignoring bad 'range' argument")
+      range <- rep(NA_real_, 2)
+    }
+
     if (plot.qty == "reflectance") {
       out.ggplot <- R_plot(spct = object,
                            w.band = w.band,
@@ -1701,7 +1851,7 @@ autoplot.reflector_mspct <-
     )
     if (photobiology::is.reflector_spct(z) && "Rfr" %in% names(z)) {
       autoplot(object = z,
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
                plot.qty = plot.qty,
                pc.out = pc.out,
                by.group = by.group,
@@ -1714,7 +1864,7 @@ autoplot.reflector_mspct <-
       z <- as.generic_spct(z)
       autoplot(object = z,
                y.name = paste("Rfr", plot.data, sep = "."),
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
                pc.out = pc.out,
                by.group = by.group,
                idfactor = NULL, # use idfactor already set in z
@@ -1766,18 +1916,11 @@ autoplot.reflector_mspct <-
 #'   \code{\link[ggplot2]{autoplot}}
 #'
 #' @examples
-#'
-#' low_res.spct <- thin_wl(Ler_leaf.spct,
-#'                         max.wl.step = 20,
-#'                         max.slope.delta = 0.01,
-#'                         col.names = "Tfr")
-#' autoplot(low_res.spct)
-#' autoplot(low_res.spct, geom = "line")
-#'
-#' two_leaves.mspct <-
-#'   object_mspct(list("Arabidopsis leaf 1" = low_res.spct,
-#'                     "Arabidopsis leaf 2" = low_res.spct))
-#' autoplot(two_leaves.mspct, idfactor = "Spectra")
+#' autoplot(Ler_leaf.spct)
+#' autoplot(Ler_leaf.spct, geom = "line")
+#' autoplot(Ler_leaf.spct, plot.qty = "absorptance")
+#' autoplot(Ler_leaf.spct, plot.qty = "reflectance")
+#' autoplot(Ler_leaf.spct, plot.qty = "transmittance")
 #'
 #' @family autoplot methods
 #'
@@ -1810,45 +1953,47 @@ autoplot.object_spct <-
            na.rm = TRUE) {
 
     force(object.label)
-    object <- apply_normalization(object, norm)
-    idfactor <- check_idfactor_arg(object, idfactor)
-    object <- rename_idfactor(object, idfactor)
-
-    if (plot.data != "as.is") {
-      return(
-        autoplot(object = photobiology::subset2mspct(object, idfactor = idfactor),
-                 w.band = w.band,
-                 range = range,
-                 plot.qty = plot.qty,
-                 pc.out = pc.out,
-                 label.qty = label.qty,
-                 span = span,
-                 wls.target = wls.target,
-                 annotations = annotations,
-                 by.group = by.group,
-                 geom = geom,
-                 time.format = time.format,
-                 tz = tz,
-                 stacked = stacked,
-                 text.size = text.size,
-                 chroma.type = chroma.type,
-                 idfactor = idfactor,
-                 facets = facets,
-                 plot.data = plot.data,
-                 ylim = ylim,
-                 object.label = object.label,
-                 na.rm = na.rm)
-      )
-    }
 
     if (is.null(plot.qty)) {
       plot.qty <- "all"
     }
-    if (is.null(facets)) {
-      facets <- plot.qty == "all" && photobiology::getMultipleWl(object) > 1L
-    }
 
     if (plot.qty == "all") {
+      object <- apply_normalization(object, norm)
+      idfactor <- check_idfactor_arg(object, idfactor)
+      object <- rename_idfactor(object, idfactor)
+
+      if (photobiology::getMultipleWl(object) > 1L) {
+        if (plot.data != "as.is") {
+          return(
+            autoplot(object = photobiology::subset2mspct(object, idfactor = idfactor),
+                     w.band = w.band,
+                     range = range,
+                     plot.qty = plot.qty,
+                     pc.out = pc.out,
+                     label.qty = label.qty,
+                     span = span,
+                     wls.target = wls.target,
+                     annotations = annotations,
+                     by.group = by.group,
+                     geom = geom,
+                     time.format = time.format,
+                     tz = tz,
+                     stacked = stacked,
+                     text.size = text.size,
+                     chroma.type = chroma.type,
+                     idfactor = idfactor,
+                     facets = facets,
+                     plot.data = plot.data,
+                     ylim = ylim,
+                     object.label = object.label,
+                     na.rm = na.rm)
+          )
+        } else if (is.null(facets) || !facets) {
+          facets <-  TRUE
+        }
+      }
+
       # stacked area plot
       annotations.default <-
         getOption("photobiology.plot.annotations",
@@ -1872,6 +2017,20 @@ autoplot.object_spct <-
           w.band <-  photobiology::waveband(range, wb.name = "Total")
         }
       }
+      if (is.null(range)) {
+        range <- rep(NA_real_, 2)
+      } else if (photobiology::is.waveband(range) ||
+                 photobiology::is.any_spct(range)) {
+        range <- photobiology::wl_range(range)
+      } else if (is.numeric(range) &&
+                 (length(range) > 2L || !anyNA(range))) {
+        range <- range(range, na.rm = TRUE)
+      }
+      if (!length(range) == 2L || !is.numeric(range)) {
+        warning("Ignoring bad 'range' argument")
+        range <- rep(NA_real_, 2)
+      }
+
       out.ggplot <- O_plot(spct = object,
                            w.band = w.band,
                            range = range,
@@ -1907,6 +2066,7 @@ autoplot.object_spct <-
       autoplot(object = object,
                w.band = w.band,
                range = range,
+               norm = norm,
                plot.qty = plot.qty,
                pc.out = pc.out,
                label.qty = label.qty,
@@ -1979,10 +2139,10 @@ autoplot.object_mspct <-
     )
     col.name <- c(transmittance = "Tfr", absorptance = "Afr", reflectance = "Rfr")
     if ((photobiology::is.object_spct(z) && sum(col.name %in% names(z)) >= 2) ||
-        (photobiology::is.filter_spct(z) && any(c("Tfr", "Afr", "A")) %in% names(z)) ||
+        (photobiology::is.filter_spct(z) && any(c("Tfr", "Afr", "A") %in% names(z))) ||
         (photobiology::is.reflector_spct(z) && "Rfr" %in% names(z)))  {
       autoplot(object = z,
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
                plot.qty = plot.qty,
                pc.out = pc.out,
                by.group = by.group,
@@ -1995,7 +2155,7 @@ autoplot.object_mspct <-
       z <- photobiology::as.generic_spct(z)
       autoplot(object = z,
                y.name = paste(col.name[plot.qty], plot.data, sep = "."),
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
                pc.out = pc.out,
                by.group = by.group,
                idfactor = NULL, # use idfactor already set in z
@@ -2007,7 +2167,7 @@ autoplot.object_mspct <-
       z <- photobiology::as.generic_spct(z)
       autoplot(object = z,
                y.name = paste("Rfr", plot.data, sep = "."),
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
                pc.out = pc.out,
                by.group = by.group,
                idfactor = NULL, # use idfactor already set in z

@@ -76,8 +76,27 @@ cps_plot <- function(spct,
     spct <- photobiology::trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    w.band <- photobiology::trim_wl(w.band, range = range(spct))
+    if ("summaries" %in% annotations) {
+      # boxes or segments display summarised wavelengths
+      w.band <- photobiology::trim_wl(w.band,
+                                      range = photobiology::wl_range(spct))
+    } else {
+      # boxes and segments display wavebands' definitions if they fit in plot
+      w.band <- photobiology::trim_wl(w.band, range = range)
+    }
   }
+  # replace NULL and NAs in range
+  if (is.null(range)) {
+    range <- range(spct[["w.length"]], na.rm = TRUE)
+  } else {
+    if (is.na(range[1])) {
+      range[1] <- min(spct[["w.length"]], na.rm = TRUE)
+    }
+    if (is.na(range[2])) {
+      range[2] <- max(spct[["w.length"]], na.rm = TRUE)
+    }
+  }
+
   cps.cols <- names(spct)[grep("^cps", names(spct))]
   num.cps.cols <- length(cps.cols)
   # if individual spectra have multiple columns we force facets
@@ -96,8 +115,9 @@ cps_plot <- function(spct,
       bquote(Pixel~~response~~rate~~k %*% N[lambda]~~("rel."))
     cps.label <- ""
   } else if (photobiology::is_normalized(spct)) {
-    norm.ls <- photobiology::getNormalization(spct)
-    norm.wl <- round(norm.ls[["norm.wl"]], digits = 1)
+    # norm.ls <- photobiology::getNormalization(spct)
+    # norm.wl <- round(norm.ls[["norm.wl"]], digits = 1)
+    norm.wl <- normalization_label(spct, digits = 1)
     if (pc.out) {
       multiplier.label <- "%"
     } else {
@@ -191,8 +211,8 @@ cps_plot <- function(spct,
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
                             y.min = y.min,
-                            x.max = max(spct),
-                            x.min = min(spct),
+                            x.max = range[2],
+                            x.min = range[1],
                             annotations = annotations,
                             by.group = by.group,
                             label.qty = label.qty,
@@ -211,10 +231,12 @@ cps_plot <- function(spct,
   if (!is.null(annotations) &&
       length(intersect(c("boxes", "segments", "labels", "summaries", "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
-    x.limits <- c(min(spct) - photobiology::wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - photobiology::wl_expanse(spct) * 0.025,
+                  max(spct$w.length, range, na.rm = TRUE) + 1) # +1 needed because of rounding errors
   } else {
-    y.limits <- c(y.min, y.max)
-    x.limits <- range(spct)
+    y.limits <- c(y.min, y.max * 1.05)
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - 1,
+                  max(spct$w.length, range, na.rm = TRUE) + 1)
   }
 
   if (pc.out) {
@@ -295,42 +317,71 @@ autoplot.cps_spct <-
            object.label = deparse(substitute(object)),
            na.rm = TRUE) {
 
+    if (is.null(norm) || is.na(norm)) {
+      norm = "update"
+    }
     force(object.label)
-    object <- apply_normalization(object, norm)
     idfactor <- check_idfactor_arg(object, idfactor)
     object <- rename_idfactor(object, idfactor)
-
-    if (plot.data != "as.is") {
-      return(
-        autoplot(object = photobiology::subset2mspct(object),
-                 w.band = w.band,
-                 range = range,
-                 unit.out = unit.out,
-                 pc.out = pc.out,
-                 label.qty = label.qty,
-                 span = span,
-                 wls.target = wls.target,
-                 annotations = annotations,
-                 by.group = by.group,
-                 geom = geom,
-                 time.format = time.format,
-                 tz = tz,
-                 text.size = text.size,
-#                 chroma.type = chroma.type,
-                 idfactor = idfactor,
-                 facets = facets,
-                 plot.data = plot.data,
-                 ylim = ylim,
-                 object.label = object.label,
-                 na.rm = na.rm)
-      )
-    }
 
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "colour.guide", "peaks"))
     annotations <- decode_annotations(annotations,
                                       annotations.default)
+
+    if (photobiology::getMultipleWl(object) > 1L) {
+      if (plot.data == "as.is") {
+        if (!facets) {
+          # with a multiple spectra per panel do not include summaries
+          annotations <-
+            decode_annotations(c("-", "summaries"), annotations)
+        }
+      } else {
+        # compute parallel summaries across spectra
+        return(
+          autoplot(object = photobiology::subset2mspct(object),
+                   w.band = w.band,
+                   range = range,
+                   unit.out = unit.out,
+                   pc.out = pc.out,
+                   label.qty = label.qty,
+                   span = span,
+                   wls.target = wls.target,
+                   annotations = annotations,
+                   by.group = by.group,
+                   geom = geom,
+                   time.format = time.format,
+                   tz = tz,
+                   text.size = text.size,
+                   #                 chroma.type = chroma.type,
+                   idfactor = idfactor,
+                   facets = facets,
+                   plot.data = plot.data,
+                   ylim = ylim,
+                   object.label = object.label,
+                   na.rm = na.rm)
+        )
+      }
+    }
+
+    # remove normalization if not updating it
+    # helps handle old objects with no normalization metadata
+    if (is.numeric(norm) ||
+        (is.character(norm) && norm %in% c("max", "min", "skip"))) {
+      photobiology::setNormalised(object, FALSE)
+    }
+    # apply normalization
+    object <- apply_normalization(x = object, norm = norm)
+
+    if (is.null(label.qty)) {
+      if (photobiology::is_normalized(object) ||
+          photobiology::is_scaled(object)) {
+        label.qty = "contribution"
+      } else {
+        label.qty = "total"
+      }
+    }
 
     if (length(w.band) == 0) {
       if (is.null(range)) {
@@ -341,6 +392,19 @@ autoplot.cps_spct <-
         w.band <-
           photobiology::waveband(range, wb.name = "Total")
       }
+    }
+    if (is.null(range)) {
+      range <- rep(NA_real_, 2)
+    } else if (photobiology::is.waveband(range) ||
+               photobiology::is.any_spct(range)) {
+      range <- photobiology::wl_range(range)
+    } else if (is.numeric(range) &&
+               (length(range) > 2L || !anyNA(range))) {
+      range <- range(range, na.rm = TRUE)
+    }
+    if (!length(range) == 2L || !is.numeric(range)) {
+      warning("Ignoring bad 'range' argument")
+      range <- rep(NA_real_, 2)
     }
 
     cps_plot(spct = object,
@@ -385,7 +449,6 @@ autoplot.cps_mspct <-
            na.rm = TRUE) {
 
     force(object.label)
-    object <- apply_normalization(object, norm)
     idfactor <- check_idfactor_arg(object, idfactor = idfactor, default = TRUE)
 
     # We trim the spectra to avoid unnecessary computations later
@@ -410,7 +473,8 @@ autoplot.cps_mspct <-
     if (photobiology::is.cps_spct(z) &&
         any(c("cps", "cps_1") %in% names(z))) {
       autoplot(object = z,
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
+               norm = norm,
                pc.out = pc.out,
                by.group = by.group,
                idfactor = NULL, # use idfactor already set in z
@@ -422,7 +486,8 @@ autoplot.cps_mspct <-
       z <- photobiology::as.generic_spct(z)
       autoplot(object = z,
                y.name = paste("cps", plot.data, sep = "."),
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
+               norm = norm,
                pc.out = pc.out,
                by.group = by.group,
                idfactor = NULL, # use idfactor already set in z

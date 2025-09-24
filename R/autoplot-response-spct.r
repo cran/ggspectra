@@ -75,11 +75,28 @@ e_rsp_plot <- function(spct,
     spct <- photobiology::trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    w.band <- photobiology::trim_wl(w.band, range = photobiology::wl_range(spct))
+    if ("summaries" %in% annotations) {
+      # boxes or segments display summarised wavelengths
+      w.band <- photobiology::trim_wl(w.band,
+                                      range = photobiology::wl_range(spct))
+    } else {
+      # boxes and segments display wavebands' definitions if they fit in plot
+      w.band <- photobiology::trim_wl(w.band, range = range)
+    }
+  }
+  # replace NULL and NAs in range
+  if (is.null(range)) {
+    range <- range(spct[["w.length"]], na.rm = TRUE)
+  } else {
+    if (is.na(range[1])) {
+      range[1] <- min(spct[["w.length"]], na.rm = TRUE)
+    }
+    if (is.na(range[2])) {
+      range[2] <- max(spct[["w.length"]], na.rm = TRUE)
+    }
   }
 
   exposure.label <- NA
-
   if (photobiology::is_scaled(spct)) {
     if (pc.out) {
       warning("Percent scale supported only for normalized cps_spct objects.")
@@ -94,8 +111,13 @@ e_rsp_plot <- function(spct,
     } else {
       multiplier.label <- "%"
     }
-    norm.ls <- photobiology::getNormalization(spct)
-    norm.wl <- round(norm.ls[["norm.wl"]], digits = 1)
+    # norm.ls <- photobiology::getNormalization(spct)
+    # if (is.numeric(norm.ls[["norm.wl"]])) {
+    #   norm.wl <- round(norm.ls[["norm.wl"]], digits = 1)
+    # } else {
+    #   norm.wl <- norm.ls[["norm.type"]]
+    # }
+    norm.wl <- normalization_label(spct, digits = 1)
     s.rsp.label <-
       bquote(Spectral~~energy~~response~~R[E~lambda]/R[E~lambda==.(norm.wl)]~~(.(multiplier.label)))
     rsp.label.total  <- bquote(atop(integral(R[E]/R[E~lambda==.(norm.wl)], min, max), (.(multiplier.label))))
@@ -174,8 +196,9 @@ e_rsp_plot <- function(spct,
     rsp.label <- ""
   }
 
-  plot <- ggplot2::ggplot(spct, aes(x = .data[["w.length"]],
-                                    y = .data[["s.e.response"]]))
+  plot <- ggplot2::ggplot(data = spct,
+                          mapping = ggplot2::aes(x = .data[["w.length"]],
+                                                 y = .data[["s.e.response"]]))
   temp <- find_idfactor(spct = spct,
                         idfactor = idfactor,
                         facets = facets,
@@ -207,8 +230,8 @@ e_rsp_plot <- function(spct,
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
                             y.min = y.min,
-                            x.max = photobiology::wl_max(spct),
-                            x.min = photobiology::wl_min(spct),
+                            x.max = range[2],
+                            x.min = range[1],
                             annotations = annotations,
                             by.group = by.group,
                             label.qty = label.qty,
@@ -233,11 +256,12 @@ e_rsp_plot <- function(spct,
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
-    x.limits <-
-      c(min(spct) - photobiology::wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - photobiology::wl_expanse(spct) * 0.025,
+                  max(spct$w.length, range, na.rm = TRUE) + 1) # +1 needed because of rounding errors
   } else {
-    y.limits <- c(y.min, y.max)
-    x.limits <- photobiology::wl_range(spct)
+    y.limits <- c(y.min, y.max * 1.05)
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - 1,
+                  max(spct$w.length, range, na.rm = TRUE) + 1)
   }
 
   if (abs(y.min) < 5e-2 && (abs(y.max - 1) < 5.e-2)) {
@@ -326,12 +350,28 @@ q_rsp_plot <- function(spct,
     spct <- photobiology::trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    w.band <- photobiology::trim_wl(w.band,
-                                    range = photobiology::wl_range(spct))
+    if ("summaries" %in% annotations) {
+      # boxes or segments display summarised wavelengths
+      w.band <- photobiology::trim_wl(w.band,
+                                      range = photobiology::wl_range(spct))
+    } else {
+      # boxes and segments display wavebands' definitions if they fit in plot
+      w.band <- photobiology::trim_wl(w.band, range = range)
+    }
+  }
+  # replace NULL and NAs in range
+  if (is.null(range)) {
+    range <- range(spct[["w.length"]], na.rm = TRUE)
+  } else {
+    if (is.na(range[1])) {
+      range[1] <- min(spct[["w.length"]], na.rm = TRUE)
+    }
+    if (is.na(range[2])) {
+      range[2] <- max(spct[["w.length"]], na.rm = TRUE)
+    }
   }
 
   exposure.label <- NA
-
   if (photobiology::is_scaled(spct)) {
     if (pc.out) {
       warning("Percent scale supported only for normalized response_spct objects.")
@@ -346,12 +386,17 @@ q_rsp_plot <- function(spct,
      } else {
       multiplier.label <- "%"
     }
-    norm.ls <- photobiology::getNormalization(spct)
-      norm.wl <- round(norm.ls[["norm.wl"]], digits = 1)
-      s.rsp.label <-
-        bquote(Spectral~~photon~~response~~R[Q~lambda]/R[Q~lambda==.(norm.wl)]~~(.(multiplier.label)))
-      rsp.label.total  <- bquote(atop(integral(R[Q~lambda], min, max), (.(multiplier.label))))
-      rsp.label.avg  <- bquote(atop(bar(R[Q~lambda]/R[Q~lambda==.(norm.wl)]), (.(multiplier.label))))
+    # norm.ls <- photobiology::getNormalization(spct)
+    # if (is.numeric(norm.ls[["norm.wl"]])) {
+    #   norm.wl <- round(norm.ls[["norm.wl"]], digits = 1)
+    # } else {
+    #   norm.wl <- norm.ls[["norm.type"]]
+    # }
+    norm.wl <- normalization_label(spct, digits = 1)
+    s.rsp.label <-
+      bquote(Spectral~~photon~~response~~R[Q~lambda]/R[Q~lambda==.(norm.wl)]~~(.(multiplier.label)))
+    rsp.label.total  <- bquote(atop(integral(R[Q~lambda], min, max), (.(multiplier.label))))
+    rsp.label.avg  <- bquote(atop(bar(R[Q~lambda]/R[Q~lambda==.(norm.wl)]), (.(multiplier.label))))
   } else {
     if (pc.out) {
       warning("Percent scale supported only for normalized cps_spct objects.")
@@ -426,8 +471,9 @@ q_rsp_plot <- function(spct,
     rsp.label <- ""
   }
 
-  plot <- ggplot2::ggplot(spct, aes(x = .data[["w.length"]],
-                                    y = .data[["s.q.response"]]))
+  plot <- ggplot2::ggplot(data = spct,
+                          mapping = ggplot2::aes(x = .data[["w.length"]],
+                                                 y = .data[["s.q.response"]]))
   temp <- find_idfactor(spct = spct,
                         idfactor = idfactor,
                         facets = facets,
@@ -460,8 +506,8 @@ q_rsp_plot <- function(spct,
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
                             y.min = y.min,
-                            x.max = photobiology::wl_max(spct),
-                            x.min = photobiology::wl_min(spct),
+                            x.max = range[2],
+                            x.min = range[1],
                             annotations = annotations,
                             by.group = by.group,
                             label.qty = label.qty,
@@ -492,11 +538,12 @@ q_rsp_plot <- function(spct,
       length(intersect(c("boxes", "segments", "labels", "summaries",
                          "colour.guide", "reserve.space"), annotations)) > 0L) {
     y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
-    x.limits <-
-      c(photobiology::wl_min(spct) - photobiology::wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - photobiology::wl_expanse(spct) * 0.025,
+                  max(spct$w.length, range, na.rm = TRUE) + 1) # +1 needed because of rounding errors
   } else {
-    y.limits <- c(y.min, y.max)
-    x.limits <- photobiology::wl_range(spct)
+    y.limits <- c(y.min, y.max * 1.05)
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - 1,
+                  max(spct$w.length, range, na.rm = TRUE) + 1)
   }
 
   if (pc.out) {
@@ -543,9 +590,8 @@ q_rsp_plot <- function(spct,
 #' autoplot(photodiode.spct, annotations = "")
 #'
 #' two_sensors.mspct <-
-#'  response_mspct(list("Photodiode" = photodiode.spct,
-#'                      "Coupled charge device" = ccd.spct)) |>
-#'  normalize()
+#'  response_mspct(list("Photodiode" = photodiode.spct * 1.5e-5,
+#'                      "Coupled charge device" = ccd.spct))
 #'
 #' autoplot(two_sensors.mspct, unit.out = "photon")
 #' autoplot(two_sensors.mspct, idfactor = "Spectra")
@@ -582,47 +628,68 @@ autoplot.response_spct <-
            object.label = deparse(substitute(object)),
            na.rm = TRUE) {
 
+    if (is.null(norm) || is.na(norm)) {
+      norm = "update"
+    }
     force(object.label)
-    object <- apply_normalization(object, norm)
     idfactor <- check_idfactor_arg(object, idfactor)
     object <- rename_idfactor(object, idfactor)
 
-    if (photobiology::getMultipleWl(object) > 1L
-        && plot.data != "as.is") {
-      return(
-        autoplot(object = photobiology::subset2mspct(object),
-                 w.band = w.band,
-                 range = range,
-                 pc.out = pc.out,
-                 label.qty = label.qty,
-                 span = span,
-                 wls.target = wls.target,
-                 annotations = annotations,
-                 by.group = by.group,
-                 geom = geom,
-                 time.format = time.format,
-                 tz = tz,
-                 text.size = text.size,
-#                 chroma.type = chroma.type,
-                 idfactor = ifelse(is.null(idfactor), TRUE, idfactor),
-                 facets = facets,
-                 plot.data = plot.data,
-                 ylim = ylim,
-                 object.label = object.label,
-                 na.rm = na.rm)
-      )
-    }
-
     annotations.default <-
       getOption("photobiology.plot.annotations",
-                default = c("boxes", "labels", "summaries", "colour.guide", "peaks"))
-    annotations <- decode_annotations(annotations,
-                                      annotations.default)
+                default =
+                  c("boxes", "labels", "summaries", "colour.guide", "peaks"))
+    annotations <- decode_annotations(annotations, annotations.default)
 
-    # Change units if needed, and update normalization
+    if (photobiology::getMultipleWl(object) > 1L) {
+      if (plot.data == "as.is") {
+        if (!facets) {
+          # with a multiple spectra per panel do not include summaries
+          annotations <-
+            decode_annotations(c("-", "summaries"), annotations)
+        }
+      } else {
+        # compute parallel summaries across spectra
+        return(
+          autoplot(object = photobiology::subset2mspct(object),
+                   w.band = w.band,
+                   range = range,
+                   pc.out = pc.out,
+                   label.qty = label.qty,
+                   span = span,
+                   wls.target = wls.target,
+                   annotations = annotations,
+                   by.group = by.group,
+                   geom = geom,
+                   time.format = time.format,
+                   tz = tz,
+                   text.size = text.size,
+                   #                 chroma.type = chroma.type,
+                   idfactor = ifelse(is.null(idfactor), TRUE, idfactor),
+                   facets = facets,
+                   plot.data = plot.data,
+                   ylim = ylim,
+                   object.label = object.label,
+                   na.rm = na.rm)
+        )
+      }
+    }
+
+    # remove normalization if not updating it
+    # helps handle old objects with no normalization metadata
+    if (is.numeric(norm) ||
+        (is.character(norm) && norm %in% c("max", "min", "skip"))) {
+      photobiology::setNormalised(object, FALSE)
+    } else if (norm == "undo") {
+      object <- photobiology::normalize(object, norm = norm)
+      norm <- "skip"
+    }
+    # Change units if needed, and obeying norm = "update"
     object <- switch(unit.out,
                      photon = photobiology::e2q(object, action = "replace"),
                      energy = photobiology::q2e(object, action = "replace"))
+    # apply other normalizations anew
+    object <- apply_normalization(x = object, norm = norm)
 
     if (is.null(label.qty)) {
       if (photobiology::is_normalized(object) ||
@@ -653,6 +720,19 @@ autoplot.response_spct <-
         w.band[[wb.PAR]] <-
           photobiology::waveband(x = c(400, 700), wb.name = "PAR")
       }
+    }
+    if (is.null(range)) {
+      range <- rep(NA_real_, 2)
+    } else if (photobiology::is.waveband(range) ||
+               photobiology::is.any_spct(range)) {
+      range <- photobiology::wl_range(range)
+    } else if (is.numeric(range) &&
+               (length(range) > 2L || !anyNA(range))) {
+      range <- range(range, na.rm = TRUE)
+    }
+    if (!length(range) == 2L || !is.numeric(range)) {
+      warning("Ignoring bad 'range' argument")
+      range <- rep(NA_real_, 2)
     }
 
     if (unit.out=="photon" || unit.out == "quantum") {
@@ -717,7 +797,6 @@ autoplot.response_mspct <-
            na.rm = TRUE) {
 
     force(object.label)
-    object <- apply_normalization(object, norm)
     idfactor <- check_idfactor_arg(object, idfactor = idfactor, default = TRUE)
 
     # We trim the spectra to avoid unnecessary computations later
@@ -747,7 +826,8 @@ autoplot.response_mspct <-
     col.name <- c(photon = "s.q.response", energy = "s.e.response")
     if (photobiology::is.response_spct(z) && any(col.name %in% names(z))) {
       autoplot(object = z,
-               range = NULL,
+               range = range, # trimmed above, needed for expansion
+               norm = norm,
                unit.out = unit.out,
                pc.out = pc.out,
                facets = facets,
@@ -760,8 +840,9 @@ autoplot.response_mspct <-
       z <- photobiology::as.generic_spct(z)
       autoplot(object = z,
                y.name = paste(col.name[unit.out], plot.data, sep = "."),
-               range = NULL,
+               range = range, # trimmed above, needed for expansion
                pc.out = pc.out,
+               norm = norm,
                facets = facets,
                idfactor = NULL, # use idfactor already set in z
                by.group = by.group,

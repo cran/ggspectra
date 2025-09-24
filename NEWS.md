@@ -4,6 +4,37 @@ editor_options:
     wrap: 72
 ---
 
+# ggspectra 0.4.0
+
+The support  in `autoplot()` methods of arguments to `range` that expand the
+limits of the wavelength axis past the range of the spectral data is the main
+new feature. "Filtering" of peaks as newly implemented in (== 0.3.16) has been
+adjusted, resulting in a code breaking change. In addition, the changes in
+`autoplot()` methods may result in plots that differ from those created with
+previous versions (marked "Changing" below).
+
+- Breaking: In `stat_peaks()`, `stat_valleys()`, `stat_label_peaks()` 
+and `stat_label_valleys()` parameter `ignore_threshold` replaced by 
+`global.threshold`.
+- Fix wrong default for `global.threshold` in `stat_valleys()` and 
+`stat_label_valleys()`.
+- Changing: Changed defaults into `strict = FALSE` and 
+`global.threshold = 0.01` in `stat_label_peaks()` and `stat_label_valleys()`.
+- Add parameter `idfactor` to `ggplot()` methods making it possible to select
+the name of the factor used to group the data by spectrum with multiple spectra.
+- Update handling of user-supplied mappings in `ggplot()` methods for spectra 
+and for collections of spectra.
+- Fix bug in mapping of id.factor in `ggplot()` methods.
+- Enhance handling of parameter `range` in `autoplot()` methods. Support `NA`
+to indicate default limit and implement _x_ limits expansion.
+- Enhance handling of parameter `norm` in `autoplot()` methods. Gracefully
+handle old objects with missing normalization metadata, when possible.
+- Changing: plots created with `autoplot.waveband()` method can be drastically
+different because of new defaults for `w.length` and `range`.
+- Add parameter `range` to `stat_wb_label()` and `stat_wl_strip()` and edit
+`decoration()` to allow passing `x.min` and `x.max` when calling these 
+statistics.
+
 # ggspectra 0.3.16
 
 Track new features available and other changes in 'photobiology' (>= 0.13.1),
@@ -17,7 +48,7 @@ for up-to-date examples.
 'photobiology' (>= 0.13.1), which is required.
 - `stat_peaks()` and `stat_valleys()` gain the new local and global threshold
 features from `find_peaks()` and `find_valleys()` from 'photobiology' 
-(>= 0.13.1).
+(>= 0.13.1). Parameter `ignore_threshold` is deprecated.
 - Breaking: Changed defaults into `strict = FALSE` and `global.threshold = 0.01` 
 in `stat_peaks()` and `stat_valleys()`.
 - The argument passed to `idfactor` when plotting multiple spectra stored in
@@ -37,7 +68,7 @@ addition of a plot layer for each group. The default behaviour remains unchanged
 enabling compatibility with 'gganimate'. **Changing default arguments using R 
 options is not supported and `by.group = TRUE` is supported only for animated
 plots.**
-- Bug fix: `aoutoplot()` method for `object_spct` with `stacked = FALSE` did 
+- Bug fix: `autoplot()` method for `object_spct` with `stacked = FALSE` did 
 not group correctly by variable. Notably some peaks and valleys were missing.
 - Check compatibility with upcoming 'ggplot2' 4.0.0.
 - Articles added or updated in the on-line documentation.

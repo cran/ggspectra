@@ -86,7 +86,25 @@ cal_plot <- function(spct,
     spct <- trim_wl(spct, range = range)
   }
   if (!is.null(w.band)) {
-    w.band <- trim_wl(w.band, range = range(spct))
+    if ("summaries" %in% annotations) {
+      # boxes or segments display summarised wavelengths
+      w.band <- photobiology::trim_wl(w.band,
+                                      range = photobiology::wl_range(spct))
+    } else {
+      # boxes and segments display wavebands' definitions if they fit in plot
+      w.band <- photobiology::trim_wl(w.band, range = range)
+    }
+  }
+  # replace NULL and NAs in range
+  if (is.null(range)) {
+    range <- range(spct[["w.length"]], na.rm = TRUE)
+  } else {
+    if (is.na(range[1])) {
+      range[1] <- min(spct[["w.length"]], na.rm = TRUE)
+    }
+    if (is.na(range[2])) {
+      range[2] <- max(spct[["w.length"]], na.rm = TRUE)
+    }
   }
 
   mult.cols <- names(spct)[grep("^irrad.mult", names(spct))]
@@ -210,8 +228,8 @@ cal_plot <- function(spct,
   plot <- plot + decoration(w.band = w.band,
                             y.max = y.max,
                             y.min = y.min,
-                            x.max = max(spct),
-                            x.min = min(spct),
+                            x.max = range[2],
+                            x.min = range[1],
                             annotations = annotations,
                             by.group = by.group,
                             label.qty = label.qty,
@@ -226,10 +244,12 @@ cal_plot <- function(spct,
                          "summaries", "colour.guide", "reserve.space"),
                        annotations)) > 0L) {
     y.limits <- c(y.min, y.min + (y.max - y.min) * 1.25)
-    x.limits <- c(min(spct) - wl_expanse(spct) * 0.025, NA) # NA needed because of rounding errors
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - photobiology::wl_expanse(spct) * 0.025,
+                  max(spct$w.length, range, na.rm = TRUE) + 1) # +1 needed because of rounding errors
   } else {
-    y.limits <- c(y.min, y.max)
-    x.limits <- range(spct)
+    y.limits <- c(y.min, y.max * 1.05)
+    x.limits <- c(min(spct$w.length, range, na.rm = TRUE) - 1,
+                  max(spct$w.length, range, na.rm = TRUE) + 1)
   }
 
   plot <- plot + scale_y_continuous(limits = y.limits)
@@ -287,41 +307,62 @@ autoplot.calibration_spct <-
            object.label = deparse(substitute(object)),
            na.rm = TRUE) {
 
-    force(object.label)
-    object <- apply_normalization(object, norm)
-    idfactor <- check_idfactor_arg(object, idfactor = idfactor)
-
-    if (plot.data != "as.is") {
-      return(
-        autoplot(object = subset2mspct(object),
-                 w.band = w.band,
-                 range = range,
-                 unit.out = unit.out,
-                 pc.out = pc.out,
-                 label.qty = label.qty,
-                 span = span,
-                 wls.target = wls.target,
-                 annotations = annotations,
-                 by.group = by.group,
-                 geom = geom,
-                 time.format = time.format,
-                 tz = tz,
-                 text.size = text.size,
-#                 chroma.type = chroma.type,
-                 idfactor = idfactor,
-                 facets = facets,
-                 plot.data = plot.data,
-                 ylim = ylim,
-                 object.label = object.label,
-                 na.rm = na.rm)
-      )
+    if (is.null(norm) || is.na(norm)) {
+      norm = "update"
     }
+    force(object.label)
+    idfactor <- check_idfactor_arg(object, idfactor = idfactor)
 
     annotations.default <-
       getOption("photobiology.plot.annotations",
                 default = c("boxes", "labels", "colour.guide", "peaks"))
     annotations <- decode_annotations(annotations,
                                       annotations.default)
+
+    if (photobiology::getMultipleWl(object) > 1L) {
+      if (plot.data == "as.is") {
+        if (!facets) {
+          # with a multiple spectra per panel do not include summaries
+          annotations <-
+            decode_annotations(c("-", "summaries"), annotations)
+        }
+      } else {
+        # compute parallel summaries across spectra
+        return(
+          autoplot(object = subset2mspct(object),
+                   w.band = w.band,
+                   range = range,
+                   unit.out = unit.out,
+                   pc.out = pc.out,
+                   label.qty = label.qty,
+                   span = span,
+                   wls.target = wls.target,
+                   annotations = annotations,
+                   by.group = by.group,
+                   geom = geom,
+                   time.format = time.format,
+                   tz = tz,
+                   text.size = text.size,
+                   #                 chroma.type = chroma.type,
+                   idfactor = idfactor,
+                   facets = facets,
+                   plot.data = plot.data,
+                   ylim = ylim,
+                   object.label = object.label,
+                   na.rm = na.rm)
+        )
+      }
+    }
+
+    # remove normalization if not updating it
+    # helps handle old objects with no normalization metadata
+    if (is.numeric(norm) ||
+        (is.character(norm) && norm %in% c("max", "min", "skip"))) {
+      photobiology::setNormalised(object, FALSE)
+    }
+    # apply normalization
+    object <- apply_normalization(x = object, norm = norm)
+
     if (length(w.band) == 0) {
       if (is.null(range)) {
         w.band <- waveband(object)
@@ -330,6 +371,19 @@ autoplot.calibration_spct <-
       } else {
         w.band <-  waveband(range, wb.name = "Total")
       }
+    }
+    if (is.null(range)) {
+      range <- rep(NA_real_, 2)
+    } else if (photobiology::is.waveband(range) ||
+               photobiology::is.any_spct(range)) {
+      range <- photobiology::wl_range(range)
+    } else if (is.numeric(range) &&
+               (length(range) > 2L || !anyNA(range))) {
+      range <- range(range, na.rm = TRUE)
+    }
+    if (!length(range) == 2L || !is.numeric(range)) {
+      warning("Ignoring bad 'range' argument")
+      range <- rep(NA_real_, 2)
     }
 
     cal_plot(spct = object,
@@ -375,7 +429,6 @@ autoplot.calibration_mspct <-
            na.rm = TRUE) {
 
     force(object.label)
-    object <- apply_normalization(object, norm)
     idfactor <- check_idfactor_arg(object, idfactor = idfactor, default = TRUE)
 
     # We trim the spectra to avoid unnecessary computations later
@@ -396,7 +449,8 @@ autoplot.calibration_mspct <-
     )
     if (is.calibration_spct(z) && "irrad.mult" %in% names(z)) {
       autoplot(object = z,
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
+               norm = norm,
                unit.out = unit.out,
                pc.out = pc.out,
                by.group = by.group,
@@ -409,7 +463,8 @@ autoplot.calibration_mspct <-
       z <- as.generic_spct(z)
       autoplot(object = z,
                y.name = paste("irrad.mult", plot.data, sep = "."),
-               range = NULL, # trimmed above
+               range = range, # trimmed above, needed for expansion
+               norm = norm,
                unit.out = unit.out,
                pc.out = pc.out,
                by.group = by.group,
